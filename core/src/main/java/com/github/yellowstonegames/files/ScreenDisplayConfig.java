@@ -1,9 +1,11 @@
 package com.github.yellowstonegames.files;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
-// import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration; // TODO - not sure why this import doesn't work
 
 import com.github.yellowstonegames.display.PanelSize;
+
+import java.util.Arrays;
 
 /**
  * Hardware specific settings for presenting the display.
@@ -28,7 +30,6 @@ public class ScreenDisplayConfig {
     public int windowHeight;
     public int windowXPosition = -1;
     public int windowYPosition = -1;
-    public String monitorIndex;
     public boolean maximized;
     public boolean fullscreen;
     public String monitorName;
@@ -132,9 +133,10 @@ public class ScreenDisplayConfig {
             contextSize = new PanelSize(secondaryGridWidth, contextGridHeight, secondaryCellWidth, secondaryCellHeight);
         }
 
-        if (monitorIndex == null || monitorIndex.isEmpty()  ) {
-            // Graphics.Monitor primary = Lwjgl3ApplicationConfiguration.getPrimaryMonitor();
-            // monitorIndex = primary.name;
+        Graphics.Monitor[] allMonitors = Gdx.app.getGraphics().getMonitors();
+        if (monitorName == null || monitorName.isEmpty() || !Arrays.stream(allMonitors).anyMatch(m -> monitorName.equals(m.name))) {
+            Graphics.Monitor primaryMonitor = Gdx.app.getGraphics().getMonitor();
+            monitorName = primaryMonitor.name;
         }
 
         // TODO - validate against minimum workable sizes where possible
