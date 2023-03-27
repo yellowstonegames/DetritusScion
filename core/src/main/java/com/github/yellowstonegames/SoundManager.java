@@ -1,5 +1,7 @@
 package com.github.yellowstonegames;
 
+import com.github.tommyettinger.ds.ObjectObjectOrderedMap;
+import com.github.tommyettinger.ds.ObjectOrderedSet;
 import com.github.tommyettinger.random.EnhancedRandom;
 import com.github.tommyettinger.random.WhiskerRandom;
 import com.github.yellowstonegames.files.Config;
@@ -24,13 +26,13 @@ public class SoundManager {
     private final EnhancedRandom rng = new WhiskerRandom(123);
 
     private boolean musicLoaded = false, soundfxLoaded = false;
-    private final Map<String, Sound> soundMap = new TreeMap<>();
-    private final Map<String, Music> musicMap = new TreeMap<>();
+    private final ObjectObjectOrderedMap<String, Sound> soundMap = new ObjectObjectOrderedMap<>();
+    private final ObjectObjectOrderedMap<String, Music> musicMap = new ObjectObjectOrderedMap<>();
     private Music nowPlaying;
-    private final OrderedSet<String> readableFileTypes = new OrderedSet<>();
+    private final ObjectOrderedSet<String> readableFileTypes;
 
     public SoundManager() {
-        readableFileTypes.addAll("wav", "mp3", "ogg");
+        readableFileTypes = ObjectOrderedSet.with("wav", "mp3", "ogg");
 
         if (Config.instance().audioConfig.soundfxOn) {
             System.out.println("Loading Sound FX");

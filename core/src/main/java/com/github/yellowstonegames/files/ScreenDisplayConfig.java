@@ -38,18 +38,18 @@ public class ScreenDisplayConfig {
     transient public int messageCount = -1;
 
     // Constants for when there is no config
-    transient private static final int mapGridWidth = 102;
-    transient private static final int mapGridHeight = 26;
-    transient private static final int mapCellWidth = 14;
-    transient private static final int mapCellHeight = 28;
+    private static final int mapGridWidth = 102;
+    private static final int mapGridHeight = 26;
+    private static final int mapCellWidth = 14;
+    private static final int mapCellHeight = 28;
 
-    transient private static final int messageGridHeight = 8;
+    private static final int messageGridHeight = 8;
 
-    transient private static final int secondaryGridWidth = 50;
-    transient private static final int infoGridHeight = 30;
-    transient private static final int contextGridHeight = 17;
-    transient private static final int secondaryCellWidth = 9;
-    transient private static final int secondaryCellHeight = 20;
+    private static final int secondaryGridWidth = 50;
+    private static final int infoGridHeight = 30;
+    private static final int contextGridHeight = 17;
+    private static final int secondaryCellWidth = 9;
+    private static final int secondaryCellHeight = 20;
     // End constants
 
     private void adjustPrimaryToMaxWidth() {
