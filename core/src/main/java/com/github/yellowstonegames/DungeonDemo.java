@@ -54,11 +54,6 @@ public class DungeonDemo extends ApplicationAdapter {
 
     private Config config;
 
-    public static final int GRID_WIDTH = 40;
-    public static final int GRID_HEIGHT = 25;
-    public static final int CELL_WIDTH = 32;
-    public static final int CELL_HEIGHT = 32;
-
     private static final int DEEP_OKLAB = describeOklab("dark dull cobalt");
     private static final int SHALLOW_OKLAB = describeOklab("dull denim");
     private static final int GRASS_OKLAB = describeOklab("duller dark green");
@@ -92,7 +87,10 @@ public class DungeonDemo extends ApplicationAdapter {
 //        Font font = KnownFonts.getAStarry().scaleTo(16, 16);
 //        Font font = KnownFonts.getAStarry().fitCell(24, 24, true);
 //        Font font = KnownFonts.getInconsolataMSDF().fitCell(24, 24, true);
-        gg = new GlyphGrid(font, GRID_WIDTH, GRID_HEIGHT, true);
+
+        int mapGridWidth = config.displayConfig.mapSize.gridWidth;
+        int mapGridHeight = config.displayConfig.mapSize.gridHeight;
+        gg = new GlyphGrid(font, mapGridWidth, mapGridHeight, true);
         //use Ă to test glyph height
         String name = Language.ANCIENT_EGYPTIAN.word(TimeUtils.millis(), true);
 //        Matcher matcher = Pattern.compile("([aeiou])").matcher(name);
@@ -114,15 +112,15 @@ public class DungeonDemo extends ApplicationAdapter {
             LineTools.pruneLines(dungeon, seen, prunedDungeon);
         };
 
-        dungeonProcessor = new DungeonProcessor(GRID_WIDTH, GRID_HEIGHT, random);
+        dungeonProcessor = new DungeonProcessor(mapGridWidth, mapGridHeight, random);
         dungeonProcessor.addWater(DungeonProcessor.ALL, 30);
         dungeonProcessor.addGrass(DungeonProcessor.ALL, 10);
         waves.setFractalType(Noise.RIDGED_MULTI);
-        light = new float[GRID_WIDTH][GRID_HEIGHT];
-        seen = new Region(GRID_WIDTH, GRID_HEIGHT);
-        blockage = new Region(GRID_WIDTH, GRID_HEIGHT);
-        prunedDungeon = new char[GRID_WIDTH][GRID_HEIGHT];
-        inView = new Region(GRID_WIDTH, GRID_HEIGHT);
+        light = new float[mapGridWidth][mapGridHeight];
+        seen = new Region(mapGridWidth, mapGridHeight);
+        blockage = new Region(mapGridWidth, mapGridHeight);
+        prunedDungeon = new char[mapGridWidth][mapGridHeight];
+        inView = new Region(mapGridWidth, mapGridHeight);
         input.setInputProcessor(new InputAdapter(){
             @Override
             public boolean keyDown(int keycode) {
@@ -199,7 +197,7 @@ public class DungeonDemo extends ApplicationAdapter {
         if(playerGlyph.hasActions()) return;
 
         final Coord next = Coord.get(Math.round(playerGlyph.getX() + way.deltaX), Math.round(playerGlyph.getY() + way.deltaY));
-        if(next.isWithin(GRID_WIDTH, GRID_HEIGHT) && bare[next.x][next.y] == '.') {
+        if(next.isWithin(config.displayConfig.mapSize.gridWidth, config.displayConfig.mapSize.gridHeight) && bare[next.x][next.y] == '.') {
             playerGlyph.addAction(MoreActions.slideTo(next.x, next.y, 0.2f, post));
         } else {
             playerGlyph.addAction(MoreActions.bump(way, 0.3f));
@@ -222,7 +220,7 @@ public class DungeonDemo extends ApplicationAdapter {
         seen.remake(inView.refill(FOV.reuseFOV(res, light, player.x, player.y, 6.5f, Radius.CIRCLE), 0.001f, 2f));
         blockage.remake(seen).not().fringe8way();
         LineTools.pruneLines(dungeon, seen, prunedDungeon);
-        gg.backgrounds = new int[GRID_WIDTH][GRID_HEIGHT];
+        gg.backgrounds = new int[config.displayConfig.mapSize.gridWidth][config.displayConfig.mapSize.gridHeight];
         gg.map.clear();
         if(playerToCursor == null)
             playerToCursor = new DijkstraMap(bare, Measurement.EUCLIDEAN);
@@ -240,8 +238,8 @@ public class DungeonDemo extends ApplicationAdapter {
                 limitToGamut(100,
                         (int) (TrigTools.sinTurns(modifiedTime * 0.2f) * 40f) + 128, (int) (TrigTools.cosTurns(modifiedTime * 0.2f) * 40f) + 128, 255));
         FOV.reuseFOV(res, light, playerX, playerY, LineWobble.wobble(12345, modifiedTime) * 2.5f + 4f, Radius.CIRCLE);
-        for (int y = 0; y < GRID_HEIGHT; y++) {
-            for (int x = 0; x < GRID_WIDTH; x++) {
+        for (int y = 0; y < config.displayConfig.mapSize.gridHeight; y++) {
+            for (int x = 0; x < config.displayConfig.mapSize.gridWidth; x++) {
                 if (inView.contains(x, y)) {
                     if(toCursor.contains(Coord.get(x, y))){
                         gg.backgrounds[x][y] = rainbow;
@@ -360,7 +358,12 @@ public class DungeonDemo extends ApplicationAdapter {
         camera.update();
         stage.act();
         stage.draw();
-        Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
+
+        if (config.debugConfig.debugActive && config.debugConfig.showFPS) {
+            Gdx.graphics.setTitle(Config.gameTitle + "  " + "FPS: " + Gdx.graphics.getFramesPerSecond());
+        } else {
+            Gdx.graphics.setTitle(Config.gameTitle);
+        }
     }
 
     @Override
@@ -369,8 +372,10 @@ public class DungeonDemo extends ApplicationAdapter {
         gg.resize(width, height);
     }
 
-    private boolean onGrid(int screenX, int screenY)
-    {
-        return screenX >= 0 && screenX < GRID_WIDTH && screenY >= 0 && screenY < GRID_HEIGHT;
+    private boolean onGrid(int screenX, int screenY) {
+        return screenX >= 0
+            && screenX < config.displayConfig.mapSize.gridWidth
+            && screenY >= 0
+            && screenY < config.displayConfig.mapSize.gridHeight;
     }
 }
