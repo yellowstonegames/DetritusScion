@@ -129,9 +129,6 @@ public class Lwjgl3Launcher {
         }
 
         appConfig.setTitle(Config.gameTitle);
-
-        appConfig.useVsync(config.displayConfig.vsync);
-
         appConfig.setWindowIcon(
             "images/icons/logo512.png",
             "images/icons/logo128.png",
@@ -139,6 +136,7 @@ public class Lwjgl3Launcher {
             "images/icons/logo32.png",
             "images/icons/logo16.png");
 
+        appConfig.useVsync(config.displayConfig.vsync);
         if (config.debugConfig.debugActive) {
             if (config.debugConfig.showFPS) {
                 appConfig.setForegroundFPS(Lwjgl3ApplicationConfiguration.getDisplayMode().refreshRate);
