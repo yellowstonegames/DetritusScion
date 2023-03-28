@@ -33,6 +33,7 @@ public class ScreenDisplayConfig {
     public boolean maximized;
     public boolean fullscreen;
     public String monitorName;
+    public boolean vsync = true;
 
     // In-flight values that shouldn't be saved to settings file
     transient public int messageCount = -1;
@@ -131,12 +132,6 @@ public class ScreenDisplayConfig {
 
         if (contextSize == null) {
             contextSize = new PanelSize(secondaryGridWidth, contextGridHeight, secondaryCellWidth, secondaryCellHeight);
-        }
-
-        Graphics.Monitor[] allMonitors = Gdx.app.getGraphics().getMonitors();
-        if (monitorName == null || monitorName.isEmpty() || !Arrays.stream(allMonitors).anyMatch(m -> monitorName.equals(m.name))) {
-            Graphics.Monitor primaryMonitor = Gdx.app.getGraphics().getMonitor();
-            monitorName = primaryMonitor.name;
         }
 
         // TODO - validate against minimum workable sizes where possible

@@ -5,7 +5,7 @@ package com.github.yellowstonegames.files;
  */
 public class Config {
 
-    public static final String gameTitle = "Epigon";
+    public static final String gameTitle = "Detritus Scion";
 
     private static final String configPath = "Settings";
     private static final String debugConfigFilename = "debug.json";

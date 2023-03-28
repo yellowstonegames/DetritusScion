@@ -7,4 +7,5 @@ public class DebugConfig {
 
     public boolean debugActive;
     public boolean odinView;
+    public boolean showFPS;
 }

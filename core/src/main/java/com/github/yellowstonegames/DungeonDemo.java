@@ -19,6 +19,7 @@ import com.github.tommyettinger.random.LineWobble;
 import com.github.tommyettinger.random.WhiskerRandom;
 import com.github.tommyettinger.textra.Font;
 import com.github.tommyettinger.textra.KnownFonts;
+import com.github.yellowstonegames.files.Config;
 import com.github.yellowstonegames.glyph.GlyphActor;
 import com.github.yellowstonegames.glyph.GlyphGrid;
 import com.github.yellowstonegames.glyph.MoreActions;
@@ -51,6 +52,8 @@ public class DungeonDemo extends ApplicationAdapter {
     private final Vector2 pos = new Vector2();
     private Runnable post;
 
+    private Config config;
+
     public static final int GRID_WIDTH = 40;
     public static final int GRID_HEIGHT = 25;
     public static final int CELL_WIDTH = 32;
@@ -65,6 +68,10 @@ public class DungeonDemo extends ApplicationAdapter {
     private static final int shallowText = toRGBA8888(offsetLightness(SHALLOW_OKLAB));
     private static final int grassText = toRGBA8888(offsetLightness(GRASS_OKLAB));
     private static final int stoneText = toRGBA8888(describeOklab("gray dullmost butter bronze"));
+
+    public DungeonDemo(Config config) {
+        this.config = config;
+    }
 
     @Override
     public void create() {
