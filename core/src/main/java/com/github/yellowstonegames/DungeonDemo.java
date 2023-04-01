@@ -36,6 +36,7 @@ import static com.github.yellowstonegames.core.DescriptiveColor.*;
 /**
  * This is from another demo, meant to serve as a basis for later changes.
  */
+@SuppressWarnings("ReassignedVariable") // A gift for you, Eben.
 public class DungeonDemo extends ApplicationAdapter {
     private Stage stage;
     private GlyphGrid gg;
