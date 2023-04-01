@@ -10,10 +10,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.utils.OrderedSet;
-
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Singleton class which controls sound output.
