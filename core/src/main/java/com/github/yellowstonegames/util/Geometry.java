@@ -6,10 +6,11 @@ import com.github.yellowstonegames.grid.BresenhamLine;
 import com.github.yellowstonegames.grid.Coord;
 import com.github.yellowstonegames.grid.Region;
 
+import java.util.Collection;
 import java.util.List;
 
 public class Geometry {
-    public static Coord findCentroid(List<Coord> coords) {
+    public static Coord findCentroid(Collection<Coord> coords) {
         int centroidX = 0;
         int centroidY = 0;
         for (Coord c : coords) {
@@ -23,10 +24,11 @@ public class Geometry {
 
     public static List<Coord> findInternalPolygonCorners(Region region, int distance, int pointLimit) {
         EnhancedRandom rng = new WhiskerRandom();
-        rng.setState(region.hash64());
+        rng.setSeed(region.hash64());
         Region points = region.copy();
         do {
-            points.remake(region).randomScatter(rng, distance, 12);
+            points.remake(region).randomScatter(rng, distance, 12)
+                .randomRegion(rng, pointLimit); // only if you want to give this a pointLimit
             if (points.isEmpty()) {
                 System.out.println("No points found for area");
             }
@@ -55,7 +57,7 @@ public class Geometry {
     public static boolean pointsInLine(Region points) {
         int sz = points.size();
         if (sz < 3) {
-            return true; // 2 or less points are considered to always be in a line
+            return true; // 2 or fewer points are considered to always be in a line
         }
 
         double angle = Coord.degrees(points.nth(0), points.nth(1));

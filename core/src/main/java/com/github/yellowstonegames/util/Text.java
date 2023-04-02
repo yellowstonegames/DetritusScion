@@ -2,6 +2,7 @@ package com.github.yellowstonegames.util;
 
 import com.badlogic.gdx.graphics.Color;
 
+import com.github.yellowstonegames.core.DigitTools;
 import regexodus.Matcher;
 import regexodus.Pattern;
 
@@ -73,9 +74,9 @@ public class Text {
             return "";
         }
 
-        String ret = "[#" + StringKit.hex(Color.rgba8888(color)) + "]" + text;
+        String ret = "[#" + DigitTools.hex(Color.rgba8888(color)) + "]" + text;
         if (defaultColor != null) {
-            ret += "[#" + StringKit.hex(Color.rgba8888(defaultColor)) + "]";
+            ret += "[#" + DigitTools.hex(Color.rgba8888(defaultColor)) + "]";
         } else {
             ret += "[]";
         }
@@ -84,7 +85,7 @@ public class Text {
     }
 
     public static String capitalizeFirst(final CharSequence original) {
-        if (original == null || original.length() <= 0) {
+        if (original == null || original.length() == 0) {
             return "";
         }
         sb.setLength(0);
@@ -97,7 +98,7 @@ public class Text {
     private static final StringBuilder sb = new StringBuilder(64);
 
     public static String caps(final CharSequence original) {
-        if (original == null || original.length() <= 0) {
+        if (original == null || original.length() == 0) {
             return "";
         }
         sb.setLength(0);
@@ -112,7 +113,7 @@ public class Text {
 
     public static String caps(final CharSequence original,
                               final CharSequence oldDelimiter) {
-        if (original == null || original.length() <= 0) {
+        if (original == null || original.length() == 0) {
             return "";
         }
         sb.setLength(0);
@@ -127,7 +128,7 @@ public class Text {
 
     public static String caps(final CharSequence original,
                               final CharSequence oldDelimiter, final CharSequence newDelimiter) {
-        if (original == null || original.length() <= 0) {
+        if (original == null || original.length() == 0) {
             return "";
         }
         sb.setLength(0);
@@ -142,7 +143,7 @@ public class Text {
 
     public static String lower(final CharSequence original,
                                final CharSequence oldDelimiter) {
-        if (original == null || original.length() <= 0) {
+        if (original == null || original.length() == 0) {
             return "";
         }
         sb.setLength(0);
@@ -192,10 +193,10 @@ public class Text {
     }
 
     // I don't think range is ever a non-integer currently...
-    public static String getRangeText(Weapon weapon) {
-        int intRange = (int) Math.round(weapon.rawWeapon.range) + 1;
-        return " " + Weapon.shapes.keyAt(weapon.shape) + " " + intRange;
-    }
+//    public static String getRangeText(Weapon weapon) {
+//        int intRange = (int) Math.round(weapon.rawWeapon.range) + 1;
+//        return " " + Weapon.shapes.keyAt(weapon.shape) + " " + intRange;
+//    }
 
     public static final String USABLE_CHARS =
         "  !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmn" +
