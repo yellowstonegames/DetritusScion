@@ -39,10 +39,10 @@ public class ScreenDisplayConfig {
     transient public int messageCount = -1;
 
     // Constants for when there is no config
-    private static final int mapGridWidth = 102;
-    private static final int mapGridHeight = 26;
-    private static final int mapCellWidth = 14;
-    private static final int mapCellHeight = 28;
+    private static final int mapGridWidth = 66;
+    private static final int mapGridHeight = 33;
+    private static final int mapCellWidth = 25;
+    private static final int mapCellHeight = 25;
 
     private static final int messageGridHeight = 8;
 

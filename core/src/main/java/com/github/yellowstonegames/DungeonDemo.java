@@ -31,6 +31,7 @@ import regexodus.Pattern;
 
 import static com.badlogic.gdx.Gdx.input;
 import static com.badlogic.gdx.Input.Keys.*;
+import static com.github.tommyettinger.textra.Font.DistanceFieldType.STANDARD;
 import static com.github.yellowstonegames.core.DescriptiveColor.*;
 
 /**
@@ -76,7 +77,10 @@ public class DungeonDemo extends ApplicationAdapter {
         Gdx.app.log("SEED", "Initial seed is " + seed);
         EnhancedRandom random = new WhiskerRandom(seed);
         stage = new Stage();
-        Font font = KnownFonts.getCascadiaMonoMSDF().scaleTo(15f, 25f);
+        Font font = new Font("Iosevka-Slab-standard.fnt", "Iosevka-Slab-standard.png", STANDARD, 0f, 0f, 0f, 0f, true)
+            .scaleTo(15f, 24f).setTextureFilter().setName("Iosevka Slab");
+//        Font font = KnownFonts.getCascadiaMonoMSDF().scaleTo(15f, 25f);
+
 //        font = KnownFonts.getCascadiaMono().scale(0.5f, 0.5f);
 //        font = KnownFonts.getIosevka().scale(0.75f, 0.75f);
 //        Font font = KnownFonts.getCascadiaMono();
