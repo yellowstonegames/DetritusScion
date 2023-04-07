@@ -212,14 +212,18 @@ public class DungeonDemo extends ApplicationAdapter {
         final Coord next = Coord.get(Math.round(playerGlyph.getX() + way.deltaX), Math.round(playerGlyph.getY() + way.deltaY));
         if(next.isWithin(config.displayConfig.mapSize.gridWidth, config.displayConfig.mapSize.gridHeight) && bare[next.x][next.y] == '.') {
             playerGlyph.addAction(MoreActions.slideTo(next.x, next.y, 0.2f, post));
+            if(enemies.containsKey(next)){
+                gg.burst(
+                        next.x + 0.5f, // not sure why it needs this
+                        next.y,
+                        1.5f, 7, ',',
+                        0x992200FF, 0x99220000,
+                        0f, 120f, 1f);
+                gg.removeActor(enemies.remove(next));
+
+            }
         } else {
             playerGlyph.addAction(MoreActions.bump(way, 0.3f));
-            gg.burst(
-                (playerGlyph.getX() + next.x + 1) * 0.5f,
-                (playerGlyph.getY() + next.y + 1) * 0.5f,
-                1.5f, 7, ',',
-                0x992200FF, 0x99220000,
-                0f, 120f, 1f);
         }
     }
 
