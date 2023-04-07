@@ -20,6 +20,8 @@ import com.github.tommyettinger.random.LineWobble;
 import com.github.tommyettinger.random.WhiskerRandom;
 import com.github.tommyettinger.textra.Font;
 import com.github.tommyettinger.textra.KnownFonts;
+import com.github.yellowstonegames.core.DescriptiveColor;
+import com.github.yellowstonegames.core.FullPalette;
 import com.github.yellowstonegames.files.Config;
 import com.github.yellowstonegames.glyph.GlyphActor;
 import com.github.yellowstonegames.glyph.GlyphGrid;
@@ -48,6 +50,7 @@ public class DungeonDemo extends ApplicationAdapter {
     private Region seen, inView, blockage;
     private final Noise waves = new Noise(123, 0.5f, Noise.FOAM, 1);
     private GlyphActor playerGlyph;
+    private CoordObjectOrderedMap<GlyphActor> enemies;
     private DijkstraMap playerToCursor;
     private final ObjectList<Coord> toCursor = new ObjectList<>(100);
     private final ObjectList<Coord> awaitedMoves = new ObjectList<>(50);
@@ -78,8 +81,8 @@ public class DungeonDemo extends ApplicationAdapter {
         Gdx.app.log("SEED", "Initial seed is " + seed);
         EnhancedRandom random = new WhiskerRandom(seed);
         stage = new Stage();
-//        Font font = new Font("Iosevka-Slab-standard.fnt", "Iosevka-Slab-standard.png", STANDARD, 0f, 0f, 0f, 0f, true)
-//            .scaleTo(15f, 24f).setTextureFilter().setName("Iosevka Slab");
+        Font font = new Font("Iosevka-Slab-standard.fnt", "Iosevka-Slab-standard.png", STANDARD, 0f, 0f, 0f, 0f, true)
+            .scaleTo(15f, 24f).setTextureFilter().setName("Iosevka Slab");
 //        Font font = KnownFonts.getCascadiaMonoMSDF().scaleTo(15f, 25f);
 
 //        font = KnownFonts.getCascadiaMono().scale(0.5f, 0.5f);
@@ -93,7 +96,7 @@ public class DungeonDemo extends ApplicationAdapter {
 //        Font font = KnownFonts.getAStarry().scaleTo(16, 16);
 //        Font font = KnownFonts.getAStarry().fitCell(24, 24, true);
 //        Font font = KnownFonts.getInconsolataMSDF().fitCell(24, 24, true);
-        Font font = KnownFonts.getKingthingsPetrock().scaleTo(19, 25);
+//        Font font = KnownFonts.getKingthingsPetrock().scaleTo(19, 25);
         ShaderProgram shader = new ShaderProgram(Gdx.files.internal("shaders/vertex.glsl"),
                 Gdx.files.internal("shaders/colorblindness-cor.frag.glsl"));
 //                Gdx.files.internal("shaders/colorblindness-sim.frag.glsl"));
@@ -107,23 +110,19 @@ public class DungeonDemo extends ApplicationAdapter {
         gg = new GlyphGrid(font, mapGridWidth, mapGridHeight, true);
         //use Ă to test glyph height
         String name = Language.ANCIENT_EGYPTIAN.word(TimeUtils.millis(), true);
-//        Matcher matcher = Pattern.compile("([aeiou])").matcher(name);
-//        StringBuffer buffer = new StringBuffer(64);
-//        if(matcher.find())
-//            matcher.appendReplacement(buffer, "@").appendTail(buffer);
-//        else
-//            buffer.append('@');
-        String replaced = Pattern.compile("([aeiou])").replacer("@").replace(name, 1);
-        if(name.equals(replaced))
-            replaced += "@";
+//        String replaced = Pattern.compile("([aeiou])").replacer("@").replace(name, 1);
+//        if(name.equals(replaced))
+//            replaced += "@";
 
-        playerGlyph = new GlyphActor(replaced.charAt(replaced.length()-1), "[red orange]", gg.getFont());
+        playerGlyph = new GlyphActor('@', "[red orange]", gg.getFont());
         gg.addActor(playerGlyph);
+        enemies = new CoordObjectOrderedMap<>(26);
         post = () -> {
             seen.or(inView.refill(FOV.reuseFOV(res, light,
                     Math.round(playerGlyph.getX()), Math.round(playerGlyph.getY()), 6.5f, Radius.CIRCLE), 0.001f, 999f));
             blockage.remake(seen).not().fringe8way();
             LineTools.pruneLines(dungeon, seen, prunedDungeon);
+            gg.setVisibilities(inView::contains);
         };
 
         dungeonProcessor = new DungeonProcessor(mapGridWidth, mapGridHeight, random);
@@ -229,11 +228,21 @@ public class DungeonDemo extends ApplicationAdapter {
         bare = dungeonProcessor.getBarePlaceGrid();
         ArrayTools.insert(dungeon, prunedDungeon, 0, 0);
         res = FOV.generateSimpleResistances(bare);
-        Coord player = new Region(bare, '.').singleRandom(dungeonProcessor.rng);
+        Region floors = new Region(bare, '.');
+        Coord player = floors.singleRandom(dungeonProcessor.rng);
         playerGlyph.setPosition(player.x, player.y);
+        floors.remove(player);
+        Coord[] selected = floors.separatedBlue(0.125f, 26);
+        for (int i = 0; i < 26 && i < selected.length; i++) {
+            GlyphActor enemy = new GlyphActor((char)('A'+i), DescriptiveColor.toRGBA8888(FullPalette.randomColorWheel(dungeonProcessor.rng)), gg.getFont());
+            enemy.setPosition(selected[i].x, selected[i].y);
+            enemies.put(selected[i], enemy);
+            gg.addActor(enemy);
+        }
         seen.remake(inView.refill(FOV.reuseFOV(res, light, player.x, player.y, 6.5f, Radius.CIRCLE), 0.001f, 2f));
         blockage.remake(seen).not().fringe8way();
         LineTools.pruneLines(dungeon, seen, prunedDungeon);
+        gg.setVisibilities(inView::contains);
         gg.backgrounds = new int[config.displayConfig.mapSize.gridWidth][config.displayConfig.mapSize.gridHeight];
         gg.map.clear();
         if(playerToCursor == null)
