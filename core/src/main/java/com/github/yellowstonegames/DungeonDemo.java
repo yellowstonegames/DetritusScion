@@ -94,7 +94,8 @@ public class DungeonDemo extends ApplicationAdapter {
 //        Font font = KnownFonts.getAStarry().fitCell(24, 24, true);
 //        Font font = KnownFonts.getInconsolataMSDF().fitCell(24, 24, true);
         ShaderProgram shader = new ShaderProgram(Gdx.files.internal("shaders/vertex.glsl"),
-                Gdx.files.internal("shaders/colorblindness-sim.frag.glsl"));
+                Gdx.files.internal("shaders/colorblindness-cor.frag.glsl"));
+//                Gdx.files.internal("shaders/colorblindness-sim.frag.glsl"));
         if(!shader.isCompiled())
             System.out.println(shader.getLog());
         stage.getBatch().setShader(shader);
