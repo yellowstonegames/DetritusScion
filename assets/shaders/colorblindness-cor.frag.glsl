@@ -10,7 +10,9 @@ uniform sampler2D u_texture;
 
 // Daltonize (source http://www.daltonize.org/search/label/Daltonize)
 // Modified to attempt to correct colors so people with color blindness can recognize them.
+// Gist by Jonathan Dickinson, from https://gist.github.com/jcdickinson/580b7fb5cc145cee8740
 
+// 0 is no change (full color), 1 corrects for protanopia, 2 corrects for deuteranopia, 3 corrects for tritanopia.
 #define mode 0
 
 vec4 correct(vec4 color)

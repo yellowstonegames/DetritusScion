@@ -10,7 +10,9 @@ uniform sampler2D u_texture;
 
 // Daltonize (source http://www.daltonize.org/search/label/Daltonize)
 // Modified to simulate color blindness.
+// Gist by Jonathan Dickinson, from https://gist.github.com/jcdickinson/580b7fb5cc145cee8740
 
+// 0 is no change (full color), 1 simulates protanopia, 2 simulates deuteranopia, 3 simulates tritanopia.
 #define mode 0
 
 vec4 simulate(vec4 color)

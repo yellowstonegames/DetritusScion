@@ -78,8 +78,8 @@ public class DungeonDemo extends ApplicationAdapter {
         Gdx.app.log("SEED", "Initial seed is " + seed);
         EnhancedRandom random = new WhiskerRandom(seed);
         stage = new Stage();
-        Font font = new Font("Iosevka-Slab-standard.fnt", "Iosevka-Slab-standard.png", STANDARD, 0f, 0f, 0f, 0f, true)
-            .scaleTo(15f, 24f).setTextureFilter().setName("Iosevka Slab");
+//        Font font = new Font("Iosevka-Slab-standard.fnt", "Iosevka-Slab-standard.png", STANDARD, 0f, 0f, 0f, 0f, true)
+//            .scaleTo(15f, 24f).setTextureFilter().setName("Iosevka Slab");
 //        Font font = KnownFonts.getCascadiaMonoMSDF().scaleTo(15f, 25f);
 
 //        font = KnownFonts.getCascadiaMono().scale(0.5f, 0.5f);
@@ -93,6 +93,7 @@ public class DungeonDemo extends ApplicationAdapter {
 //        Font font = KnownFonts.getAStarry().scaleTo(16, 16);
 //        Font font = KnownFonts.getAStarry().fitCell(24, 24, true);
 //        Font font = KnownFonts.getInconsolataMSDF().fitCell(24, 24, true);
+        Font font = KnownFonts.getKingthingsPetrock().scaleTo(19, 25);
         ShaderProgram shader = new ShaderProgram(Gdx.files.internal("shaders/vertex.glsl"),
                 Gdx.files.internal("shaders/colorblindness-cor.frag.glsl"));
 //                Gdx.files.internal("shaders/colorblindness-sim.frag.glsl"));
