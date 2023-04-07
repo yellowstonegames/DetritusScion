@@ -6,6 +6,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -92,6 +93,12 @@ public class DungeonDemo extends ApplicationAdapter {
 //        Font font = KnownFonts.getAStarry().scaleTo(16, 16);
 //        Font font = KnownFonts.getAStarry().fitCell(24, 24, true);
 //        Font font = KnownFonts.getInconsolataMSDF().fitCell(24, 24, true);
+        ShaderProgram shader = new ShaderProgram(Gdx.files.internal("shaders/vertex.glsl"),
+                Gdx.files.internal("shaders/colorblindness-sim.frag.glsl"));
+        if(!shader.isCompiled())
+            System.out.println(shader.getLog());
+        stage.getBatch().setShader(shader);
+        font.shader = shader;
 
         int mapGridWidth = config.displayConfig.mapSize.gridWidth;
         int mapGridHeight = config.displayConfig.mapSize.gridHeight;
@@ -322,6 +329,7 @@ public class DungeonDemo extends ApplicationAdapter {
 
     @Override
     public void render() {
+//        stage.getBatch().getShader().setUniformi("u_mode", 1);
         recolor();
         handleHeldKeys();
 

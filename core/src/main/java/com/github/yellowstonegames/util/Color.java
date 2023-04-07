@@ -1,5 +1,6 @@
 package com.github.yellowstonegames.util;
 
+import com.github.tommyettinger.random.EnhancedRandom;
 import com.github.yellowstonegames.core.DescriptiveColor;
 import com.github.yellowstonegames.core.FullPalette;
 
@@ -7,7 +8,7 @@ import com.github.yellowstonegames.core.FullPalette;
  * Try to use int colors, either Oklab (using the methods in DescriptiveColor to edit them) or RGBA.
  */
 public class Color {
-    public static int[][] randomColors(int innerSize, RNG rng) {
+    public static int[][] randomColors(int innerSize, EnhancedRandom rng) {
     int[][] cs = new int[8][innerSize];
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < innerSize; j++) {
