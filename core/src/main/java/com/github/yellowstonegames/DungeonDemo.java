@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.github.tommyettinger.digital.ArrayTools;
@@ -81,8 +82,9 @@ public class DungeonDemo extends ApplicationAdapter {
         Gdx.app.log("SEED", "Initial seed is " + seed);
         EnhancedRandom random = new WhiskerRandom(seed);
         stage = new Stage();
-        Font font = new Font("Iosevka-Slab-standard.fnt", "Iosevka-Slab-standard.png", STANDARD, 0f, 0f, 0f, 0f, true)
-            .scaleTo(15f, 24f).setTextureFilter().setName("Iosevka Slab");
+        Font font = KnownFonts.getIosevkaSlab();
+//        Font font = new Font("Iosevka-Slab-standard.fnt", "Iosevka-Slab-standard.png", STANDARD, 0f, 0f, 0f, 0f, true)
+//            .scaleTo(15f, 24f).setTextureFilter().setName("Iosevka Slab");
 //        Font font = KnownFonts.getCascadiaMonoMSDF().scaleTo(15f, 25f);
 
 //        font = KnownFonts.getCascadiaMono().scale(0.5f, 0.5f);
@@ -347,6 +349,9 @@ public class DungeonDemo extends ApplicationAdapter {
 //        stage.getBatch().getShader().setUniformi("u_mode", 1);
         recolor();
         handleHeldKeys();
+        for (int i = 0; i < enemies.size(); i++) {
+            enemies.getAt(i).setRotation((System.currentTimeMillis() & 0xFFFFFL) * 0.25f);
+        }
 
         if(!gg.areChildrenActing() && !awaitedMoves.isEmpty())
         {

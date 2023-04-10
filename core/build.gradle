@@ -15,5 +15,6 @@ dependencies {
   api "com.github.yellowstonegames.SquidSquad:SquidGrid:$squidGridVersion"
   api "com.github.yellowstonegames.SquidSquad:SquidPath:$squidPathVersion"
   api "com.github.yellowstonegames.SquidSquad:SquidPlace:$squidPlaceVersion"
+  api "com.github.yellowstonegames.SquidSquad:SquidPress:$squidPressVersion"
   api "com.github.yellowstonegames.SquidSquad:SquidText:$squidTextVersion"
 }
