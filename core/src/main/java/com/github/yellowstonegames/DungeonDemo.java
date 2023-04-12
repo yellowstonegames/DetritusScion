@@ -215,7 +215,7 @@ public class DungeonDemo extends ApplicationAdapter {
             player.glyph.addAction(MoreActions.slideTo(next.x, next.y, 0.2f, post));
             if(enemies.containsKey(next)){
                 gg.burst(
-                        next.x + 0.5f, // not sure why it needs this
+                        next.x,
                         next.y,
                         1.5f, 7, ',',
                         0x992200FF, 0x99220000,
