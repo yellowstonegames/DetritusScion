@@ -17,4 +17,5 @@ dependencies {
   api "com.github.yellowstonegames.SquidSquad:SquidPlace:$squidPlaceVersion"
   api "com.github.yellowstonegames.SquidSquad:SquidPress:$squidPressVersion"
   api "com.github.yellowstonegames.SquidSquad:SquidText:$squidTextVersion"
+  api "com.github.tommyettinger.gdx-graalhelper:gdx-svmhelper:$graalHelperVersion"
 }

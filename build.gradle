@@ -17,13 +17,19 @@ buildscript {
 allprojects {
   apply plugin: 'eclipse'
   apply plugin: 'idea'
+  ext {
+    graalvmVersion = '22.3.1'
+  }
 }
 
 configure(subprojects) {
   apply plugin: 'java-library'
-  sourceCompatibility = 19
+  sourceCompatibility = 11
   compileJava {
     options.incremental = true
+  }
+  dependencies {
+    compileOnly "org.graalvm.nativeimage:svm:$graalvmVersion"
   }
 }
 

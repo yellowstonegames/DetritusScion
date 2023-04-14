@@ -48,17 +48,17 @@ public class Text {
         for (Coord c : coords) {
             if (c.x == 0) {
                 switch (c.y) {
-                    case 0 -> b += 0x1;
-                    case 1 -> b += 0x2;
-                    case 2 -> b += 0x4;
-                    case 3 -> b += 0x40;
+                    case 0: b += 0x1; break;
+                    case 1: b += 0x2; break;
+                    case 2: b += 0x4; break;
+                    case 3: b += 0x40; break;
                 }
             } else if (c.x == 1) {
                 switch (c.y) {
-                    case 0 -> b += 0x8;
-                    case 1 -> b += 0x10;
-                    case 2 -> b += 0x20;
-                    case 3 -> b += 0x80;
+                    case 0: b += 0x8; break;
+                    case 1: b += 0x10; break;
+                    case 2: b += 0x20; break;
+                    case 3: b += 0x80; break;
                 }
             }
         }
@@ -161,13 +161,22 @@ public class Text {
      * character from the set returned will work nicely.
      */
     public static String linesFor(Direction dir) {
-        return switch (dir) {
-            case DOWN, UP -> "|｜∣ǀ";
-            case DOWN_LEFT, UP_RIGHT -> "/／╱⁄";
-            case DOWN_RIGHT, UP_LEFT -> "\\＼╲";
-            case LEFT, RIGHT -> "-－−‐‑‒–—―";
-            default -> "+＋✚✕✖✗";
-        };
+        switch (dir) {
+            case DOWN:
+            case UP:
+                return "|｜∣ǀ";
+            case DOWN_LEFT:
+            case UP_RIGHT:
+                return "/／╱⁄";
+            case DOWN_RIGHT:
+            case UP_LEFT:
+                return "\\＼╲";
+            case LEFT:
+            case RIGHT:
+                return "-－−‐‑‒–—―";
+            default:
+                return "+＋✚✕✖✗";
+        }
     }
 
     //String s = "\u253c \u251c \u2524 \u2534 \u252c \u250c \u2510 \u2514 \u2518 \u2502 \u2500";
@@ -179,17 +188,26 @@ public class Text {
      * character from the set returned will work nicely.
      */
     public static String arrowsFor(Direction dir) {
-        return switch (dir) {
-            case DOWN -> "↓↡";
-            case DOWN_LEFT -> "↙";
-            case DOWN_RIGHT -> "↘";
-            case LEFT -> "←↞↢";
-            case UP -> "↑↟";
-            case UP_LEFT -> "↖";
-            case UP_RIGHT -> "↗";
-            case RIGHT -> "→↠↣";
-            default -> "⊙⊛";
-        };
+        switch (dir) {
+            case DOWN:
+                return "↓↡";
+            case DOWN_LEFT:
+                return "↙";
+            case DOWN_RIGHT:
+                return "↘";
+            case LEFT:
+                return "←↞↢";
+            case UP:
+                return "↑↟";
+            case UP_LEFT:
+                return "↖";
+            case UP_RIGHT:
+                return "↗";
+            case RIGHT:
+                return "→↠↣";
+            default:
+                return "⊙⊛";
+        }
     }
 
     // I don't think range is ever a non-integer currently...
