@@ -26,6 +26,7 @@ dependencies {
   implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
   implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
   implementation project(':core')
+  implementation "com.github.tommyettinger.gdx-graalhelper:gdx-svmhelper-backend-lwjgl3:$graalHelperVersion"
 }
 
 def os = System.properties['os.name'].toLowerCase()
@@ -42,7 +43,7 @@ run {
 
 jar {
 // sets the name of the .jar file this produces to the name of the game or app.
-  archiveBaseName.set(appName)
+  archiveFileName.set(appName + ".jar")
 // using 'lib' instead of the default 'libs' appears to be needed by jpackageimage.
   destinationDirectory = file("$project.buildDir/lib")
 // the duplicatesStrategy matters starting in Gradle 7.0; this setting works.

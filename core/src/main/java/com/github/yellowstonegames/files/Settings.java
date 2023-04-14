@@ -7,6 +7,9 @@ import com.github.tommyettinger.digital.Hasher;
  */
 public class Settings {
 
+    public Settings() {
+    }
+
     public final String[] advice = new String[]{
         "If you ever want to reset your settings, you can simply delete this file.",
         "If the seed can be read as a long, it will be. Otherwise it will be read as a string."

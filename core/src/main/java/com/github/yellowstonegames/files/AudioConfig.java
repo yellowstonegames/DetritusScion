@@ -7,4 +7,5 @@ public class AudioConfig {
     public float soundfxVolume = 1f;
     public float musicVolume = 1f;
 
+    public AudioConfig() {}
 }

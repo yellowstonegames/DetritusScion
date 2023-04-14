@@ -53,6 +53,10 @@ public class ScreenDisplayConfig {
     private static final int secondaryCellHeight = 20;
     // End constants
 
+    public ScreenDisplayConfig() {
+
+    }
+
     private void adjustPrimaryToMaxWidth() {
         if (mapSize.pixelWidth() == messageSize.pixelWidth()) {
             return; // no adjustments needed
