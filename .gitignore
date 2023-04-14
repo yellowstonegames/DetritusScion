@@ -153,5 +153,5 @@ Thumbs.db
 *.*#
 *#*#
 
-/graal-native/
+/graal-native/*
 !/graal-native/build_native.bat
