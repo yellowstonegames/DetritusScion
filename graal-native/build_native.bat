@@ -3,6 +3,5 @@ C:\d\jvm\graal11\bin\native-image.cmd ^
 -H:+ReportExceptionStackTraces ^
 --report-unsupported-elements-at-runtime ^
 --no-fallback ^
--H:IncludeResources=".*.dll" ^
--Dorg.lwjgl.librarypath=. ^
--jar DetritusScion.jar 
+-H:IncludeResources=".*.*" ^
+-jar DetritusScion.jar

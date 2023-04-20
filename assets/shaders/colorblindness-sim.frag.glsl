@@ -60,7 +60,7 @@ vec4 simulate(vec4 color)
 	
 	// Shift colors towards visible spectrum (apply error modifications)
 	// vec4 correction;
-	// correction.r = 0; // (error.r * 0.0) + (error.g * 0.0) + (error.b * 0.0);
+	// correction.r = 0.0; // (error.r * 0.0) + (error.g * 0.0) + (error.b * 0.0);
 	// correction.g = (error.r * 0.7) + (error.g * 1.0); // + (error.b * 0.0);
 	// correction.b = (error.r * 0.7) + (error.b * 1.0); // + (error.g * 0.0);
 	
