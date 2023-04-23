@@ -43,10 +43,10 @@ public class SoundManager {
 
     private void loadSoundFXResources() {
 
-        for (FileHandle f : Gdx.files.internal("sound fx").list()) {
+        for (FileHandle f : Gdx.files.internal("sfx").list()) {
             String name = f.name();
             if (readableFileTypes.contains(name.substring(name.lastIndexOf('.') + 1))) {
-                Sound sound = Gdx.audio.newSound(Gdx.files.internal("sound fx/" + name));
+                Sound sound = Gdx.audio.newSound(Gdx.files.internal("sfx/" + name));
                 soundMap.put(f.nameWithoutExtension(), sound);
             }
         }
@@ -56,7 +56,7 @@ public class SoundManager {
 
     private void unloadSoundFXResources() {
         if (!soundfxLoaded) {
-            return; //no sound fx loaded so nothing to unload
+            return; //no sfx loaded so nothing to unload
         }
 
         for (Sound s : soundMap.values()) {
@@ -68,7 +68,7 @@ public class SoundManager {
     }
 
     /**
-     * Plays the sound fx associated with the provided key. The key is the filename of the sound
+     * Plays the sfx associated with the provided key. The key is the filename of the sound
      * without its extension.
      *
      * @param key
