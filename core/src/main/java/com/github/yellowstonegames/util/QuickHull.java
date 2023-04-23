@@ -1,5 +1,7 @@
 package com.github.yellowstonegames.util;
 
+import com.github.tommyettinger.digital.MathTools;
+import com.github.tommyettinger.ds.ObjectList;
 import com.github.yellowstonegames.grid.Coord;
 
 import java.util.ArrayList;
@@ -9,8 +11,8 @@ import java.util.List;
 /**
  * QuickHull is an algorithm to compute the convex hull of a set of points. The time complexity is O(n^2) in the worst
  * case and O(n*log n) on average.
- *
- * Based on https://github.com/Thurion/algolab and modified to work in the SquidLib ecosystem
+ * <br>
+ * Based on <a href="https://github.com/Thurion/algolab">algolab</a> and modified to work in the SquidSquad ecosystem.
  */
 public class QuickHull {
 
@@ -20,8 +22,8 @@ public class QuickHull {
      * @param inputPoints The points to find a hull around
      * @return A list of points which form the convex hull of the given list of points.
      */
-    public List<Coord> executeQuickHull(Coord[] inputPoints) {
-        List<Coord> convexHull = new ArrayList<>();
+    public ObjectList<Coord> executeQuickHull(Coord[] inputPoints) {
+        ObjectList<Coord> convexHull = new ObjectList<>();
         if (inputPoints == null || inputPoints.length < 1) {
             throw new IllegalArgumentException("Cannot compute convex hull of zero points.");
         }
@@ -38,8 +40,8 @@ public class QuickHull {
         }
 
         // divide the set into two halves
-        List<Coord> leftOfLine = new LinkedList<>();
-        List<Coord> rightOfLine = new LinkedList<>();
+        ObjectList<Coord> leftOfLine = new ObjectList<>();
+        ObjectList<Coord> rightOfLine = new ObjectList<>();
         for (Coord point : inputPoints) {
             if (point.equals(rightmostPoint) || point.equals(leftmostPoint)) {
                 continue;
@@ -53,7 +55,7 @@ public class QuickHull {
         }
 
         convexHull.add(leftmostPoint);
-        List<Coord> hull = divide(leftOfLine, leftmostPoint, rightmostPoint);
+        ObjectList<Coord> hull = divide(leftOfLine, leftmostPoint, rightmostPoint);
         convexHull.addAll(hull);
         convexHull.add(rightmostPoint);
 
@@ -64,13 +66,14 @@ public class QuickHull {
 
     /**
      * Calculate the cross product of vectors origin->p2 and origin->this.
+     * Because origin, p1, and p2 are all integer-component Coord items, this returns an int.
      *
      * @param origin The point in which both vectors originate
      * @param p2 The point that determines the second vector.
      * @return 0 if both points are collinear, a value > 0 if this point lies left of vector origin->p2 (when standing
      * in origin looking at p2), a value < 0 if this point lies right of vector origin->p2.
      */
-    private double calcCrossProductWithOrigin(Coord origin, Coord p1, Coord p2) {
+    private int calcCrossProductWithOrigin(Coord origin, Coord p1, Coord p2) {
         return (p2.x - origin.x) * (p1.y - origin.y)
             - (p2.y - origin.y) * (p1.x - origin.x);
     }
@@ -100,7 +103,7 @@ public class QuickHull {
      */
     private double getDistanceToLine(Coord point, Coord start, Coord end) {
         return Math.abs((end.getX() - start.getX()) * (start.getY() - point.y) - (start.getX() - point.x) * (end.getY() - start.getY()))
-            / Math.sqrt(Math.pow(end.getX() - start.getX(), 2) + Math.pow(end.getY() - start.getY(), 2));
+            / Math.sqrt(MathTools.square(end.getX() - start.getX()) + MathTools.square(end.getY() - start.getY()));
     }
 
     /**
@@ -112,22 +115,22 @@ public class QuickHull {
      * @param bottom The "bottom" point for splitting left of
      * @return a List of points to the "left" of the line p1-p2.
      * If the list is empty, the line p1-p2 is the convex hull.
-     * If p1 si to the right of p2, this vertically mirrors the list, causing the "left" that's returned to be the "right" of the original list.
+     * If p1 is to the right of p2, this vertically mirrors the list, causing the "left" that's returned to be the "right" of the original list.
      */
-    private List<Coord> divide(List<Coord> points, Coord top, Coord bottom) {
+    private ObjectList<Coord> divide(ObjectList<Coord> points, Coord top, Coord bottom) {
 
-        List<Coord> hull = new ArrayList<>();
+        ObjectList<Coord> hull = new ObjectList<>();
 
         if (points.isEmpty()) {
             return hull;
         } else if (points.size() == 1) {
-            hull.add(points.get(0));
+            hull.add(points.first());
             return hull;
         }
 
         Coord maxDistancePoint = points.get(0);
-        List<Coord> l1 = new LinkedList<>();
-        List<Coord> l2 = new LinkedList<>();
+        ObjectList<Coord> l1 = new ObjectList<>();
+        ObjectList<Coord> l2 = new ObjectList<>();
         double distance = 0.0;
         for (Coord point : points) {
             if (getDistanceToLine(point, top, bottom) > distance) {
@@ -148,7 +151,7 @@ public class QuickHull {
 
         points.clear();
 
-        List<Coord> hullPart = divide(l1, top, maxDistancePoint);
+        ObjectList<Coord> hullPart = divide(l1, top, maxDistancePoint);
         hull.addAll(hullPart);
         hull.add(maxDistancePoint);
         hullPart = divide(l2, maxDistancePoint, bottom);

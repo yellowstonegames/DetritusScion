@@ -84,6 +84,41 @@ public class Text {
         return ret;
     }
 
+    /**
+     * Produces a markup String that will use the given RGBA8888 color for the text, and then reset it. This always
+     * resets to the default clear color, which is usually white.
+     * @param text a non-null String to write in the given color
+     * @param color an RGBA8888 color, as an int; 256 is a placeholder that means "write nothing"
+     * @return a markup String for the colored version of text
+     */
+    public static String colorize(String text, int color) {
+        return colorize(text, color, 256);
+    }
+
+    /**
+     * Produces a markup String that will use the given RGBA8888 color for the text, and then reset it to the given
+     * RGBA8888 resetColor. If color is 256, nothing will be written. If defaultColor is 256, the default clear color
+     * (typically white) will be used for the reset.
+     * @param text a non-null String to write in the given color
+     * @param color an RGBA8888 color, as an int; 256 is a placeholder that means "write nothing"
+     * @param resetColor an RGBA8888 color, as an int; 256 is a placeholder that means "reset to the default"
+     * @return a markup String for the colored version of text
+     */
+    public static String colorize(String text, int color, int resetColor) {
+        if (text == null || text.isEmpty() || color == 256) {
+            return "";
+        }
+
+        String ret = "[#" + DigitTools.hex(color) + "]" + text;
+        if (resetColor != 256) {
+            ret += "[#" + DigitTools.hex(resetColor) + "]";
+        } else {
+            ret += "[]";
+        }
+
+        return ret;
+    }
+
     public static String capitalizeFirst(final CharSequence original) {
         if (original == null || original.length() == 0) {
             return "";

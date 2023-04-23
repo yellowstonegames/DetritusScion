@@ -59,6 +59,21 @@ public class RNG extends WhiskerRandom {
     }
 
     /**
+     * Returns a value from a uniform distribution from min (inclusive) to max
+     * (exclusive). If min is greater than max, min is still inclusive, and max
+     * is still exclusive.
+     * <br>
+     * This is an alias for {@link #nextDouble(double, double)}.
+     *
+     * @param min the minimum bound on the return value (inclusive)
+     * @param max the maximum bound on the return value (exclusive)
+     * @return the found value
+     */
+    public float between(float min, float max) {
+        return nextFloat(min, max);
+    }
+
+    /**
      * Returns a value between min (inclusive) and max (exclusive).
      * <p>
      * The inclusive and exclusive behavior is to match the behavior of the
