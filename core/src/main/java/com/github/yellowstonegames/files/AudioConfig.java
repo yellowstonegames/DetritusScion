@@ -1,8 +1,8 @@
 package com.github.yellowstonegames.files;
 
-/**
- * User audio preferences for sound effects and music.
- */
+import com.anyicomplex.gdx.svm.CollectForReflection;
+
+@CollectForReflection
 public class AudioConfig {
 
     public boolean soundfxOn = true;
