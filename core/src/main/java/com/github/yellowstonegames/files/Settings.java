@@ -1,12 +1,10 @@
 package com.github.yellowstonegames.files;
 
-import com.anyicomplex.gdx.svm.CollectForReflection;
 import com.github.tommyettinger.digital.Hasher;
 
 /**
  * User accessible settings, should be displayed in-game.
  */
-@CollectForReflection
 public class Settings {
 
     public Settings() {

@@ -26,7 +26,7 @@ dependencies {
   implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
   implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
   implementation project(':core')
-  implementation "com.github.tommyettinger.gdx-graalhelper:gdx-svmhelper-backend-lwjgl3:$graalHelperVersion"
+//  implementation "com.github.tommyettinger.gdx-graalhelper:gdx-svmhelper-backend-lwjgl3:$graalHelperVersion"
 }
 
 def os = System.properties['os.name'].toLowerCase()

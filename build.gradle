@@ -17,9 +17,9 @@ buildscript {
 allprojects {
   apply plugin: 'eclipse'
   apply plugin: 'idea'
-  ext {
-    graalvmVersion = '22.3.1'
-  }
+//  ext {
+//    graalvmVersion = '22.3.1'
+//  }
 }
 
 configure(subprojects) {
@@ -28,9 +28,9 @@ configure(subprojects) {
   compileJava {
     options.incremental = true
   }
-  dependencies {
-    compileOnly "org.graalvm.nativeimage:svm:$graalvmVersion"
-  }
+//  dependencies {
+//    compileOnly "org.graalvm.nativeimage:svm:$graalvmVersion"
+//  }
 }
 
 subprojects {
