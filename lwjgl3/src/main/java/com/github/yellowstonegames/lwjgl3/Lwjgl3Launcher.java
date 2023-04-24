@@ -141,10 +141,8 @@ public class Lwjgl3Launcher {
             "images/icons/logo16.png");
 
         appConfig.useVsync(config.displayConfig.vsync);
-        if (config.debugConfig.debugActive) {
-            if (config.debugConfig.showFPS) {
-                appConfig.setForegroundFPS(Lwjgl3ApplicationConfiguration.getDisplayMode().refreshRate);
-            }
+        if (!(config.debugConfig.debugActive && config.debugConfig.showFPS)) {
+            appConfig.setForegroundFPS(Lwjgl3ApplicationConfiguration.getDisplayMode().refreshRate);
         }
 
         new Lwjgl3Application(dungeonDemo, appConfig) {
