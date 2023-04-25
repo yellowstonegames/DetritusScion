@@ -1,11 +1,11 @@
 package com.github.yellowstonegames.files;
 
-import com.anyicomplex.gdx.svm.CollectForReflection;
+import com.anyicomplex.gdx.svm.CollectForGDXJsonSerialization;
 
 /**
  * A class to hold the game's launch configurations.
  */
-@CollectForReflection
+@CollectForGDXJsonSerialization
 public class Config {
 
     public static final String gameTitle = "Detritus Scion";

@@ -1,12 +1,12 @@
 package com.github.yellowstonegames.files;
 
-import com.anyicomplex.gdx.svm.CollectForReflection;
+import com.anyicomplex.gdx.svm.CollectForGDXJsonSerialization;
 import com.github.yellowstonegames.display.PanelSize;
 
 /**
  * Hardware specific settings for presenting the display.
  */
-@CollectForReflection
+@CollectForGDXJsonSerialization
 public class ScreenDisplayConfig {
 
     public final String[] advice = new String[]{

@@ -1,11 +1,11 @@
 package com.github.yellowstonegames.files;
 
-import com.anyicomplex.gdx.svm.CollectForReflection;
+import com.anyicomplex.gdx.svm.CollectForGDXJsonSerialization;
 
 /**
  * Debug configuration, not all need to appear in in-game settings.
  */
-@CollectForReflection
+@CollectForGDXJsonSerialization
 public class DebugConfig {
 
     public boolean debugActive;

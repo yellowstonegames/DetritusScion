@@ -1,8 +1,8 @@
 package com.github.yellowstonegames.files;
 
-import com.anyicomplex.gdx.svm.CollectForReflection;
+import com.anyicomplex.gdx.svm.CollectForGDXJsonSerialization;
 
-@CollectForReflection
+@CollectForGDXJsonSerialization
 public class AudioConfig {
 
     public boolean soundfxOn = true;

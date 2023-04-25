@@ -1,12 +1,12 @@
 package com.github.yellowstonegames.files;
 
-import com.anyicomplex.gdx.svm.CollectForReflection;
+import com.anyicomplex.gdx.svm.CollectForGDXJsonSerialization;
 import com.github.tommyettinger.digital.Hasher;
 
 /**
  * User accessible settings, should be displayed in-game.
  */
-@CollectForReflection
+@CollectForGDXJsonSerialization
 public class Settings {
 
     public Settings() {
