@@ -1,13 +1,11 @@
 package com.github.yellowstonegames.lwjgl3;
 
-import com.badlogic.gdx.Files;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Window;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3WindowAdapter;
-import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.github.yellowstonegames.DungeonDemo;
 import com.github.yellowstonegames.files.Config;
 
@@ -16,6 +14,8 @@ import com.github.yellowstonegames.files.Config;
  */
 public class Lwjgl3Launcher {
     public static void main(String[] args) {
+        // Needed for macOS support, but also Windows with non-ASCII usernames.
+        if (StartOnFirstThreadHelper.startNewJvmIfRequired()) return;
         // Graal stuff
         org.lwjgl.system.Library.initialize();
         org.lwjgl.system.ThreadLocalUtil.setupEnvData();
