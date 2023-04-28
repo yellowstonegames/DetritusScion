@@ -80,7 +80,8 @@ public class DungeonDemo extends ApplicationAdapter {
         Gdx.app.log("SEED", "Initial seed is " + seed);
         EnhancedRandom random = new WhiskerRandom(seed);
         stage = new Stage();
-        Font font = KnownFonts.getIosevkaSlab();
+        KnownFonts.setAssetPrefix("fonts/");
+        Font font = KnownFonts.addGameIcons(KnownFonts.getIosevkaSlab(), -24, -24, 0);
 //        Font font = new Font("Iosevka-Slab-standard.fnt", "Iosevka-Slab-standard.png", STANDARD, 0f, 0f, 0f, 0f, true)
 //            .scaleTo(15f, 24f).setTextureFilter().setName("Iosevka Slab");
 //        Font font = KnownFonts.getCascadiaMonoMSDF().scaleTo(15f, 25f);
@@ -115,7 +116,8 @@ public class DungeonDemo extends ApplicationAdapter {
 //            replaced += "@";
 
         player = new Mob();
-        player.glyph = new GlyphActor('@', "[red orange]", gg.getFont());
+        player.glyph = new GlyphActor("[dark richer red raspberry][+imperial-crown]", gg.getFont());
+        player.glyph.setName(name);
         gg.addActor(player.glyph);
         enemies = new CoordObjectOrderedMap<>(26);
         post = () -> {

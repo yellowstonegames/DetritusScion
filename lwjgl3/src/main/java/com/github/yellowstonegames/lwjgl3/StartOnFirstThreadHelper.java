@@ -14,6 +14,7 @@
  */
 
 package com.github.yellowstonegames.lwjgl3;
+// package copy.me.into.your.lwjgl3.project;
 
 import org.lwjgl.system.macosx.LibC;
 
@@ -26,8 +27,9 @@ import java.util.ArrayList;
 /**
  * Adds some utilities to ensure that the JVM was started with the
  * {@code -XstartOnFirstThread} argument, which is required on macOS for LWJGL 3
- * to function.
- * 
+ * to function. Also helps on Windows when users have names with characters from
+ * outside the Latin alphabet, a common cause of startup crashes.
+ *
  * @author damios
  * @see <a href="https://jvm-gaming.org/t/starting-jvm-on-mac-with-xstartonfirstthread-programmatically/57547">Based on this java-gaming.org post by kappa</a>
  */
@@ -41,8 +43,11 @@ public class StartOnFirstThreadHelper {
 
     /**
      * Starts a new JVM if the application was started on macOS without the
-     * {@code -XstartOnFirstThread} argument. Returns whether a new JVM was
-     * started and thus no code should be executed.
+     * {@code -XstartOnFirstThread} argument. This also includes some code for
+     * Windows, for the case where the user's home directory includes certain
+     * non-Latin-alphabet characters (without this code, most LWJGL3 apps fail
+     * immediately for those users). Returns whether a new JVM was started and
+     * thus no code should be executed.
      * <p>
      * <u>Usage:</u>
      *
