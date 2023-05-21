@@ -4,10 +4,8 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -58,6 +56,7 @@ public class DungeonDemo extends ApplicationAdapter {
     private Coord cursor = Coord.get(-1, -1);
     private final Vector2 pos = new Vector2();
     private Runnable post;
+    private LightingManager lighting;
 
     private Config config;
 
@@ -88,20 +87,6 @@ public class DungeonDemo extends ApplicationAdapter {
         Font font = KnownFonts.addGameIcons(KnownFonts.getIosevkaSlab().scaleTo(16f, 28f).adjustLineHeight(1.25f));
 //        Font font = new Font("Iosevka-Slab-standard.fnt", "Iosevka-Slab-standard.png", STANDARD, 0f, 0f, 0f, 0f, true)
 //            .scaleTo(15f, 24f).setTextureFilter().setName("Iosevka Slab");
-//        Font font = KnownFonts.getCascadiaMonoMSDF().scaleTo(15f, 25f);
-
-//        font = KnownFonts.getCascadiaMono().scale(0.5f, 0.5f);
-//        font = KnownFonts.getIosevka().scale(0.75f, 0.75f);
-//        Font font = KnownFonts.getCascadiaMono();
-//        Font font = KnownFonts.getInconsolata();
-//        font = KnownFonts.getDejaVuSansMono().scale(0.75f, 0.75f);
-//        Font font = KnownFonts.getCozette();
-//        Font font = KnownFonts.getAStarry();
-//        Font font = KnownFonts.getIosevkaMSDF().scaleTo(24, 24);
-//        Font font = KnownFonts.getAStarry().scaleTo(16, 16);
-//        Font font = KnownFonts.getAStarry().fitCell(24, 24, true);
-//        Font font = KnownFonts.getInconsolataMSDF().fitCell(24, 24, true);
-//        Font font = KnownFonts.getKingthingsPetrock().scaleTo(19, 25);
         ShaderProgram shader = new ShaderProgram(Gdx.files.internal("shaders/vertex.glsl"),
                 Gdx.files.internal("shaders/colorblindness-cor.frag.glsl"));
 //                Gdx.files.internal("shaders/colorblindness-sim.frag.glsl"));
@@ -126,8 +111,9 @@ public class DungeonDemo extends ApplicationAdapter {
         gg.addActor(player.glyph);
         enemies = new CoordObjectOrderedMap<>(26);
         post = () -> {
-            seen.or(inView.refill(FOV.reuseFOV(res, light,
-                Math.round(player.glyph.getX()), Math.round(player.glyph.getY()), 6.5f, Radius.CIRCLE), 0.001f, 999f));
+            int playerX = Math.round(player.glyph.getX()), playerY = Math.round(player.glyph.getY());
+            lighting.calculateFOV(playerX, playerY, playerX - 10, playerY - 10, playerX + 11, playerY + 11);
+            seen.or(inView.refill(lighting.fovResult, 0.001f, 2f));
             blockage.remake(seen).not().fringe8way();
             LineTools.pruneLines(dungeon, seen, prunedDungeon);
             gg.setVisibilities(inView::contains);
@@ -238,10 +224,12 @@ public class DungeonDemo extends ApplicationAdapter {
     public void regenerate(){
         dungeonProcessor.setPlaceGrid(dungeon = LineTools.hashesToLines(dungeonProcessor.generate(), true));
         bare = dungeonProcessor.getBarePlaceGrid();
+        EnhancedRandom rng = dungeonProcessor.rng;
         ArrayTools.insert(dungeon, prunedDungeon, 0, 0);
         res = FOV.generateSimpleResistances(bare);
+        lighting = new LightingManager(res, "dark gray black", Radius.CIRCLE, 6.5f);
         Region floors = new Region(bare, '.');
-        Coord player = floors.singleRandom(dungeonProcessor.rng);
+        Coord player = floors.singleRandom(rng);
         this.player.glyph.setPosition(player.x, player.y);
         floors.remove(player);
         Coord[] selected = floors.separatedBlue(0.125f, 26);
@@ -252,8 +240,11 @@ public class DungeonDemo extends ApplicationAdapter {
             mob.glyph = enemy;
             enemies.put(selected[i], mob);
             gg.addActor(enemy);
+            lighting.addLight(selected[i], new Radiance(rng.nextFloat(3f) + 2f,
+                    FullPalette.COLOR_WHEEL_PALETTE_BRIGHT[rng.nextInt(FullPalette.COLOR_WHEEL_PALETTE_BRIGHT.length)], 0.5f, 0f));
         }
-        seen.remake(inView.refill(FOV.reuseFOV(res, light, player.x, player.y, 6.5f, Radius.CIRCLE), 0.001f, 2f));
+        lighting.calculateFOV(player.x, player.y, player.x - 10, player.y - 10, player.x + 11, player.y + 11);
+        seen.remake(inView.refill(lighting.fovResult, 0.001f, 2f));
         blockage.remake(seen).not().fringe8way();
         LineTools.pruneLines(dungeon, seen, prunedDungeon);
         gg.setVisibilities(inView::contains);
@@ -274,7 +265,7 @@ public class DungeonDemo extends ApplicationAdapter {
         int rainbow = toRGBA8888(
                 limitToGamut(100,
                         (int) (TrigTools.sinTurns(modifiedTime * 0.2f) * 40f) + 128, (int) (TrigTools.cosTurns(modifiedTime * 0.2f) * 40f) + 128, 255));
-        FOV.reuseFOV(res, light, playerX, playerY, LineWobble.wobble(12345, modifiedTime) * 2.5f + 4f, Radius.CIRCLE);
+//        FOV.reuseFOV(res, light, playerX, playerY, LineWobble.wobble(12345, modifiedTime) * 2.5f + 4f, Radius.CIRCLE);
         for (int y = 0; y < config.displayConfig.mapSize.gridHeight; y++) {
             for (int x = 0; x < config.displayConfig.mapSize.gridWidth; x++) {
                 if (inView.contains(x, y)) {
@@ -326,6 +317,12 @@ public class DungeonDemo extends ApplicationAdapter {
                 }
             }
         }
+        lighting.draw(gg.backgrounds);
+        for (int i = 0; i < toCursor.size(); i++) {
+            Coord curr = toCursor.get(i);
+            if(inView.contains(curr))
+                gg.backgrounds[curr.x][curr.y] = rainbow;
+        }
     }
 
     /**
@@ -355,6 +352,7 @@ public class DungeonDemo extends ApplicationAdapter {
     @Override
     public void render() {
 //        stage.getBatch().getShader().setUniformi("u_mode", 1);
+        lighting.update();
         recolor();
         handleHeldKeys();
         for (int i = 0; i < enemies.size(); i++) {
