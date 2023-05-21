@@ -16,7 +16,6 @@ import com.github.tommyettinger.digital.ArrayTools;
 import com.github.tommyettinger.digital.TrigTools;
 import com.github.tommyettinger.ds.ObjectList;
 import com.github.tommyettinger.random.EnhancedRandom;
-import com.github.tommyettinger.random.LineWobble;
 import com.github.tommyettinger.random.WhiskerRandom;
 import com.github.tommyettinger.textra.Font;
 import com.github.tommyettinger.textra.KnownFonts;
@@ -65,6 +64,7 @@ public class DungeonDemo extends ApplicationAdapter {
     private static final int GRASS_OKLAB = describeOklab("duller dark green");
     private static final int DRY_OKLAB = describeOklab("dull light apricot sage");
     private static final int STONE_OKLAB = describeOklab("darkmost gray dullest bronze");
+    private static final int MEMORY_RGBA = describe("darker gray black");
     private static final int deepText = toRGBA8888(offsetLightness(DEEP_OKLAB));
     private static final int shallowText = toRGBA8888(offsetLightness(SHALLOW_OKLAB));
     private static final int grassText = toRGBA8888(offsetLightness(GRASS_OKLAB));
@@ -276,22 +276,23 @@ public class DungeonDemo extends ApplicationAdapter {
                     else {
                         switch (prunedDungeon[x][y]) {
                             case '~':
-                                gg.backgrounds[x][y] = toRGBA8888(lighten(DEEP_OKLAB, 0.6f * Math.min(1.2f, Math.max(0, light[x][y] + waves.getConfiguredNoise(x, y, modifiedTime)))));
+                                gg.backgrounds[x][y] = (lighten(DEEP_OKLAB, 0.6f * Math.min(1.2f, Math.max(0, lighting.fovResult[x][y] + waves.getConfiguredNoise(x, y, modifiedTime)))));
                                 gg.put(x, y, prunedDungeon[x][y], deepText);
                                 break;
                             case ',':
-                                gg.backgrounds[x][y] = toRGBA8888(lighten(SHALLOW_OKLAB, 0.6f * Math.min(1.2f, Math.max(0, light[x][y] + waves.getConfiguredNoise(x, y, modifiedTime)))));
+                                gg.backgrounds[x][y] = (lighten(SHALLOW_OKLAB, 0.6f * Math.min(1.2f, Math.max(0, lighting.fovResult[x][y] + waves.getConfiguredNoise(x, y, modifiedTime)))));
                                 gg.put(x, y, prunedDungeon[x][y], shallowText);
                                 break;
                             case '"':
-                                gg.backgrounds[x][y] = toRGBA8888(darken(lerpColors(GRASS_OKLAB, DRY_OKLAB, waves.getConfiguredNoise(x, y) * 0.5f + 0.5f), 0.4f * Math.min(1.1f, Math.max(0, 1f - light[x][y] + waves.getConfiguredNoise(x, y, modifiedTime * 0.7f)))));
+                                gg.backgrounds[x][y] = (darken(lerpColors(GRASS_OKLAB, DRY_OKLAB, waves.getConfiguredNoise(x, y) * 0.5f + 0.5f), 0.4f * Math.min(1.1f, Math.max(0, 1f - lighting.fovResult[x][y] + waves.getConfiguredNoise(x, y, modifiedTime * 0.7f)))));
                                 gg.put(x, y, prunedDungeon[x][y], grassText);
                                 break;
                             case ' ':
                                 gg.backgrounds[x][y] = 0;
                                 break;
                             default:
-                                gg.backgrounds[x][y] = toRGBA8888(lighten(STONE_OKLAB, 0.6f * light[x][y]));
+//                                gg.backgrounds[x][y] = toRGBA8888(lighten(STONE_OKLAB, 0.6f * lighting.fovResult[x][y]));
+                                gg.backgrounds[x][y] = 0;
                                 gg.put(x, y, prunedDungeon[x][y], stoneText);
                         }
                     }
@@ -309,7 +310,7 @@ public class DungeonDemo extends ApplicationAdapter {
                             gg.backgrounds[x][y] = 0;
                             break;
                         default:
-                            gg.backgrounds[x][y] = toRGBA8888(edit(STONE_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
+                            gg.backgrounds[x][y] = MEMORY_RGBA;
                             gg.put(x, y, prunedDungeon[x][y], stoneText);
                     }
                 } else {
