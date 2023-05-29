@@ -1,13 +1,11 @@
 package com.github.yellowstonegames.lwjgl3;
 
 import com.github.yellowstonegames.glyph.GridAction;
-import com.oracle.svm.core.annotate.AutomaticFeature;
 import org.graalvm.nativeimage.hosted.Feature;
 import org.graalvm.nativeimage.hosted.RuntimeReflection;
 
 import com.github.yellowstonegames.glyph.MoreActions;
 
-@AutomaticFeature
 public class ReflectionConfiguration implements Feature {
     @Override
     public void beforeAnalysis(BeforeAnalysisAccess access) {

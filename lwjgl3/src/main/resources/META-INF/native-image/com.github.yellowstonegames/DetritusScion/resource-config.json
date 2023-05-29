@@ -1,0 +1,9 @@
+{
+  "resources":{
+  "includes":[
+    {
+      "pattern":"libgdx\\d+\\.png"
+    }
+  ]},
+  "bundles":[]
+}
