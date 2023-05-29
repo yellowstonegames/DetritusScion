@@ -29,9 +29,9 @@ import java.util.ArrayList;
  * {@code -XstartOnFirstThread} argument, which is required on macOS for LWJGL 3
  * to function. Also helps on Windows when users have names with characters from
  * outside the Latin alphabet, a common cause of startup crashes.
- *
+ * <br>
+ * <a href="https://jvm-gaming.org/t/starting-jvm-on-mac-with-xstartonfirstthread-programmatically/57547">Based on this java-gaming.org post by kappa</a>
  * @author damios
- * @see <a href="https://jvm-gaming.org/t/starting-jvm-on-mac-with-xstartonfirstthread-programmatically/57547">Based on this java-gaming.org post by kappa</a>
  */
 public class StartOnFirstThreadHelper {
 
@@ -53,7 +53,7 @@ public class StartOnFirstThreadHelper {
      *
      * <pre><code>
      * public static void main(String... args) {
-     * 	if (StartOnFirstThreadHelper.startNewJvmIfRequired()) return; // don't execute any code
+     * 	if (StartOnFirstThreadHelper.startNewJvmIfRequired(true)) return; // don't execute any code
      * 	// after this is the actual main method code
      * }
      * </code></pre>
@@ -94,16 +94,19 @@ public class StartOnFirstThreadHelper {
         }
 
         // Restart the JVM with -XstartOnFirstThread
-        ArrayList<String> jvmArgs = new ArrayList<String>();
+        ArrayList<String> jvmArgs = new ArrayList<>();
         String separator = System.getProperty("file.separator");
-        // TODO Java 9: ProcessHandle.current().info().command();
-        String javaExecPath = System.getProperty("java.home") + separator
-                + "bin" + separator + "java";
+        // This line is used assuming you target Java 8, the minimum for LWJGL3.
+        String javaExecPath = System.getProperty("java.home") + separator + "bin" + separator + "java";
+        // If targeting Java 9 or higher, you could use the following instead of the above line:
+        //String javaExecPath = ProcessHandle.current().info().command().orElseThrow();
+
         if (!(new File(javaExecPath)).exists()) {
             System.err.println(
                     "A Java installation could not be found. If you are distributing this app with a bundled JRE, be sure to set the -XstartOnFirstThread argument manually!");
             return false;
         }
+
         jvmArgs.add(javaExecPath);
         jvmArgs.add("-XstartOnFirstThread");
         jvmArgs.add("-D" + JVM_RESTARTED_ARG + "=true");
