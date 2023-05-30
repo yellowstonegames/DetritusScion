@@ -46,7 +46,8 @@ public class DungeonDemo extends ApplicationAdapter {
     private char[][] bare, dungeon, prunedDungeon;
     private float[][] res, light;
     private Region seen, inView, blockage;
-    private final Noise waves = new Noise(123, 0.5f, Noise.FOAM, 1);
+    private final Noise waves = new Noise(123, 0.5f, Noise.FOAM_FRACTAL, 1);
+    private final Noise ridges = new Noise(12345, 0.6f, Noise.FOAM_FRACTAL, 1);
     private Mob player;
     private CoordObjectOrderedMap<Mob> enemies;
     private DijkstraMap playerToCursor;
@@ -61,12 +62,16 @@ public class DungeonDemo extends ApplicationAdapter {
 
     private static final int DEEP_OKLAB = describeOklab("dark dull cobalt");
     private static final int SHALLOW_OKLAB = describeOklab("dull denim");
+    private static final int LAVA_OKLAB = describeOklab("dark rich ember");
+    private static final int CHAR_OKLAB = describeOklab("darker dullmost black ember");
     private static final int GRASS_OKLAB = describeOklab("duller dark green");
     private static final int DRY_OKLAB = describeOklab("dull light apricot sage");
     private static final int STONE_OKLAB = describeOklab("darkmost gray dullest bronze");
     private static final int MEMORY_RGBA = describe("darker gray black");
     private static final int deepText = toRGBA8888(offsetLightness(DEEP_OKLAB));
     private static final int shallowText = toRGBA8888(offsetLightness(SHALLOW_OKLAB));
+    private static final int lavaText = toRGBA8888(offsetLightness(LAVA_OKLAB));
+    private static final int charText = toRGBA8888(offsetLightness(CHAR_OKLAB));
     private static final int grassText = toRGBA8888(offsetLightness(GRASS_OKLAB));
     private static final int stoneText = toRGBA8888(describeOklab("gray dullmost butter bronze"));
 
@@ -120,9 +125,11 @@ public class DungeonDemo extends ApplicationAdapter {
         };
 
         dungeonProcessor = new DungeonProcessor(mapGridWidth, mapGridHeight, random);
-        dungeonProcessor.addWater(DungeonProcessor.ALL, 30);
+        dungeonProcessor.addWater(DungeonProcessor.ALL, 20);
         dungeonProcessor.addGrass(DungeonProcessor.ALL, 10);
+        dungeonProcessor.addLake(20, '₤', '¢');
         waves.setFractalType(Noise.RIDGED_MULTI);
+        ridges.setFractalType(Noise.RIDGED_MULTI);
         light = new float[mapGridWidth][mapGridHeight];
         seen = new Region(mapGridWidth, mapGridHeight);
         blockage = new Region(mapGridWidth, mapGridHeight);
@@ -283,10 +290,18 @@ public class DungeonDemo extends ApplicationAdapter {
                                 gg.backgrounds[x][y] = (lighten(SHALLOW_OKLAB, 0.6f * Math.min(1.2f, Math.max(0, lighting.fovResult[x][y] + waves.getConfiguredNoise(x, y, modifiedTime)))));
                                 gg.put(x, y, prunedDungeon[x][y], shallowText);
                                 break;
-                            case '"':
-                                gg.backgrounds[x][y] = (darken(lerpColors(GRASS_OKLAB, DRY_OKLAB, waves.getConfiguredNoise(x, y) * 0.5f + 0.5f), 0.4f * Math.min(1.1f, Math.max(0, 1f - lighting.fovResult[x][y] + waves.getConfiguredNoise(x, y, modifiedTime * 0.7f)))));
-                                gg.put(x, y, prunedDungeon[x][y], grassText);
+                            case '₤':
+                                gg.backgrounds[x][y] = (lighten(LAVA_OKLAB, 0.5f * Math.min(1.5f, Math.max(0, lighting.fovResult[x][y] + ridges.getConfiguredNoise(x, y, modifiedTime)))));
+                                gg.put(x, y, prunedDungeon[x][y], lavaText);
                                 break;
+                            case '¢':
+                                gg.backgrounds[x][y] = (lighten(CHAR_OKLAB, 0.2f * Math.min(0.8f, Math.max(0, lighting.fovResult[x][y] + ridges.getConfiguredNoise(x, y, modifiedTime)))));
+                                gg.put(x, y, prunedDungeon[x][y], charText);
+                                break;
+//                            case '"':
+//                                gg.backgrounds[x][y] = (darken(lerpColors(GRASS_OKLAB, DRY_OKLAB, waves.getConfiguredNoise(x, y) * 0.5f + 0.5f), 0.4f * Math.min(1.1f, Math.max(0, 1f - lighting.fovResult[x][y] + waves.getConfiguredNoise(x, y, modifiedTime * 0.7f)))));
+//                                gg.put(x, y, prunedDungeon[x][y], grassText);
+//                                break;
                             case ' ':
                                 gg.backgrounds[x][y] = 0;
                                 break;
@@ -305,6 +320,14 @@ public class DungeonDemo extends ApplicationAdapter {
                         case ',':
                             gg.backgrounds[x][y] = toRGBA8888(edit(SHALLOW_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
                             gg.put(x, y, prunedDungeon[x][y], shallowText);
+                            break;
+                        case '₤':
+                            gg.backgrounds[x][y] = toRGBA8888(edit(LAVA_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
+                            gg.put(x, y, prunedDungeon[x][y], lavaText);
+                            break;
+                        case '¢':
+                            gg.backgrounds[x][y] = toRGBA8888(edit(CHAR_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
+                            gg.put(x, y, prunedDungeon[x][y], charText);
                             break;
                         case ' ':
                             gg.backgrounds[x][y] = 0;
