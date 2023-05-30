@@ -381,7 +381,11 @@ public class DungeonDemo extends ApplicationAdapter {
         handleHeldKeys();
         for (int i = 0; i < enemies.size(); i++) {
             enemies.getAt(i).glyph.setRotation((System.currentTimeMillis() & 0xFFFFFL) * 0.25f);
+            Coord pos = enemies.keyAt(i);
+            if(inView.contains(pos))
+                gg.map.remove(GlyphGrid.fuse(pos));
         }
+        gg.map.remove(GlyphGrid.fuse(player.glyph.getLocation()));
 
         if(!gg.areChildrenActing() && !awaitedMoves.isEmpty())
         {
