@@ -3,8 +3,10 @@ package com.github.yellowstonegames.util;
 import com.github.tommyettinger.digital.MathTools;
 import com.github.tommyettinger.ds.ObjectList;
 import com.github.yellowstonegames.grid.Coord;
+import com.github.yellowstonegames.grid.Region;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -22,15 +24,15 @@ public class QuickHull {
      * @param inputPoints The points to find a hull around
      * @return A list of points which form the convex hull of the given list of points.
      */
-    public ObjectList<Coord> executeQuickHull(Coord[] inputPoints) {
+    public ObjectList<Coord> executeQuickHull(Region inputPoints) {
         ObjectList<Coord> convexHull = new ObjectList<>();
-        if (inputPoints == null || inputPoints.length < 1) {
+        if (inputPoints == null || inputPoints.size() < 1) {
             throw new IllegalArgumentException("Cannot compute convex hull of zero points.");
         }
 
         // search extreme values
-        Coord rightmostPoint = inputPoints[0];
-        Coord leftmostPoint = inputPoints[0];
+        Coord rightmostPoint = inputPoints.first();
+        Coord leftmostPoint = inputPoints.first();
         for (Coord point : inputPoints) {
             if (point.getX() < rightmostPoint.getX()) {
                 rightmostPoint = point;

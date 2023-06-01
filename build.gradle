@@ -28,9 +28,9 @@ configure(subprojects) {
   compileJava {
     options.incremental = true
   }
-  dependencies {
-    compileOnly "org.graalvm.nativeimage:svm:$graalvmVersion"
-  }
+//  dependencies {
+//    compileOnly "org.graalvm.nativeimage:svm:$graalvmVersion"
+//  }
 }
 
 subprojects {

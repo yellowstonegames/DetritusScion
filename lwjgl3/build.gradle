@@ -28,6 +28,7 @@ dependencies {
   implementation project(':core')
   implementation "com.github.tommyettinger.gdx-graalhelper:gdx-svmhelper-backend-lwjgl3:$graalHelperVersion"
 //  implementation "com.github.Berstanio.gdx-graalhelper:gdx-svmhelper-backend-lwjgl3:$graalHelperVersion"
+  compileOnly "org.graalvm.nativeimage:svm:$graalvmVersion"
 }
 
 def os = System.properties['os.name'].toLowerCase()

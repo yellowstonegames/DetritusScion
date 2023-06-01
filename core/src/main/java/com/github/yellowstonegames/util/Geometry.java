@@ -23,8 +23,7 @@ public class Geometry {
     }
 
     public static List<Coord> findInternalPolygonCorners(Region region, int distance, int pointLimit) {
-        EnhancedRandom rng = new WhiskerRandom();
-        rng.setSeed(region.hash64());
+        EnhancedRandom rng = new WhiskerRandom(region.hash64());
         Region points = region.copy();
         do {
             points.remake(region).randomScatter(rng, distance, 12)
@@ -35,8 +34,7 @@ public class Geometry {
         } while (pointsInLine(points)); // need to make sure at least a triangle is possible
 
         QuickHull hull = new QuickHull();
-        Coord[] coords = points.asCoords();
-        return hull.executeQuickHull(coords);
+        return hull.executeQuickHull(points);
     }
 
     public static Region connectPoints(Region region, Coord... points) {
