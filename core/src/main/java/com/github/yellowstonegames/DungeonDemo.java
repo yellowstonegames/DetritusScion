@@ -221,6 +221,7 @@ public class DungeonDemo extends ApplicationAdapter {
                         0x992200FF, 0x99220000,
                         0f, 120f, 1f);
                 gg.removeActor(enemies.remove(next).glyph);
+                lighting.removeLight(next);
 
             }
         } else {
