@@ -122,6 +122,8 @@ public class DungeonDemo extends ApplicationAdapter {
             blockage.remake(seen).not().fringe8way();
             LineTools.pruneLines(dungeon, seen, prunedDungeon);
             gg.setVisibilities(inView::contains);
+            if(!awaitedMoves.isEmpty())
+                awaitedMoves.remove(0);
         };
 
         dungeonProcessor = new DungeonProcessor(mapGridWidth, mapGridHeight, random);
@@ -154,6 +156,8 @@ public class DungeonDemo extends ApplicationAdapter {
             // ourselves and copy toCursor over to awaitedMoves.
             @Override
             public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+                if(!awaitedMoves.isEmpty())
+                    return false;
                 pos.set(screenX, screenY);
                 gg.viewport.unproject(pos);
                 if (onGrid(MathUtils.floor(pos.x), MathUtils.floor(pos.y))) {
@@ -390,7 +394,7 @@ public class DungeonDemo extends ApplicationAdapter {
 
         if(!gg.areChildrenActing() && !awaitedMoves.isEmpty())
         {
-            Coord m = awaitedMoves.remove(0);
+            Coord m = awaitedMoves.get(0);
             if (!toCursor.isEmpty())
                 toCursor.remove(0);
             move(player.glyph.getLocation().toGoTo(m));
