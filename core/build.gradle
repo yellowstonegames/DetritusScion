@@ -18,9 +18,35 @@ dependencies {
 //  api "com.github.yellowstonegames.SquidSquad:SquidPlace:$squidSquadVersion"
 //  api "com.github.yellowstonegames.SquidSquad:SquidPress:$squidSquadVersion"
 //  api "com.github.yellowstonegames.SquidSquad:SquidText:$squidSquadVersion"
+  implementation 'systems.manifold:manifold-ext-rt:2023.1.10'
+  implementation 'systems.manifold:manifold-props-rt:2023.1.10'
+
+  // Add manifold to -processorpath for javac
+  annotationProcessor 'systems.manifold:manifold-props:2023.1.10'
+  testAnnotationProcessor 'systems.manifold:manifold-props:2023.1.10'
+  annotationProcessor 'systems.manifold:manifold-ext:2023.1.10'
+  testAnnotationProcessor 'systems.manifold:manifold-ext:2023.1.10'
+
 //  compileOnly "com.github.tommyettinger.gdx-graalhelper:gdx-svmhelper:$graalHelperVersion"
   implementation "com.github.Berstanio.gdx-graalhelper:gdx-svmhelper:$graalHelperVersion"
   testImplementation "junit:junit:$junitVersion"
   testRuntimeOnly "org.junit.vintage:junit-vintage-engine:5.9.0"
 
+}
+
+if (JavaVersion.current() != JavaVersion.VERSION_1_8 &&
+        sourceSets.main.allJava.files.any {it.name == "module-info.java"}) {
+  tasks.withType(JavaCompile).tap {
+    configureEach {
+      // if you DO define a module-info.java file:
+      options.compilerArgs += ['-Xplugin:Manifold', '--module-path', it.classpath.asPath]
+    }
+  }
+} else {
+  tasks.withType(JavaCompile).tap {
+    configureEach {
+      // If you DO NOT define a module-info.java file:
+      options.compilerArgs += ['-Xplugin:Manifold']
+    }
+  }
 }

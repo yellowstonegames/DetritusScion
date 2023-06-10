@@ -9,6 +9,6 @@ public class CombatTest {
     public void testCalculator() {
         Mob mobA = new Mob();
         Mob mobB = new Mob();
-//        System.out.println(CombatCalculator.calculateDamage(mobA, mobB));
+        System.out.println(CombatCalculator.calculateDamage(mobA, mobB));
     }
 }
