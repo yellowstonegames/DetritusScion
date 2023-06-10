@@ -3,7 +3,8 @@ package com.github.yellowstonegames.mobs;
 import com.github.yellowstonegames.glyph.GlyphActor;
 
 public class Mob {
-    public GlyphActor glyph;
+    public long glyph;
+    public transient GlyphActor actor;
 
     public double health;
     public double strength;

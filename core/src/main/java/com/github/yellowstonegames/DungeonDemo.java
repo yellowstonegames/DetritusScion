@@ -110,13 +110,14 @@ public class DungeonDemo extends ApplicationAdapter {
 //            replaced += "@";
 
         player = new Mob();
-        player.glyph = new GlyphActor("[dark richer red raspberry]@", gg.getFont());
-//        player.glyph = new GlyphActor("[dark richer red raspberry][+imperial-crown]", gg.getFont());
-        player.glyph.setName(name);
-        gg.addActor(player.glyph);
+//        player.glyph = gg.getFont().markupGlyph("[dark richer red raspberry][+imperial-crown]");
+        player.glyph = gg.getFont().markupGlyph("[dark richer red raspberry]@");
+        player.actor = new GlyphActor(player.glyph, gg.getFont());
+        player.actor.setName(name);
+        gg.addActor(player.actor);
         enemies = new CoordObjectOrderedMap<>(26);
         post = () -> {
-            int playerX = Math.round(player.glyph.getX()), playerY = Math.round(player.glyph.getY());
+            int playerX = Math.round(player.actor.getX()), playerY = Math.round(player.actor.getY());
             lighting.calculateFOV(playerX, playerY, playerX - 10, playerY - 10, playerX + 11, playerY + 11);
             seen.or(inView.refill(lighting.fovResult, 0.001f, 2f));
             blockage.remake(seen).not().fringe8way();
@@ -212,11 +213,11 @@ public class DungeonDemo extends ApplicationAdapter {
 
     public void move(Direction way){
         // this prevents movements from restarting while a slide is already in progress.
-        if(player.glyph.hasActions()) return;
+        if(player.actor.hasActions()) return;
 
-        final Coord next = Coord.get(Math.round(player.glyph.getX() + way.deltaX), Math.round(player.glyph.getY() + way.deltaY));
+        final Coord next = Coord.get(Math.round(player.actor.getX() + way.deltaX), Math.round(player.actor.getY() + way.deltaY));
         if(next.isWithin(config.displayConfig.mapSize.gridWidth, config.displayConfig.mapSize.gridHeight) && bare[next.x][next.y] == '.') {
-            player.glyph.addAction(MoreActions.slideTo(next.x, next.y, 0.2f, post));
+            player.actor.addAction(MoreActions.slideTo(next.x, next.y, 0.2f, post));
             if(enemies.containsKey(next)){
                 gg.burst(
                         next.x,
@@ -224,12 +225,12 @@ public class DungeonDemo extends ApplicationAdapter {
                         1.5f, 7, ',',
                         0x992200FF, 0x99220000,
                         0f, 120f, 1f);
-                gg.removeActor(enemies.remove(next).glyph);
+                gg.removeActor(enemies.remove(next).actor);
                 lighting.removeLight(next);
 
             }
         } else {
-            player.glyph.addAction(MoreActions.bump(way, 0.3f));
+            player.actor.addAction(MoreActions.bump(way, 0.3f));
         }
     }
 
@@ -242,14 +243,15 @@ public class DungeonDemo extends ApplicationAdapter {
         lighting = new LightingManager(res, "dark gray black", Radius.CIRCLE, 6.5f);
         Region floors = new Region(bare, '.');
         Coord player = floors.singleRandom(rng);
-        this.player.glyph.setPosition(player.x, player.y);
+        this.player.actor.setPosition(player.x, player.y);
         floors.remove(player);
         Coord[] selected = floors.separatedBlue(0.125f, 26);
         for (int i = 0; i < 26 && i < selected.length; i++) {
-            GlyphActor enemy = new GlyphActor((char)('A'+i), DescriptiveColor.toRGBA8888(FullPalette.randomColorWheel(dungeonProcessor.rng)), gg.getFont());
-            enemy.setPosition(selected[i].x, selected[i].y);
             Mob mob = new Mob();
-            mob.glyph = enemy;
+            mob.glyph = (char)('A'+i) | ((long)DescriptiveColor.toRGBA8888(FullPalette.randomColorWheel(dungeonProcessor.rng)) << 32);
+            GlyphActor enemy = new GlyphActor(mob.glyph, gg.getFont());
+            enemy.setPosition(selected[i].x, selected[i].y);
+            mob.actor = enemy;
             enemies.put(selected[i], mob);
             gg.addActor(enemy);
             lighting.addLight(selected[i], new Radiance(rng.nextFloat(3f) + 2f,
@@ -271,8 +273,8 @@ public class DungeonDemo extends ApplicationAdapter {
     }
 
     public void recolor(){
-        int playerX = Math.round(player.glyph.getX());
-        int playerY = Math.round(player.glyph.getY());
+        int playerX = Math.round(player.actor.getX());
+        int playerY = Math.round(player.actor.getY());
         float modifiedTime = (TimeUtils.millis() & 0xFFFFFL) * 0x1p-9f;
         int rainbow = toRGBA8888(
                 limitToGamut(100,
@@ -385,19 +387,19 @@ public class DungeonDemo extends ApplicationAdapter {
         recolor();
         handleHeldKeys();
         for (int i = 0; i < enemies.size(); i++) {
-            enemies.getAt(i).glyph.setRotation((System.currentTimeMillis() & 0xFFFFFL) * 0.25f);
+            enemies.getAt(i).actor.setRotation((System.currentTimeMillis() & 0xFFFFFL) * 0.25f);
             Coord pos = enemies.keyAt(i);
             if(inView.contains(pos))
                 gg.map.remove(GlyphGrid.fuse(pos));
         }
-        gg.map.remove(GlyphGrid.fuse(player.glyph.getLocation()));
+        gg.map.remove(GlyphGrid.fuse(player.actor.getLocation()));
 
         if(!gg.areChildrenActing() && !awaitedMoves.isEmpty())
         {
             Coord m = awaitedMoves.get(0);
             if (!toCursor.isEmpty())
                 toCursor.remove(0);
-            move(player.glyph.getLocation().toGoTo(m));
+            move(player.actor.getLocation().toGoTo(m));
         }
         else {
             if (!gg.areChildrenActing()) {
@@ -415,7 +417,7 @@ public class DungeonDemo extends ApplicationAdapter {
                     // found, but the player doesn't move until a cell is clicked, the "goal" is the non-changing cell, so the
                     // player's position, and the "target" of a pathfinding method like DijkstraMap.findPathPreScanned() is the
                     // currently-moused-over cell, which we only need to set where the mouse is being handled.
-                    playerToCursor.setGoal(player.glyph.getLocation());
+                    playerToCursor.setGoal(player.actor.getLocation());
                     // DijkstraMap.partialScan only finds the distance to get to a cell if that distance is less than some limit,
                     // which is 13 here. It also won't try to find distances through an impassable cell, which here is the blockage
                     // GreasedRegion that contains the cells just past the edge of the player's FOV area.

@@ -18,6 +18,9 @@ dependencies {
 //  api "com.github.yellowstonegames.SquidSquad:SquidPlace:$squidSquadVersion"
 //  api "com.github.yellowstonegames.SquidSquad:SquidPress:$squidSquadVersion"
 //  api "com.github.yellowstonegames.SquidSquad:SquidText:$squidSquadVersion"
-  compileOnly "com.github.tommyettinger.gdx-graalhelper:gdx-svmhelper:$graalHelperVersion"
-//  implementation "com.github.Berstanio.gdx-graalhelper:gdx-svmhelper:$graalHelperVersion"
+//  compileOnly "com.github.tommyettinger.gdx-graalhelper:gdx-svmhelper:$graalHelperVersion"
+  implementation "com.github.Berstanio.gdx-graalhelper:gdx-svmhelper:$graalHelperVersion"
+  testImplementation "junit:junit:$junitVersion"
+  testRuntimeOnly "org.junit.vintage:junit-vintage-engine:5.9.0"
+
 }
