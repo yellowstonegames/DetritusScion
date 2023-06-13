@@ -3,7 +3,7 @@ package com.github.yellowstonegames.mobs;
 import com.github.tommyettinger.ds.ObjectFloatOrderedMap;
 import com.github.yellowstonegames.glyph.GlyphActor;
 
-public class Mob {
+public class Mob implements HasStats {
     public long glyph;
     public transient GlyphActor actor;
 
@@ -11,6 +11,11 @@ public class Mob {
             "offense", 0, "defense", 0, "accuracy", 0, "evasion", 0, "health", 1, "max health", 1);
 
     public Runnable onDeath;
+
+    @Override
+    public ObjectFloatOrderedMap<String> getStats() {
+        return stats;
+    }
 
     public float getOffense() {
         return stats.get("offense");
