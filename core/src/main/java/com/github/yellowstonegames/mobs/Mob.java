@@ -7,10 +7,18 @@ public class Mob implements HasStats {
     public long glyph;
     public transient GlyphActor actor;
 
+    public ObjectFloatOrderedMap<String> baseStats = ObjectFloatOrderedMap.with(
+            "offense", 0, "defense", 0, "accuracy", 0, "evasion", 0, "health", 1, "max health", 1);
+
     public ObjectFloatOrderedMap<String> stats = ObjectFloatOrderedMap.with(
             "offense", 0, "defense", 0, "accuracy", 0, "evasion", 0, "health", 1, "max health", 1);
 
-    public Runnable onDeath;
+    public transient Runnable onDeath;
+
+    @Override
+    public ObjectFloatOrderedMap<String> getBaseStats() {
+        return baseStats;
+    }
 
     @Override
     public ObjectFloatOrderedMap<String> getStats() {
