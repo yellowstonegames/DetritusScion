@@ -3,12 +3,16 @@ package com.github.yellowstonegames.util;
 import com.github.yellowstonegames.mobs.Mob;
 
 public class CombatCalculator {
-    private final static float EVASION_FACTOR = 20;
+    // See this Desmos graph to compare the sqrt() option vs. the abs() option:
+    // https://www.desmos.com/calculator/kysjp4felk
+    // The sqrt() code has a smooth derivative at all points, but abs() does not.
+    // I don't know if this matters.
+    private final static float EVASION_FACTOR = 500;
 
     public static float calculateDamage(Mob attacker, Mob defender) {
         float hit = Math.max(0, attacker.offense - defender.defense);
-        float precision = attacker.accuracy - defender.evasion;
-        float factoredDefense = 1 + precision / (EVASION_FACTOR + Math.abs(precision));
+        double precision = attacker.accuracy - defender.evasion;
+        float factoredDefense = (float)(1 + precision / Math.sqrt(EVASION_FACTOR + precision * precision));
 
         return hit * factoredDefense;
     }
