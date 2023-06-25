@@ -8,12 +8,6 @@ import regexodus.Pattern;
 
 import com.github.yellowstonegames.grid.*;
 
-/*
-import squidpony.StringKit;
-import squidpony.epigon.data.Weapon;
-import squidpony.epigon.mapping.QuickHull;
-*/
-
 import java.util.Collection;
 
 public class Text {

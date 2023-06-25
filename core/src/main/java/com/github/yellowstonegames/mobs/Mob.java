@@ -7,11 +7,14 @@ public class Mob implements HasStats {
     public long glyph;
     public transient GlyphActor actor;
 
-    public ObjectFloatOrderedMap<String> baseStats = ObjectFloatOrderedMap.with(
-            "offense", 0, "defense", 0, "accuracy", 0, "evasion", 0, "health", 1, "max health", 1);
+    public ObjectFloatOrderedMap<String> baseStats = new ObjectFloatOrderedMap<>(COMBAT_STATS, COMBAT_VALUES);
 
-    public ObjectFloatOrderedMap<String> stats = ObjectFloatOrderedMap.with(
-            "offense", 0, "defense", 0, "accuracy", 0, "evasion", 0, "health", 1, "max health", 1);
+    {
+        baseStats.putAll(VITAL_STATS, VITAL_VALUES);
+        baseStats.putAll(SLOTS, SLOT_VALUES);
+    }
+
+    public ObjectFloatOrderedMap<String> stats = new ObjectFloatOrderedMap<>(baseStats);
 
     public transient Runnable onDeath;
 
@@ -77,6 +80,27 @@ public class Mob implements HasStats {
         stats.put("max health", maxHealth);
         if(health > maxHealth || fullyHealed) {
             health = maxHealth;
+        }
+    }
+
+    public float getEnergy() {
+        return stats.get("energy");
+    }
+
+    public void setEnergy(float energy) {
+        stats.put("energy", Math.min(Math.max(energy, 0), stats.get("max energy")));
+    }
+
+    public float getMaxEnergy() {
+        return stats.get("max energy");
+    }
+
+    public void setMaxEnergy(float maxEnergy) {
+        boolean fullyEnergized = (stats.get("max energy") <= energy);
+        maxEnergy = Math.max(maxEnergy, 0);
+        stats.put("max energy", maxEnergy);
+        if(energy > maxEnergy || fullyEnergized) {
+            energy = maxEnergy;
         }
     }
 }
