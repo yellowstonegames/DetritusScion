@@ -1,15 +1,23 @@
 package com.github.yellowstonegames.mobs;
 
 import com.github.tommyettinger.ds.ObjectFloatOrderedMap;
+import com.github.tommyettinger.random.EnhancedRandom;
+import com.github.tommyettinger.textra.Font;
+import com.github.yellowstonegames.core.FullPalette;
+import com.github.yellowstonegames.core.StringTools;
 import com.github.yellowstonegames.glyph.GlyphActor;
+import com.github.yellowstonegames.glyph.GlyphGrid;
+import com.github.yellowstonegames.grid.Coord;
+import com.github.yellowstonegames.util.RNG;
 
 public class Mob implements HasStats {
     public long glyph;
     public transient GlyphActor actor;
 
-    public ObjectFloatOrderedMap<String> baseStats = new ObjectFloatOrderedMap<>(COMBAT_STATS, COMBAT_VALUES);
-
+    public ObjectFloatOrderedMap<String> baseStats =
+            new ObjectFloatOrderedMap<>(COMBAT_STATS.length + VITAL_STATS.length + SLOTS.length);
     {
+        baseStats.putAll(COMBAT_STATS, COMBAT_VALUES);
         baseStats.putAll(VITAL_STATS, VITAL_VALUES);
         baseStats.putAll(SLOTS, SLOT_VALUES);
     }
@@ -17,6 +25,63 @@ public class Mob implements HasStats {
     public ObjectFloatOrderedMap<String> stats = new ObjectFloatOrderedMap<>(baseStats);
 
     public transient Runnable onDeath;
+
+    public Mob() {
+        glyph = Font.applyColor(StringTools.LETTERS.charAt(RNG.rng.nextInt(StringTools.LETTERS.length())),
+                FullPalette.COLORS_BY_HUE.random(RNG.rng));
+        actor = new GlyphActor(glyph, null);
+    }
+
+    public Mob(GlyphGrid gg, Coord position) {
+        Font font = gg.getFont();
+
+        char c = StringTools.LETTERS.charAt(RNG.rng.nextInt(StringTools.LETTERS.length()));
+        int problems = 0;
+        while (!font.mapping.containsKey(c) && ++problems < 10)
+            c = StringTools.LETTERS.charAt(RNG.rng.nextInt(StringTools.LETTERS.length()));
+        if(problems == 10)
+            c = (char)RNG.rng.nextInt('A', 'Z'+1);
+
+        glyph = Font.applyColor(c,
+                FullPalette.COLORS_BY_HUE.random(RNG.rng));
+        actor = new GlyphActor(glyph, font);
+        actor.setLocation(position);
+    }
+
+    public Mob(GlyphGrid gg, Coord position, EnhancedRandom chaos) {
+        Font font = gg.getFont();
+        char c = StringTools.LETTERS.charAt(chaos.nextInt(StringTools.LETTERS.length()));
+        int problems = 0;
+        while (!font.mapping.containsKey(c) && ++problems < 10)
+            c = StringTools.LETTERS.charAt(chaos.nextInt(StringTools.LETTERS.length()));
+        if(problems == 10)
+            c = (char)chaos.nextInt('A', 'Z'+1);
+
+        glyph = Font.applyColor(c,
+                FullPalette.COLORS_BY_HUE.random(chaos));
+        actor = new GlyphActor(glyph, font);
+        actor.setLocation(position);
+    }
+
+    public Mob(GlyphGrid gg, Coord position, long glyph) {
+        Font font = gg.getFont();
+        this.glyph = glyph;
+        actor = new GlyphActor(this.glyph, font);
+        actor.setLocation(position);
+    }
+
+    public Mob(GlyphGrid gg, Coord position, long glyph, Runnable onDeath, ObjectFloatOrderedMap<String> statReplacements) {
+        Font font = gg.getFont();
+        this.glyph = glyph;
+        actor = new GlyphActor(this.glyph, font);
+        actor.setLocation(position);
+        if(onDeath != null)
+            this.onDeath = onDeath;
+        else
+            this.onDeath = () -> gg.removeActor(actor);
+        if(statReplacements != null)
+            baseStats.putAll(statReplacements);
+    }
 
     @Override
     public ObjectFloatOrderedMap<String> getBaseStats() {
