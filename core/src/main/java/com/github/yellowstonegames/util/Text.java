@@ -3,6 +3,7 @@ package com.github.yellowstonegames.util;
 import com.badlogic.gdx.graphics.Color;
 
 import com.github.yellowstonegames.core.DigitTools;
+import com.github.yellowstonegames.text.Thesaurus;
 import regexodus.Matcher;
 import regexodus.Pattern;
 
@@ -12,6 +13,7 @@ import java.util.Collection;
 
 public class Text {
 
+    public static final Thesaurus thesaurus = new Thesaurus(RNG.rng.nextLong(), RNG.rng.nextLong());
     public static char randomBraille() {
         return (char) RNG.rng.between(0x2801, 0x2900);
     }

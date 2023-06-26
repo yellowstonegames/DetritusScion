@@ -1,5 +1,6 @@
 package com.github.yellowstonegames.mobs;
 
+import com.github.tommyettinger.digital.Hasher;
 import com.github.tommyettinger.ds.ObjectFloatOrderedMap;
 import com.github.tommyettinger.random.EnhancedRandom;
 import com.github.tommyettinger.textra.Font;
@@ -8,6 +9,7 @@ import com.github.yellowstonegames.core.StringTools;
 import com.github.yellowstonegames.glyph.GlyphActor;
 import com.github.yellowstonegames.glyph.GlyphGrid;
 import com.github.yellowstonegames.grid.Coord;
+import com.github.yellowstonegames.text.Language;
 import com.github.yellowstonegames.util.RNG;
 
 public class Mob implements HasStats {
@@ -21,6 +23,7 @@ public class Mob implements HasStats {
         baseStats.putAll(VITAL_STATS, VITAL_VALUES);
         baseStats.putAll(SLOTS, SLOT_VALUES);
     }
+    public String name;
 
     public ObjectFloatOrderedMap<String> stats = new ObjectFloatOrderedMap<>(baseStats);
 
@@ -30,6 +33,8 @@ public class Mob implements HasStats {
         glyph = Font.applyColor(StringTools.LETTERS.charAt(RNG.rng.nextInt(StringTools.LETTERS.length())),
                 FullPalette.COLORS_BY_HUE.random(RNG.rng));
         actor = new GlyphActor(glyph, null);
+        name = RNG.rng.randomElement(Language.romanizedHumanLanguages).word(RNG.rng, true) + " " +
+                RNG.rng.randomElement(Language.romanizedHumanLanguages).word(RNG.rng, true);
     }
 
     public Mob(GlyphGrid gg, Coord position) {
@@ -50,6 +55,9 @@ public class Mob implements HasStats {
         else
             actor.setVisible(false);
         this.onDeath = () -> gg.removeActor(actor);
+        name = RNG.rng.randomElement(Language.romanizedHumanLanguages).word(RNG.rng, true) + " " +
+                RNG.rng.randomElement(Language.romanizedHumanLanguages).word(RNG.rng, true);
+
     }
 
     public Mob(GlyphGrid gg, Coord position, EnhancedRandom chaos) {
@@ -69,6 +77,9 @@ public class Mob implements HasStats {
         else
             actor.setVisible(false);
         this.onDeath = () -> gg.removeActor(actor);
+        name = chaos.randomElement(Language.romanizedHumanLanguages).word(chaos, true) + " " +
+                chaos.randomElement(Language.romanizedHumanLanguages).word(chaos, true);
+
     }
 
     public Mob(GlyphGrid gg, Coord position, long glyph) {
@@ -76,10 +87,15 @@ public class Mob implements HasStats {
         this.glyph = glyph;
         actor = new GlyphActor(this.glyph, font);
         if(position != null)
+        {
             actor.setLocation(position);
+            glyph ^= position.hashCode();
+        }
         else
             actor.setVisible(false);
         this.onDeath = () -> gg.removeActor(actor);
+        name = Language.romanizedHumanLanguages[Hasher.randomize3Bounded(++glyph, Language.romanizedHumanLanguages.length)].word(Hasher.randomize3(++glyph), true) + " " +
+                Language.romanizedHumanLanguages[Hasher.randomize3Bounded(++glyph, Language.romanizedHumanLanguages.length)].word(Hasher.randomize3(++glyph), true);
     }
 
     public Mob(GlyphGrid gg, Coord position, long glyph, Runnable onDeath, ObjectFloatOrderedMap<String> statReplacements) {
@@ -87,7 +103,10 @@ public class Mob implements HasStats {
         this.glyph = glyph;
         actor = new GlyphActor(this.glyph, font);
         if(position != null)
+        {
             actor.setLocation(position);
+            glyph ^= position.hashCode();
+        }
         else
             actor.setVisible(false);
         if(onDeath != null)
@@ -99,6 +118,37 @@ public class Mob implements HasStats {
             baseStats.putAll(statReplacements);
             stats.putAll(statReplacements);
         }
+        name = Language.romanizedHumanLanguages[Hasher.randomize3Bounded(++glyph, Language.romanizedHumanLanguages.length)].word(Hasher.randomize3(++glyph), true) + " " +
+                Language.romanizedHumanLanguages[Hasher.randomize3Bounded(++glyph, Language.romanizedHumanLanguages.length)].word(Hasher.randomize3(++glyph), true);
+    }
+
+    public Mob(GlyphGrid gg, Coord position, long glyph, Runnable onDeath, ObjectFloatOrderedMap<String> statReplacements,
+               String name) {
+        Font font = gg.getFont();
+        this.glyph = glyph;
+        actor = new GlyphActor(this.glyph, font);
+        if(position != null)
+        {
+            actor.setLocation(position);
+            glyph ^= position.hashCode();
+        }
+        else
+            actor.setVisible(false);
+        if(onDeath != null)
+            this.onDeath = onDeath;
+        else
+            this.onDeath = () -> gg.removeActor(actor);
+        if(statReplacements != null)
+        {
+            baseStats.putAll(statReplacements);
+            stats.putAll(statReplacements);
+        }
+        if(name != null)
+            this.name = name;
+        else
+            name = Language.romanizedHumanLanguages[Hasher.randomize3Bounded(++glyph, Language.romanizedHumanLanguages.length)].word(Hasher.randomize3(++glyph), true) + " " +
+                    Language.romanizedHumanLanguages[Hasher.randomize3Bounded(++glyph, Language.romanizedHumanLanguages.length)].word(Hasher.randomize3(++glyph), true);
+
     }
 
     @Override
@@ -158,11 +208,12 @@ public class Mob implements HasStats {
     }
 
     public void setMaxHealth(float maxHealth) {
+        float health = stats.get("health");
         boolean fullyHealed = (stats.get("max health") <= health);
         maxHealth = Math.max(maxHealth, 0);
         stats.put("max health", maxHealth);
         if(health > maxHealth || fullyHealed) {
-            health = maxHealth;
+            setHealth(maxHealth);
         }
     }
 
@@ -179,11 +230,12 @@ public class Mob implements HasStats {
     }
 
     public void setMaxEnergy(float maxEnergy) {
+        float energy = stats.get("energy");
         boolean fullyEnergized = (stats.get("max energy") <= energy);
         maxEnergy = Math.max(maxEnergy, 0);
         stats.put("max energy", maxEnergy);
         if(energy > maxEnergy || fullyEnergized) {
-            energy = maxEnergy;
+            setEnergy(maxEnergy);
         }
     }
 }
