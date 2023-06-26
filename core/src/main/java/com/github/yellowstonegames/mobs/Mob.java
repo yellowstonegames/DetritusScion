@@ -33,8 +33,8 @@ public class Mob implements HasStats {
         glyph = Font.applyColor(StringTools.LETTERS.charAt(RNG.rng.nextInt(StringTools.LETTERS.length())),
                 FullPalette.COLORS_BY_HUE.random(RNG.rng));
         actor = new GlyphActor(glyph, null);
-        name = RNG.rng.randomElement(Language.romanizedHumanLanguages).word(RNG.rng, true) + " " +
-                RNG.rng.randomElement(Language.romanizedHumanLanguages).word(RNG.rng, true);
+        Language lang = RNG.rng.randomElement(Language.romanizedHumanLanguages);
+        name = lang.word(RNG.rng, true) + " " + lang.word(RNG.rng, true);
     }
 
     public Mob(GlyphGrid gg, Coord position) {
@@ -55,9 +55,8 @@ public class Mob implements HasStats {
         else
             actor.setVisible(false);
         this.onDeath = () -> gg.removeActor(actor);
-        name = RNG.rng.randomElement(Language.romanizedHumanLanguages).word(RNG.rng, true) + " " +
-                RNG.rng.randomElement(Language.romanizedHumanLanguages).word(RNG.rng, true);
-
+        Language lang = RNG.rng.randomElement(Language.romanizedHumanLanguages);
+        name = lang.word(RNG.rng, true) + " " + lang.word(RNG.rng, true);
     }
 
     public Mob(GlyphGrid gg, Coord position, EnhancedRandom chaos) {
@@ -77,9 +76,8 @@ public class Mob implements HasStats {
         else
             actor.setVisible(false);
         this.onDeath = () -> gg.removeActor(actor);
-        name = chaos.randomElement(Language.romanizedHumanLanguages).word(chaos, true) + " " +
-                chaos.randomElement(Language.romanizedHumanLanguages).word(chaos, true);
-
+        Language lang = chaos.randomElement(Language.romanizedHumanLanguages);
+        name = lang.word(chaos, true) + " " + lang.word(chaos, true);
     }
 
     public Mob(GlyphGrid gg, Coord position, long glyph) {
@@ -94,8 +92,8 @@ public class Mob implements HasStats {
         else
             actor.setVisible(false);
         this.onDeath = () -> gg.removeActor(actor);
-        name = Language.romanizedHumanLanguages[Hasher.randomize3Bounded(++glyph, Language.romanizedHumanLanguages.length)].word(Hasher.randomize3(++glyph), true) + " " +
-                Language.romanizedHumanLanguages[Hasher.randomize3Bounded(++glyph, Language.romanizedHumanLanguages.length)].word(Hasher.randomize3(++glyph), true);
+        Language lang = Language.romanizedHumanLanguages[Hasher.randomize3Bounded(glyph + 123, Language.romanizedHumanLanguages.length)];
+        name = lang.word(Hasher.randomize3(glyph + 456), true) + " " + lang.word(Hasher.randomize3(glyph + 789), true);
     }
 
     public Mob(GlyphGrid gg, Coord position, long glyph, Runnable onDeath, ObjectFloatOrderedMap<String> statReplacements) {
@@ -118,8 +116,8 @@ public class Mob implements HasStats {
             baseStats.putAll(statReplacements);
             stats.putAll(statReplacements);
         }
-        name = Language.romanizedHumanLanguages[Hasher.randomize3Bounded(++glyph, Language.romanizedHumanLanguages.length)].word(Hasher.randomize3(++glyph), true) + " " +
-                Language.romanizedHumanLanguages[Hasher.randomize3Bounded(++glyph, Language.romanizedHumanLanguages.length)].word(Hasher.randomize3(++glyph), true);
+        Language lang = Language.romanizedHumanLanguages[Hasher.randomize3Bounded(glyph + 123, Language.romanizedHumanLanguages.length)];
+        name = lang.word(Hasher.randomize3(glyph + 456), true) + " " + lang.word(Hasher.randomize3(glyph + 789), true);
     }
 
     public Mob(GlyphGrid gg, Coord position, long glyph, Runnable onDeath, ObjectFloatOrderedMap<String> statReplacements,
@@ -145,10 +143,10 @@ public class Mob implements HasStats {
         }
         if(name != null)
             this.name = name;
-        else
-            name = Language.romanizedHumanLanguages[Hasher.randomize3Bounded(++glyph, Language.romanizedHumanLanguages.length)].word(Hasher.randomize3(++glyph), true) + " " +
-                    Language.romanizedHumanLanguages[Hasher.randomize3Bounded(++glyph, Language.romanizedHumanLanguages.length)].word(Hasher.randomize3(++glyph), true);
-
+        else {
+            Language lang = Language.romanizedHumanLanguages[Hasher.randomize3Bounded(glyph + 123, Language.romanizedHumanLanguages.length)];
+            name = lang.word(Hasher.randomize3(glyph + 456), true) + " " + lang.word(Hasher.randomize3(glyph + 789), true);
+        }
     }
 
     @Override
@@ -237,5 +235,10 @@ public class Mob implements HasStats {
         if(energy > maxEnergy || fullyEnergized) {
             setEnergy(maxEnergy);
         }
+    }
+
+    @Override
+    public String toString() {
+        return (char)glyph + " " + name;
     }
 }

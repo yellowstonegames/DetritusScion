@@ -3,16 +3,11 @@ package com.github.yellowstonegames.mobs;
 import com.github.tommyettinger.ds.ObjectFloatOrderedMap;
 import com.github.tommyettinger.textra.Font;
 import com.github.yellowstonegames.core.DescriptiveColor;
-import com.github.yellowstonegames.core.FullPalette;
-import com.github.yellowstonegames.core.StringTools;
 import com.github.yellowstonegames.glyph.GlyphActor;
 import com.github.yellowstonegames.glyph.GlyphGrid;
 import com.github.yellowstonegames.grid.Coord;
-import com.github.yellowstonegames.text.Thesaurus;
 import com.github.yellowstonegames.util.RNG;
 import com.github.yellowstonegames.util.Text;
-
-import java.util.Objects;
 
 public class Item implements HasStats {
     public static final String ITEM_CHARS = "⌶⌷⌸⌹⌺⌻⌼⌽⌾⍁⍂⍃⍄⍅⍆⍇⍈⍉⍊⍋⍌⍍⍎⍏⍐⍑⍒⍓⍔⍕⍖⍗⍘⍙⍚⍛⍜⍝⍞⍟⍠⍡⍢⍣⍤⍥⍨⍩⍪⍫⍬⍮⍯⍰";
@@ -63,4 +58,10 @@ public class Item implements HasStats {
             this.name = Text.thesaurus.process("weapon`noun`");
         }
     }
+
+    @Override
+    public String toString() {
+        return (char)glyph + " " + name;
+    }
+
 }
