@@ -45,7 +45,11 @@ public class Mob implements HasStats {
         glyph = Font.applyColor(c,
                 FullPalette.COLORS_BY_HUE.random(RNG.rng));
         actor = new GlyphActor(glyph, font);
-        actor.setLocation(position);
+        if(position != null)
+            actor.setLocation(position);
+        else
+            actor.setVisible(false);
+        this.onDeath = () -> gg.removeActor(actor);
     }
 
     public Mob(GlyphGrid gg, Coord position, EnhancedRandom chaos) {
@@ -60,27 +64,41 @@ public class Mob implements HasStats {
         glyph = Font.applyColor(c,
                 FullPalette.COLORS_BY_HUE.random(chaos));
         actor = new GlyphActor(glyph, font);
-        actor.setLocation(position);
+        if(position != null)
+            actor.setLocation(position);
+        else
+            actor.setVisible(false);
+        this.onDeath = () -> gg.removeActor(actor);
     }
 
     public Mob(GlyphGrid gg, Coord position, long glyph) {
         Font font = gg.getFont();
         this.glyph = glyph;
         actor = new GlyphActor(this.glyph, font);
-        actor.setLocation(position);
+        if(position != null)
+            actor.setLocation(position);
+        else
+            actor.setVisible(false);
+        this.onDeath = () -> gg.removeActor(actor);
     }
 
     public Mob(GlyphGrid gg, Coord position, long glyph, Runnable onDeath, ObjectFloatOrderedMap<String> statReplacements) {
         Font font = gg.getFont();
         this.glyph = glyph;
         actor = new GlyphActor(this.glyph, font);
-        actor.setLocation(position);
+        if(position != null)
+            actor.setLocation(position);
+        else
+            actor.setVisible(false);
         if(onDeath != null)
             this.onDeath = onDeath;
         else
             this.onDeath = () -> gg.removeActor(actor);
         if(statReplacements != null)
+        {
             baseStats.putAll(statReplacements);
+            stats.putAll(statReplacements);
+        }
     }
 
     @Override
