@@ -244,6 +244,12 @@ public class DungeonDemo extends ApplicationAdapter {
     }
 
     public void regenerate(){
+        enemies.clear();
+        Actor[] kids = gg.children.begin();
+        for(int c = 0; c < gg.children.size; c++)
+            kids[c].clearActions();
+        gg.children.end();
+        gg.clearChildren(true);
         dungeonProcessor.setPlaceGrid(dungeon = LineTools.hashesToLines(dungeonProcessor.generate(), true));
         bare = dungeonProcessor.getBarePlaceGrid();
         EnhancedRandom rng = dungeonProcessor.rng;
@@ -252,6 +258,7 @@ public class DungeonDemo extends ApplicationAdapter {
         Region floors = new Region(bare, '.');
         Coord player = floors.singleRandom(rng);
         this.player.actor.setLocation(player);
+        gg.addActor(this.player.actor);
         floors.remove(player);
         Coord[] selected = floors.separatedBlue(0.125f, 26);
         for (int i = 0; i < 26 && i < selected.length; i++) {
