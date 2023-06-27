@@ -60,6 +60,9 @@ public class DungeonDemo extends ApplicationAdapter {
 
     private Config config;
 
+    private static final int DUNGEON_WIDTH = 100;
+    private static final int DUNGEON_HEIGHT = 100;
+
     private static final int DEEP_OKLAB = describeOklab("dark dull cobalt");
     private static final int SHALLOW_OKLAB = describeOklab("dull denim");
     private static final int LAVA_OKLAB = describeOklab("dark rich ember");
@@ -107,7 +110,9 @@ public class DungeonDemo extends ApplicationAdapter {
 
         int mapGridWidth = config.displayConfig.mapSize.gridWidth;
         int mapGridHeight = config.displayConfig.mapSize.gridHeight;
-        gg = new GlyphGrid(font, mapGridWidth, mapGridHeight, true);
+        gg = new GlyphGrid(font, DUNGEON_WIDTH, DUNGEON_HEIGHT, true);
+        gg.viewport.setWorldSize(config.displayConfig.mapSize.gridWidth, config.displayConfig.mapSize.gridHeight);
+        gg.backgrounds = new int[DUNGEON_WIDTH][DUNGEON_HEIGHT];
         //use Ă to test glyph height
         String name = Language.ANCIENT_EGYPTIAN.word(TimeUtils.millis(), true);
 //        String replaced = Pattern.compile("([aeiou])").replacer("@").replace(name, 1);
@@ -118,7 +123,7 @@ public class DungeonDemo extends ApplicationAdapter {
 //        player.glyph = gg.getFont().markupGlyph("[dark richer red raspberry][+imperial-crown]");
         player.glyph = gg.getFont().markupGlyph("[dark richer red raspberry]@");
         player.actor = new GlyphActor(player.glyph, gg.getFont());
-        player.actor.setName(name);
+        player.setName(name);
         gg.addActor(player.actor);
         enemies = new CoordObjectOrderedMap<>(26);
         post = () -> {
@@ -132,16 +137,16 @@ public class DungeonDemo extends ApplicationAdapter {
                 awaitedMoves.remove(0);
         };
 
-        dungeonProcessor = new DungeonProcessor(mapGridWidth, mapGridHeight, random);
+        dungeonProcessor = new DungeonProcessor(DUNGEON_WIDTH, DUNGEON_HEIGHT, random);
         dungeonProcessor.addWater(DungeonProcessor.ALL, 20);
         dungeonProcessor.addGrass(DungeonProcessor.ALL, 10);
         dungeonProcessor.addLake(20, '₤', '¢');
         waves.setFractalType(Noise.RIDGED_MULTI);
         ridges.setFractalType(Noise.RIDGED_MULTI);
-        seen = new Region(mapGridWidth, mapGridHeight);
-        blockage = new Region(mapGridWidth, mapGridHeight);
-        prunedDungeon = new char[mapGridWidth][mapGridHeight];
-        inView = new Region(mapGridWidth, mapGridHeight);
+        seen = new Region(DUNGEON_WIDTH, DUNGEON_HEIGHT);
+        blockage = new Region(DUNGEON_WIDTH, DUNGEON_HEIGHT);
+        prunedDungeon = new char[DUNGEON_WIDTH][DUNGEON_HEIGHT];
+        inView = new Region(DUNGEON_WIDTH, DUNGEON_HEIGHT);
         input.setInputProcessor(new InputAdapter(){
             @Override
             public boolean keyDown(int keycode) {
@@ -220,7 +225,7 @@ public class DungeonDemo extends ApplicationAdapter {
         if(player.actor.hasActions()) return;
         final Coord old = player.actor.getLocation();
         final Coord next = Coord.get(Math.round(player.actor.getX() + way.deltaX), Math.round(player.actor.getY() + way.deltaY));
-        if(next.isWithin(config.displayConfig.mapSize.gridWidth, config.displayConfig.mapSize.gridHeight) && bare[next.x][next.y] == '.') {
+        if(next.isWithin(DUNGEON_WIDTH, DUNGEON_HEIGHT) && bare[next.x][next.y] == '.') {
             player.actor.addAction(MoreActions.slideTo(next.x, next.y, 0.2f, post));
             if(enemies.containsKey(next)){
                 gg.burst(
@@ -273,7 +278,8 @@ public class DungeonDemo extends ApplicationAdapter {
         blockage.remake(seen).not().fringe8way();
         LineTools.pruneLines(dungeon, seen, prunedDungeon);
         gg.setVisibilities(inView::contains);
-        gg.backgrounds = new int[config.displayConfig.mapSize.gridWidth][config.displayConfig.mapSize.gridHeight];
+//        gg.backgrounds = new int[config.displayConfig.mapSize.gridWidth][config.displayConfig.mapSize.gridHeight];
+//        ArrayTools.fill(gg.backgrounds, 0);
         gg.map.clear();
         if(playerToCursor == null)
             playerToCursor = new DijkstraMap(bare, Measurement.EUCLIDEAN);
@@ -291,8 +297,8 @@ public class DungeonDemo extends ApplicationAdapter {
                 limitToGamut(100,
                         (int) (TrigTools.sinTurns(modifiedTime * 0.2f) * 40f) + 128, (int) (TrigTools.cosTurns(modifiedTime * 0.2f) * 40f) + 128, 255));
 //        FOV.reuseFOV(res, light, playerX, playerY, LineWobble.wobble(12345, modifiedTime) * 2.5f + 4f, Radius.CIRCLE);
-        for (int y = 0; y < config.displayConfig.mapSize.gridHeight; y++) {
-            for (int x = 0; x < config.displayConfig.mapSize.gridWidth; x++) {
+        for (int y = 0; y < DUNGEON_HEIGHT; y++) {
+            for (int x = 0; x < DUNGEON_WIDTH; x++) {
                 if (inView.contains(x, y)) {
                     if(toCursor.contains(Coord.get(x, y))){
                         gg.backgrounds[x][y] = rainbow;
@@ -439,7 +445,9 @@ public class DungeonDemo extends ApplicationAdapter {
 
         ScreenUtils.clear(Color.BLACK);
         Camera camera = gg.viewport.getCamera();
-        camera.position.set(gg.getGridWidth() * 0.5f, gg.getGridHeight() * 0.5f, 0f);
+        camera.position.set(player.actor.getX(), player.actor.getY(), 0f);
+        // this keeps the map stationary, but does not allow the map to be larger than the screen.
+//        camera.position.set(gg.getGridWidth() * 0.5f, gg.getGridHeight() * 0.5f, 0f);
         camera.update();
         stage.act();
         stage.draw();
@@ -459,8 +467,8 @@ public class DungeonDemo extends ApplicationAdapter {
 
     private boolean onGrid(int screenX, int screenY) {
         return screenX >= 0
-            && screenX < config.displayConfig.mapSize.gridWidth
+            && screenX < DUNGEON_WIDTH
             && screenY >= 0
-            && screenY < config.displayConfig.mapSize.gridHeight;
+            && screenY < DUNGEON_HEIGHT;
     }
 }

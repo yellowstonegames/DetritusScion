@@ -23,7 +23,7 @@ public class Mob implements HasStats {
         baseStats.putAll(VITAL_STATS, VITAL_VALUES);
         baseStats.putAll(SLOTS, SLOT_VALUES);
     }
-    public String name;
+    protected String name;
 
     public ObjectFloatOrderedMap<String> stats = new ObjectFloatOrderedMap<>(baseStats);
 
@@ -235,6 +235,16 @@ public class Mob implements HasStats {
         if(energy > maxEnergy || fullyEnergized) {
             setEnergy(maxEnergy);
         }
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+        if(actor != null)
+            actor.setName(name);
     }
 
     @Override
