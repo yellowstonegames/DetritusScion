@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
@@ -25,7 +26,17 @@ import com.github.yellowstonegames.files.Config;
 import com.github.yellowstonegames.glyph.GlyphActor;
 import com.github.yellowstonegames.glyph.GlyphGrid;
 import com.github.yellowstonegames.glyph.MoreActions;
-import com.github.yellowstonegames.grid.*;
+import com.github.yellowstonegames.grid.Coord;
+import com.github.yellowstonegames.grid.CoordObjectOrderedMap;
+import com.github.yellowstonegames.grid.Direction;
+import com.github.yellowstonegames.grid.FOV;
+import com.github.yellowstonegames.grid.LightingManager;
+import com.github.yellowstonegames.grid.LineTools;
+import com.github.yellowstonegames.grid.Measurement;
+import com.github.yellowstonegames.grid.Noise;
+import com.github.yellowstonegames.grid.Radiance;
+import com.github.yellowstonegames.grid.Radius;
+import com.github.yellowstonegames.grid.Region;
 import com.github.yellowstonegames.mobs.Mob;
 import com.github.yellowstonegames.path.DijkstraMap;
 import com.github.yellowstonegames.place.DungeonProcessor;
@@ -44,7 +55,6 @@ public class DungeonDemo extends ApplicationAdapter {
     private GlyphGrid gg;
     private DungeonProcessor dungeonProcessor;
     private char[][] bare, dungeon, prunedDungeon;
-    private float[][] res, light;
     private Region seen, inView, blockage;
     private final Noise waves = new Noise(123, 0.5f, Noise.FOAM_FRACTAL, 1);
     private final Noise ridges = new Noise(12345, 0.6f, Noise.FOAM_FRACTAL, 1);
@@ -92,13 +102,13 @@ public class DungeonDemo extends ApplicationAdapter {
         Font font = KnownFonts.addGameIcons(KnownFonts.getIosevkaSlab().scaleTo(16f, 28f).adjustLineHeight(1.25f));
 //        Font font = new Font("Iosevka-Slab-standard.fnt", "Iosevka-Slab-standard.png", STANDARD, 0f, 0f, 0f, 0f, true)
 //            .scaleTo(15f, 24f).setTextureFilter().setName("Iosevka Slab");
-        ShaderProgram shader = new ShaderProgram(Gdx.files.internal("shaders/vertex.glsl"),
-                Gdx.files.internal("shaders/colorblindness-cor.frag.glsl"));
-//                Gdx.files.internal("shaders/colorblindness-sim.frag.glsl"));
-        if(!shader.isCompiled())
-            System.out.println(shader.getLog());
-        stage.getBatch().setShader(shader);
-        font.shader = shader;
+//        ShaderProgram shader = new ShaderProgram(Gdx.files.internal("shaders/vertex.glsl"),
+//                Gdx.files.internal("shaders/colorblindness-cor.frag.glsl"));
+////                Gdx.files.internal("shaders/colorblindness-sim.frag.glsl"));
+//        if(!shader.isCompiled())
+//            System.out.println(shader.getLog());
+//        stage.getBatch().setShader(shader);
+//        font.shader = shader;
 
         int mapGridWidth = config.displayConfig.mapSize.gridWidth;
         int mapGridHeight = config.displayConfig.mapSize.gridHeight;
@@ -133,7 +143,6 @@ public class DungeonDemo extends ApplicationAdapter {
         dungeonProcessor.addLake(20, '₤', '¢');
         waves.setFractalType(Noise.RIDGED_MULTI);
         ridges.setFractalType(Noise.RIDGED_MULTI);
-        light = new float[mapGridWidth][mapGridHeight];
         seen = new Region(mapGridWidth, mapGridHeight);
         blockage = new Region(mapGridWidth, mapGridHeight);
         prunedDungeon = new char[mapGridWidth][mapGridHeight];
@@ -214,7 +223,7 @@ public class DungeonDemo extends ApplicationAdapter {
     public void move(Direction way){
         // this prevents movements from restarting while a slide is already in progress.
         if(player.actor.hasActions()) return;
-
+        final Coord old = player.actor.getLocation();
         final Coord next = Coord.get(Math.round(player.actor.getX() + way.deltaX), Math.round(player.actor.getY() + way.deltaY));
         if(next.isWithin(config.displayConfig.mapSize.gridWidth, config.displayConfig.mapSize.gridHeight) && bare[next.x][next.y] == '.') {
             player.actor.addAction(MoreActions.slideTo(next.x, next.y, 0.2f, post));
@@ -227,8 +236,8 @@ public class DungeonDemo extends ApplicationAdapter {
                         0f, 120f, 1f);
                 gg.removeActor(enemies.remove(next).actor);
                 lighting.removeLight(next);
-
             }
+            lighting.moveLight(old, next);
         } else {
             player.actor.addAction(MoreActions.bump(way, 0.3f));
         }
@@ -239,11 +248,10 @@ public class DungeonDemo extends ApplicationAdapter {
         bare = dungeonProcessor.getBarePlaceGrid();
         EnhancedRandom rng = dungeonProcessor.rng;
         ArrayTools.insert(dungeon, prunedDungeon, 0, 0);
-        res = FOV.generateSimpleResistances(bare);
-        lighting = new LightingManager(res, "dark gray black", Radius.CIRCLE, 6.5f);
+        lighting = new LightingManager(FOV.generateSimpleResistances(bare), "dark gray black", Radius.CIRCLE, 2.5f);
         Region floors = new Region(bare, '.');
         Coord player = floors.singleRandom(rng);
-        this.player.actor.setPosition(player.x, player.y);
+        this.player.actor.setLocation(player);
         floors.remove(player);
         Coord[] selected = floors.separatedBlue(0.125f, 26);
         for (int i = 0; i < 26 && i < selected.length; i++) {
@@ -255,8 +263,9 @@ public class DungeonDemo extends ApplicationAdapter {
             enemies.put(selected[i], mob);
             gg.addActor(enemy);
             lighting.addLight(selected[i], new Radiance(rng.nextFloat(3f) + 2f,
-                    FullPalette.COLOR_WHEEL_PALETTE_BRIGHT[rng.nextInt(FullPalette.COLOR_WHEEL_PALETTE_BRIGHT.length)], 0.5f, 0f));
+                    FullPalette.COLOR_WHEEL_PALETTE_FLUSH[rng.nextInt(FullPalette.COLOR_WHEEL_PALETTE_FLUSH.length)], 0.5f, 0f));
         }
+        lighting.addLight(player, new Radiance(5f, FullPalette.COSMIC_LATTE, 0.3f, 0f));
         lighting.calculateFOV(player.x, player.y, player.x - 10, player.y - 10, player.x + 11, player.y + 11);
         seen.remake(inView.refill(lighting.fovResult, 0.001f, 2f));
         blockage.remake(seen).not().fringe8way();
