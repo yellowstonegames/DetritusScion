@@ -1,16 +1,17 @@
-package com.github.yellowstonegames.mobs;
+package com.github.yellowstonegames.data;
 
 import com.github.tommyettinger.digital.Hasher;
 import com.github.tommyettinger.ds.ObjectFloatOrderedMap;
+import com.github.tommyettinger.ds.ObjectList;
 import com.github.tommyettinger.random.EnhancedRandom;
 import com.github.tommyettinger.textra.Font;
 import com.github.yellowstonegames.core.FullPalette;
-import com.github.yellowstonegames.core.StringTools;
 import com.github.yellowstonegames.glyph.GlyphActor;
 import com.github.yellowstonegames.glyph.GlyphGrid;
 import com.github.yellowstonegames.grid.Coord;
 import com.github.yellowstonegames.text.Language;
 import com.github.yellowstonegames.util.RNG;
+import com.github.yellowstonegames.util.Text;
 
 public class Mob implements HasStats {
     public long glyph;
@@ -27,10 +28,12 @@ public class Mob implements HasStats {
 
     public ObjectFloatOrderedMap<String> stats = new ObjectFloatOrderedMap<>(baseStats);
 
+    public ObjectList<Item> equipment = new ObjectList<>(16);
+
     public transient Runnable onDeath;
 
     public Mob() {
-        glyph = Font.applyColor(StringTools.LETTERS.charAt(RNG.rng.nextInt(StringTools.LETTERS.length())),
+        glyph = Font.applyColor(Text.USABLE_LETTERS.charAt(RNG.rng.nextInt(Text.USABLE_LETTERS.length())),
                 FullPalette.COLORS_BY_HUE.random(RNG.rng));
         actor = new GlyphActor(glyph, null);
         Language lang = RNG.rng.randomElement(Language.romanizedHumanLanguages);
@@ -40,10 +43,10 @@ public class Mob implements HasStats {
     public Mob(GlyphGrid gg, Coord position) {
         Font font = gg.getFont();
 
-        char c = StringTools.LETTERS.charAt(RNG.rng.nextInt(StringTools.LETTERS.length()));
+        char c = Text.USABLE_LETTERS.charAt(RNG.rng.nextInt(Text.USABLE_LETTERS.length()));
         int problems = 0;
         while (!font.mapping.containsKey(c) && ++problems < 10)
-            c = StringTools.LETTERS.charAt(RNG.rng.nextInt(StringTools.LETTERS.length()));
+            c = Text.USABLE_LETTERS.charAt(RNG.rng.nextInt(Text.USABLE_LETTERS.length()));
         if(problems == 10)
             c = (char)RNG.rng.nextInt('A', 'Z'+1);
 
@@ -61,10 +64,10 @@ public class Mob implements HasStats {
 
     public Mob(GlyphGrid gg, Coord position, EnhancedRandom chaos) {
         Font font = gg.getFont();
-        char c = StringTools.LETTERS.charAt(chaos.nextInt(StringTools.LETTERS.length()));
+        char c = Text.USABLE_LETTERS.charAt(chaos.nextInt(Text.USABLE_LETTERS.length()));
         int problems = 0;
         while (!font.mapping.containsKey(c) && ++problems < 10)
-            c = StringTools.LETTERS.charAt(chaos.nextInt(StringTools.LETTERS.length()));
+            c = Text.USABLE_LETTERS.charAt(chaos.nextInt(Text.USABLE_LETTERS.length()));
         if(problems == 10)
             c = (char)chaos.nextInt('A', 'Z'+1);
 
@@ -157,6 +160,44 @@ public class Mob implements HasStats {
     @Override
     public ObjectFloatOrderedMap<String> getStats() {
         return stats;
+    }
+
+    /**
+     * Equips an item, adding its stats to the Mob's if the Mob has adequate slots.
+     * @param item a non-null Item; if successfully donned, will be made invisible
+     * @return this, for chaining
+     */
+    public Mob don(Item item) {
+        if(equipment.contains(item))
+            return this; // if it's already equipped, do nothing.
+        for(String slot : HasStats.SLOTS){
+            if(stats.getOrDefault(slot, 0f) < item.baseStats.getOrDefault(slot, -Float.MAX_VALUE)) {
+                return this; // cannot equip because there are inadequate slots.
+            }
+        }
+        if(item.actor != null)
+            item.actor.setVisible(false);
+        addStats(item);
+        equipment.add(item);
+        return this;
+    }
+
+    /**
+     * Removes an item from a Mob's equipment, restoring slots and placing the Item in
+     * the Mob's cell (made visible).
+     * @param item a non-null Item in the Mob's equipment
+     * @return this, for chaining.
+     */
+    public Mob doff(Item item) {
+        if(equipment.remove(item)) {
+            // if the Item was actually removed from equipment, then put it on the floor.
+            subtractStats(item);
+            if (item.actor != null && this.actor != null) {
+                item.actor.setLocation(this.actor.getLocation());
+                item.actor.setVisible(true);
+            }
+        }
+        return this;
     }
 
     public float getOffense() {

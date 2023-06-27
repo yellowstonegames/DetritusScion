@@ -26,11 +26,10 @@ import com.github.yellowstonegames.glyph.GlyphActor;
 import com.github.yellowstonegames.glyph.GlyphGrid;
 import com.github.yellowstonegames.glyph.MoreActions;
 import com.github.yellowstonegames.grid.*;
-import com.github.yellowstonegames.mobs.Mob;
+import com.github.yellowstonegames.data.Mob;
 import com.github.yellowstonegames.path.DijkstraMap;
 import com.github.yellowstonegames.place.DungeonProcessor;
 import com.github.yellowstonegames.text.Language;
-import com.github.yellowstonegames.util.Text;
 
 import static com.badlogic.gdx.Gdx.input;
 import static com.badlogic.gdx.Input.Keys.*;
@@ -108,8 +107,6 @@ public class DungeonDemo extends ApplicationAdapter {
 //        stage.getBatch().setShader(shader);
 //        font.shader = shader;
 
-        int mapGridWidth = config.displayConfig.mapSize.gridWidth;
-        int mapGridHeight = config.displayConfig.mapSize.gridHeight;
         gg = new GlyphGrid(font, DUNGEON_WIDTH, DUNGEON_HEIGHT, true);
         gg.viewport.setWorldSize(config.displayConfig.mapSize.gridWidth, config.displayConfig.mapSize.gridHeight);
         gg.backgrounds = new int[DUNGEON_WIDTH][DUNGEON_HEIGHT];

@@ -1,6 +1,6 @@
 package com.github.yellowstonegames.util;
 
-import com.github.yellowstonegames.mobs.Mob;
+import com.github.yellowstonegames.data.Mob;
 
 public class CombatCalculator {
     // See this Desmos graph to compare the sqrt() option vs. the abs() option:

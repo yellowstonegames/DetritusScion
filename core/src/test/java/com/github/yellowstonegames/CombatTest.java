@@ -1,6 +1,6 @@
 package com.github.yellowstonegames;
 
-import com.github.yellowstonegames.mobs.Mob;
+import com.github.yellowstonegames.data.Mob;
 import com.github.yellowstonegames.util.CombatCalculator;
 import org.junit.Test;
 

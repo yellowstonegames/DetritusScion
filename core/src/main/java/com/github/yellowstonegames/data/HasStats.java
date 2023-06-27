@@ -1,4 +1,4 @@
-package com.github.yellowstonegames.mobs;
+package com.github.yellowstonegames.data;
 
 import com.github.tommyettinger.ds.ObjectFloatOrderedMap;
 

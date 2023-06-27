@@ -1,4 +1,4 @@
-package com.github.yellowstonegames.mobs;
+package com.github.yellowstonegames.data;
 
 import com.github.tommyettinger.ds.ObjectFloatOrderedMap;
 import com.github.tommyettinger.textra.Font;
@@ -10,7 +10,7 @@ import com.github.yellowstonegames.util.RNG;
 import com.github.yellowstonegames.util.Text;
 
 public class Item implements HasStats {
-    public static final String ITEM_CHARS = "⌶⌷⌸⌹⌺⌻⌼⌽⌾⍁⍂⍃⍄⍅⍆⍇⍈⍉⍊⍋⍌⍍⍎⍏⍐⍑⍒⍓⍔⍕⍖⍗⍘⍙⍚⍛⍜⍝⍞⍟⍠⍡⍢⍣⍤⍥⍨⍩⍪⍫⍬⍮⍯⍰";
+    public static final String ITEM_CHARS = Text.USABLE_SYMBOLS;
     public long glyph;
     public transient GlyphActor actor;
     public String name;
