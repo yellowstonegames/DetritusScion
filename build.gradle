@@ -28,6 +28,7 @@ configure(subprojects) {
   compileJava {
     options.incremental = true
   }
+  [compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
 }
 
 subprojects {

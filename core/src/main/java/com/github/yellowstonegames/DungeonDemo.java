@@ -6,7 +6,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -26,21 +25,12 @@ import com.github.yellowstonegames.files.Config;
 import com.github.yellowstonegames.glyph.GlyphActor;
 import com.github.yellowstonegames.glyph.GlyphGrid;
 import com.github.yellowstonegames.glyph.MoreActions;
-import com.github.yellowstonegames.grid.Coord;
-import com.github.yellowstonegames.grid.CoordObjectOrderedMap;
-import com.github.yellowstonegames.grid.Direction;
-import com.github.yellowstonegames.grid.FOV;
-import com.github.yellowstonegames.grid.LightingManager;
-import com.github.yellowstonegames.grid.LineTools;
-import com.github.yellowstonegames.grid.Measurement;
-import com.github.yellowstonegames.grid.Noise;
-import com.github.yellowstonegames.grid.Radiance;
-import com.github.yellowstonegames.grid.Radius;
-import com.github.yellowstonegames.grid.Region;
+import com.github.yellowstonegames.grid.*;
 import com.github.yellowstonegames.mobs.Mob;
 import com.github.yellowstonegames.path.DijkstraMap;
 import com.github.yellowstonegames.place.DungeonProcessor;
 import com.github.yellowstonegames.text.Language;
+import com.github.yellowstonegames.util.Text;
 
 import static com.badlogic.gdx.Gdx.input;
 import static com.badlogic.gdx.Input.Keys.*;
@@ -91,6 +81,11 @@ public class DungeonDemo extends ApplicationAdapter {
 
     @Override
     public void create() {
+//        System.out.println("USABLE_LETTERS:");
+//        System.out.println(Text.USABLE_LETTERS);
+//        System.out.println("USABLE_SYMBOLS:");
+//        System.out.println(Text.USABLE_SYMBOLS);
+
         Gdx.app.setLogLevel(Application.LOG_INFO);
         long seed = TimeUtils.millis() >>> 21;
         Gdx.app.log("SEED", "Initial seed is " + seed);
