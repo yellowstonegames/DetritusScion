@@ -401,9 +401,9 @@ public class DungeonDemo extends ApplicationAdapter {
             enemies.getAt(i).actor.setRotation((System.currentTimeMillis() & 0xFFFFFL) * 0.25f);
             Coord pos = enemies.keyAt(i);
             if(inView.contains(pos))
-                gg.map.remove(GlyphGrid.fuse(pos));
+                gg.map.remove(pos);
         }
-        gg.map.remove(GlyphGrid.fuse(player.actor.getLocation()));
+        gg.map.remove(player.actor.getLocation());
 
         if(!gg.areChildrenActing() && !awaitedMoves.isEmpty())
         {
