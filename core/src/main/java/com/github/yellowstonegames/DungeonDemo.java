@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.github.tommyettinger.digital.ArrayTools;
+import com.github.tommyettinger.digital.MathTools;
 import com.github.tommyettinger.digital.TrigTools;
 import com.github.tommyettinger.ds.ObjectList;
 import com.github.tommyettinger.random.EnhancedRandom;
@@ -66,8 +67,8 @@ public class DungeonDemo extends ApplicationAdapter {
     private static final int SHALLOW_OKLAB = describeOklab("dull denim");
     private static final int LAVA_OKLAB = describeOklab("dark rich ember");
     private static final int CHAR_OKLAB = describeOklab("darker dullmost black ember");
-    private static final int GRASS_OKLAB = describeOklab("duller dark green");
-    private static final int DRY_OKLAB = describeOklab("dull light apricot sage");
+    private static final int GRASS_OKLAB = describeOklab("dullest darkest green");
+    private static final int DRY_OKLAB = describeOklab("duller apricot sage");
     private static final int STONE_OKLAB = describeOklab("darkmost gray dullest bronze");
     private static final int MEMORY_RGBA = describe("darker gray black");
     private static final int deepText = toRGBA8888(offsetLightness(DEEP_OKLAB));
@@ -136,7 +137,7 @@ public class DungeonDemo extends ApplicationAdapter {
 
         dungeonProcessor = new DungeonProcessor(DUNGEON_WIDTH, DUNGEON_HEIGHT, random);
         dungeonProcessor.addWater(DungeonProcessor.ALL, 20);
-        dungeonProcessor.addGrass(DungeonProcessor.ALL, 10);
+        dungeonProcessor.addGrass(DungeonProcessor.ALL, 30);
         dungeonProcessor.addLake(20, '₤', '¢');
         waves.setFractalType(Noise.RIDGED_MULTI);
         ridges.setFractalType(Noise.RIDGED_MULTI);
@@ -319,10 +320,11 @@ public class DungeonDemo extends ApplicationAdapter {
                                 gg.backgrounds[x][y] = (lighten(CHAR_OKLAB, 0.2f * Math.min(0.8f, Math.max(0, lighting.fovResult[x][y] + ridges.getConfiguredNoise(x, y, modifiedTime)))));
                                 gg.put(x, y, prunedDungeon[x][y], charText);
                                 break;
-//                            case '"':
-//                                gg.backgrounds[x][y] = (darken(lerpColors(GRASS_OKLAB, DRY_OKLAB, waves.getConfiguredNoise(x, y) * 0.5f + 0.5f), 0.4f * Math.min(1.1f, Math.max(0, 1f - lighting.fovResult[x][y] + waves.getConfiguredNoise(x, y, modifiedTime * 0.7f)))));
-//                                gg.put(x, y, prunedDungeon[x][y], grassText);
-//                                break;
+                            case '"':
+                                gg.backgrounds[x][y] = lerpColors(GRASS_OKLAB, DRY_OKLAB, MathTools.square(IntPointHash.hash256(x, y, 12345) * 0x1.8p-9f));
+// (darken(lerpColors(GRASS_OKLAB, DRY_OKLAB, waves.getConfiguredNoise(x, y) * 0.5f + 0.5f), 0.4f * Math.min(1.1f, Math.max(0, 1f - lighting.fovResult[x][y] + waves.getConfiguredNoise(x, y, modifiedTime * 0.7f)))));
+                                gg.put(x, y, prunedDungeon[x][y], grassText);
+                                break;
                             case ' ':
                                 gg.backgrounds[x][y] = 0;
                                 break;
