@@ -31,6 +31,8 @@ import com.github.yellowstonegames.data.Mob;
 import com.github.yellowstonegames.path.DijkstraMap;
 import com.github.yellowstonegames.place.DungeonProcessor;
 import com.github.yellowstonegames.text.Language;
+import com.github.yellowstonegames.util.RNG;
+import com.github.yellowstonegames.util.Text;
 
 import static com.badlogic.gdx.Gdx.input;
 import static com.badlogic.gdx.Input.Keys.*;
@@ -123,7 +125,7 @@ public class DungeonDemo extends ApplicationAdapter {
         player.actor = new GlyphActor(player.glyph, gg.getFont());
         player.setName(name);
         gg.addActor(player.actor);
-        enemies = new CoordObjectOrderedMap<>(26);
+        enemies = new CoordObjectOrderedMap<>(100);
         post = () -> {
             int playerX = Math.round(player.actor.getX()), playerY = Math.round(player.actor.getY());
             lighting.calculateFOV(playerX, playerY, playerX - 10, playerY - 10, playerX + 11, playerY + 11);
@@ -258,17 +260,14 @@ public class DungeonDemo extends ApplicationAdapter {
         this.player.actor.setLocation(player);
         gg.addActor(this.player.actor);
         floors.remove(player);
-        Coord[] selected = floors.separatedBlue(0.125f, 26);
-        for (int i = 0; i < 26 && i < selected.length; i++) {
-            Mob mob = new Mob();
-            mob.glyph = (char)('A'+i) | ((long)DescriptiveColor.toRGBA8888(FullPalette.randomColorWheel(dungeonProcessor.rng)) << 32);
-            GlyphActor enemy = new GlyphActor(mob.glyph, gg.getFont());
-            enemy.setPosition(selected[i].x, selected[i].y);
-            mob.actor = enemy;
+        Coord[] selected = floors.randomPortion(RNG.rng, 100);
+        for (int i = 0, ci = 0; i < selected.length; i++, ci++) {
+            int color = rng.randomElement(FullPalette.COLOR_WHEEL_PALETTE_FLUSH);
+            Mob mob = new Mob(gg, selected[i], Text.USABLE_LETTERS.charAt(ci += RNG.rng.next(1)), toRGBA8888(darken(color, 0.1f)));
             enemies.put(selected[i], mob);
-            gg.addActor(enemy);
+            gg.addActor(mob.actor);
             lighting.addLight(selected[i], new Radiance(rng.nextFloat(3f) + 2f,
-                    FullPalette.COLOR_WHEEL_PALETTE_FLUSH[rng.nextInt(FullPalette.COLOR_WHEEL_PALETTE_FLUSH.length)], 0.5f, 0f));
+                    lighten(color, 0.2f), 0.5f, 0f));
         }
         lighting.addLight(player, new Radiance(5f, FullPalette.COSMIC_LATTE, 0.3f, 0f));
         lighting.calculateFOV(player.x, player.y, player.x - 10, player.y - 10, player.x + 11, player.y + 11);

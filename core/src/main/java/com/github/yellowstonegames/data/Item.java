@@ -58,7 +58,7 @@ public class Item implements HasStats {
         if(name != null)
             this.name = name;
         else {
-            this.name = Text.thesaurus.process("weapon`noun` of ancient_egyptian`gen`");
+            this.name = Text.thesaurus.process("weapon`noun` of ancient_egyptian`Gen`");
         }
     }
 

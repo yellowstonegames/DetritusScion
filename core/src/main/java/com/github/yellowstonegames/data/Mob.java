@@ -33,7 +33,7 @@ public class Mob implements HasStats {
     public transient Runnable onDeath;
 
     public Mob() {
-        glyph = Font.applyColor(Text.USABLE_LETTERS.charAt(RNG.rng.nextInt(Text.USABLE_LETTERS.length())),
+        glyph = Font.applyColor(RNG.rng.randomElement(Text.USABLE_LETTERS),
                 FullPalette.COLORS_BY_HUE.random(RNG.rng));
         actor = new GlyphActor(glyph, null);
         Language lang = RNG.rng.randomElement(Language.romanizedHumanLanguages);
@@ -43,10 +43,10 @@ public class Mob implements HasStats {
     public Mob(GlyphGrid gg, Coord position) {
         Font font = gg.getFont();
 
-        char c = Text.USABLE_LETTERS.charAt(RNG.rng.nextInt(Text.USABLE_LETTERS.length()));
+        char c = RNG.rng.randomElement(Text.USABLE_LETTERS);
         int problems = 0;
         while (!font.mapping.containsKey(c) && ++problems < 10)
-            c = Text.USABLE_LETTERS.charAt(RNG.rng.nextInt(Text.USABLE_LETTERS.length()));
+            c = RNG.rng.randomElement(Text.USABLE_LETTERS);
         if(problems == 10)
             c = (char)RNG.rng.nextInt('A', 'Z'+1);
 
@@ -85,6 +85,23 @@ public class Mob implements HasStats {
 
     public Mob(GlyphGrid gg, Coord position, long glyph) {
         Font font = gg.getFont();
+        this.glyph = glyph;
+        actor = new GlyphActor(this.glyph, font);
+        if(position != null)
+        {
+            actor.setLocation(position);
+            glyph ^= position.hashCode();
+        }
+        else
+            actor.setVisible(false);
+        this.onDeath = () -> gg.removeActor(actor);
+        Language lang = Language.romanizedHumanLanguages[Hasher.randomize3Bounded(glyph + 123, Language.romanizedHumanLanguages.length)];
+        name = lang.word(Hasher.randomize3(glyph + 456), true) + " " + lang.word(Hasher.randomize3(glyph + 789), true);
+    }
+
+    public Mob(GlyphGrid gg, Coord position, char ch, int color) {
+        Font font = gg.getFont();
+        long glyph = (long) color << 32 | ch;
         this.glyph = glyph;
         actor = new GlyphActor(this.glyph, font);
         if(position != null)
