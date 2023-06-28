@@ -3,6 +3,7 @@ package com.github.yellowstonegames.data;
 import com.github.tommyettinger.ds.ObjectFloatOrderedMap;
 import com.github.tommyettinger.textra.Font;
 import com.github.yellowstonegames.core.DescriptiveColor;
+import com.github.yellowstonegames.core.FullPalette;
 import com.github.yellowstonegames.glyph.GlyphActor;
 import com.github.yellowstonegames.glyph.GlyphGrid;
 import com.github.yellowstonegames.grid.Coord;
@@ -36,7 +37,9 @@ public class Item implements HasStats {
 
     public Item() {
         this(Font.applyColor(ITEM_CHARS.charAt(RNG.rng.nextInt(ITEM_CHARS.length())),
-                DescriptiveColor.lerpColors(DescriptiveColor.COLORS_BY_HUE.random(RNG.rng), DescriptiveColor.SILVER, 0.4f)),
+                DescriptiveColor.lerpColors(
+                        RNG.rng.randomElement(FullPalette.COLOR_WHEEL_PALETTE_MID), // extension method, woo!
+                        DescriptiveColor.SILVER, 0.4f)),
                 null, null, null, null);
 
     }
@@ -55,7 +58,7 @@ public class Item implements HasStats {
         if(name != null)
             this.name = name;
         else {
-            this.name = Text.thesaurus.process("weapon`noun`");
+            this.name = Text.thesaurus.process("weapon`noun` of ancient_egyptian`gen`");
         }
     }
 
