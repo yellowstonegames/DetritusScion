@@ -104,7 +104,7 @@ public class Item implements HasStats, Replicable {
      * @return a copy of this with a different identifier
      */
     @Override
-    public Item copy() {
+    public Item replicate() {
         Item replica = new Item(glyph, null, null, null, null);
         replica.baseStats.clear();
         replica.baseStats.putAll(baseStats);

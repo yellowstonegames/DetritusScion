@@ -192,7 +192,7 @@ public class DungeonDemo extends ApplicationAdapter {
                 gg.viewport.unproject(pos);
                 if (onGrid(screenX = MathUtils.floor(pos.x), screenY = MathUtils.floor(pos.y))) {
                     // we also need to check if screenX or screenY is the same cell.
-                    if (cursor.x == screenX && cursor.y == screenY) {
+                    if (cursor.x == screenX && cursor.y == screenY || gg.areChildrenActing()) {
                         return false;
                     }
                     cursor = Coord.get(screenX, screenY);

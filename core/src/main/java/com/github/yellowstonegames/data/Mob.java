@@ -326,11 +326,15 @@ public class Mob implements HasStats, Replicable {
     /**
      * Creates a replica of this object, which is a copy except that it has its own, different identifying int.
      * This uses Manifold's Self annotation to ensure implementing classes return their own class, not Replicable.
+     * <br>
+     * This version copies all fields but onDeath, and also calls replicate() on each Item in {@link #equipment}.
+     * Note that this version does not copy the {@link #onDeath} listener, since copying it would still refer to the
+     * original Mob, not the replica. You should set onDeath yourself if you want it to be non-null.
      *
      * @return a copy of this with a different identifier
      */
     @Override
-    public Mob copy() {
+    public Mob replicate() {
         Mob replica = new Mob();
         replica.glyph = glyph;
         replica.baseStats.clear();
@@ -344,6 +348,9 @@ public class Mob implements HasStats, Replicable {
             replica.actor.setLocation(actor.getLocation());
         }
         else replica.actor.setVisible(false);
+        replica.equipment = new ObjectList<>(equipment.size());
+        for(Item item : equipment)
+            replica.equipment.add(item.replicate());
         return replica;
     }
 }
