@@ -9,6 +9,7 @@ import com.github.tommyettinger.digital.Hasher;
 @CollectForGDXJsonSerialization
 public class Settings {
 
+    public static int ID_COUNTER = Integer.MIN_VALUE;
     public Settings() {
     }
 
@@ -24,6 +25,7 @@ public class Settings {
     public int worldWidth = 160;
     public int worldHeight = 160;
     public int worldDepth = 10;
+    public int lastID = ID_COUNTER;
 
     // In-flight values that shouldn't be saved to settings file
     transient public long seedValue;

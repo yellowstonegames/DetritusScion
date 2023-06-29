@@ -45,6 +45,7 @@ public class Config {
         String text = fileManager.json().prettyPrint(debugConfig);
         fileManager.writeFile(debugConfigFilename, configPath, text);
 
+        settings.lastID = Settings.ID_COUNTER;
         text = fileManager.json().prettyPrint(settings);
         fileManager.writeFile(settingsConfigFilename, configPath, text);
 
@@ -87,6 +88,7 @@ public class Config {
         } else {
             settings = fileManager.json().fromJson(Settings.class, text);
         }
+        Settings.ID_COUNTER = settings.lastID;
         settings.calcSeed();
         text = fileManager.json().prettyPrint(settings);
         fileManager.writeFile(settingsConfigFilename, configPath, text);

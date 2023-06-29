@@ -287,8 +287,6 @@ public class DungeonDemo extends ApplicationAdapter {
     }
 
     public void recolor(){
-        int playerX = Math.round(player.actor.getX());
-        int playerY = Math.round(player.actor.getY());
         float modifiedTime = (TimeUtils.millis() & 0xFFFFFL) * 0x1p-9f;
         int rainbow = toRGBA8888(
                 limitToGamut(100,

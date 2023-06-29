@@ -82,7 +82,7 @@ public class Lwjgl3Launcher {
                     config.displayConfig.windowWidth = Gdx.graphics.getWidth();
                     config.displayConfig.windowHeight = Gdx.graphics.getHeight();
                     config.displayConfig.monitorName = Gdx.graphics.getMonitor().name;
-                    config.saveDisplay();
+                    config.saveAll();
                 }
 
                 return super.closeRequested();

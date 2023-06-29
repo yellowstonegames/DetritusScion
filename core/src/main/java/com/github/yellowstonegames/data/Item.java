@@ -4,13 +4,16 @@ import com.github.tommyettinger.ds.ObjectFloatOrderedMap;
 import com.github.tommyettinger.textra.Font;
 import com.github.yellowstonegames.core.DescriptiveColor;
 import com.github.yellowstonegames.core.FullPalette;
+import com.github.yellowstonegames.files.Settings;
 import com.github.yellowstonegames.glyph.GlyphActor;
 import com.github.yellowstonegames.glyph.GlyphGrid;
 import com.github.yellowstonegames.grid.Coord;
 import com.github.yellowstonegames.util.RNG;
+import com.github.yellowstonegames.util.Replicable;
 import com.github.yellowstonegames.util.Text;
 
-public class Item implements HasStats {
+public class Item implements HasStats, Replicable {
+    public final int identifier = ++Settings.ID_COUNTER;
     public static final String ITEM_CHARS = Text.USABLE_SYMBOLS;
     public long glyph;
     public transient GlyphActor actor;
@@ -62,9 +65,53 @@ public class Item implements HasStats {
         }
     }
 
-    @Override
-    public String toString() {
-        return (char)glyph + " " + name;
+    public Item makeActor(Font font) {
+        if(font != null)
+            actor = new GlyphActor(this.glyph, font);
+        return this;
     }
 
+    public Item setPosition(Coord position){
+        if(position != null)
+        {
+            actor.setLocation(position);
+            actor.setVisible(true);
+        }
+        else
+            actor.setVisible(false);
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return "'" + (char)glyph + "' " + name;
+    }
+
+    /**
+     * Gets the identifier for this object, as an int.
+     *
+     * @return the int identifier for this
+     */
+    @Override
+    public int getIdentifier() {
+        return identifier;
+    }
+
+    /**
+     * Creates a replica of this object, which is a copy except that it has its own, different identifying int.
+     * This uses Manifold's Self annotation to ensure implementing classes return their own class, not Replicable.
+     *
+     * @return a copy of this with a different identifier
+     */
+    @Override
+    public Item copy() {
+        Item replica = new Item(glyph, null, null, null, null);
+        replica.baseStats.clear();
+        replica.baseStats.putAll(baseStats);
+        replica.stats.clear();
+        replica.stats.putAll(stats);
+        replica.makeActor(actor.font).setPosition(actor.getLocation());
+        replica.name = name;
+        return replica;
+    }
 }
