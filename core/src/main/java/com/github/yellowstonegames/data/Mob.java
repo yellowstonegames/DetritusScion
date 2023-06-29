@@ -6,14 +6,17 @@ import com.github.tommyettinger.ds.ObjectList;
 import com.github.tommyettinger.random.EnhancedRandom;
 import com.github.tommyettinger.textra.Font;
 import com.github.yellowstonegames.core.FullPalette;
+import com.github.yellowstonegames.files.Settings;
 import com.github.yellowstonegames.glyph.GlyphActor;
 import com.github.yellowstonegames.glyph.GlyphGrid;
 import com.github.yellowstonegames.grid.Coord;
 import com.github.yellowstonegames.text.Language;
 import com.github.yellowstonegames.util.RNG;
+import com.github.yellowstonegames.util.Replicable;
 import com.github.yellowstonegames.util.Text;
 
-public class Mob implements HasStats {
+public class Mob implements HasStats, Replicable {
+    public final int identifier = ++Settings.ID_COUNTER;
     public long glyph;
     public transient GlyphActor actor;
 
@@ -308,5 +311,39 @@ public class Mob implements HasStats {
     @Override
     public String toString() {
         return (char)glyph + " " + name;
+    }
+
+    /**
+     * Gets the identifier for this object, as an int.
+     *
+     * @return the int identifier for this
+     */
+    @Override
+    public int getIdentifier() {
+        return identifier;
+    }
+
+    /**
+     * Creates a replica of this object, which is a copy except that it has its own, different identifying int.
+     * This uses Manifold's Self annotation to ensure implementing classes return their own class, not Replicable.
+     *
+     * @return a copy of this with a different identifier
+     */
+    @Override
+    public Mob copy() {
+        Mob replica = new Mob();
+        replica.glyph = glyph;
+        replica.baseStats.clear();
+        replica.baseStats.putAll(baseStats);
+        replica.stats.clear();
+        replica.stats.putAll(stats);
+        replica.name = name;
+        replica.actor = new GlyphActor(glyph, actor.font);
+        if(actor.isVisible()){
+            replica.actor.setVisible(true);
+            replica.actor.setLocation(actor.getLocation());
+        }
+        else replica.actor.setVisible(false);
+        return replica;
     }
 }

@@ -20,14 +20,13 @@ import com.github.tommyettinger.random.EnhancedRandom;
 import com.github.tommyettinger.random.WhiskerRandom;
 import com.github.tommyettinger.textra.Font;
 import com.github.tommyettinger.textra.KnownFonts;
-import com.github.yellowstonegames.core.DescriptiveColor;
 import com.github.yellowstonegames.core.FullPalette;
+import com.github.yellowstonegames.data.Mob;
 import com.github.yellowstonegames.files.Config;
 import com.github.yellowstonegames.glyph.GlyphActor;
 import com.github.yellowstonegames.glyph.GlyphGrid;
 import com.github.yellowstonegames.glyph.MoreActions;
 import com.github.yellowstonegames.grid.*;
-import com.github.yellowstonegames.data.Mob;
 import com.github.yellowstonegames.path.DijkstraMap;
 import com.github.yellowstonegames.place.DungeonProcessor;
 import com.github.yellowstonegames.text.Language;
@@ -260,7 +259,7 @@ public class DungeonDemo extends ApplicationAdapter {
         this.player.actor.setLocation(player);
         gg.addActor(this.player.actor);
         floors.remove(player);
-        Coord[] selected = floors.randomPortion(RNG.rng, 100);
+        Coord[] selected = floors.separatedPoisson(RNG.rng, 4f, 100);
         for (int i = 0, ci = 0; i < selected.length; i++, ci++) {
             int color = rng.randomElement(FullPalette.COLOR_WHEEL_PALETTE_FLUSH);
             Mob mob = new Mob(gg, selected[i], Text.USABLE_LETTERS.charAt(ci += RNG.rng.next(1)), toRGBA8888(darken(color, 0.1f)));
