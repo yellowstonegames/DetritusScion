@@ -134,6 +134,10 @@ public class DungeonDemo extends ApplicationAdapter {
             gg.setVisibilities(inView::contains);
             if(!awaitedMoves.isEmpty())
                 awaitedMoves.remove(0);
+            playerToCursor.clearGoals();
+            playerToCursor.resetMap();
+            playerToCursor.setGoal(player.actor.getLocation());
+            playerToCursor.partialScan(13, blockage);
         };
 
         dungeonProcessor = new DungeonProcessor(DUNGEON_WIDTH, DUNGEON_HEIGHT, random);
