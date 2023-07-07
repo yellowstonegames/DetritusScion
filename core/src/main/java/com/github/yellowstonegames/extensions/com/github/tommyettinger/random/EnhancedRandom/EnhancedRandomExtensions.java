@@ -1,44 +1,41 @@
 package com.github.yellowstonegames.extensions.com.github.tommyettinger.random.EnhancedRandom;
 
 import com.github.tommyettinger.random.EnhancedRandom;
-import manifold.ext.rt.api.Extension;
-import manifold.ext.rt.api.This;
 
-@Extension
 public class EnhancedRandomExtensions {
-    public static boolean randomElement(@This EnhancedRandom thiz, boolean[] arr){
+    public static boolean randomElement(EnhancedRandom thiz, boolean[] arr){
         return arr[thiz.nextInt(arr.length)];
     }
 
-    public static byte randomElement(@This EnhancedRandom thiz, byte[] arr){
+    public static byte randomElement(EnhancedRandom thiz, byte[] arr){
         return arr[thiz.nextInt(arr.length)];
     }
 
-    public static short randomElement(@This EnhancedRandom thiz, short[] arr){
+    public static short randomElement(EnhancedRandom thiz, short[] arr){
         return arr[thiz.nextInt(arr.length)];
     }
 
-    public static int randomElement(@This EnhancedRandom thiz, int[] arr){
+    public static int randomElement(EnhancedRandom thiz, int[] arr){
         return arr[thiz.nextInt(arr.length)];
     }
 
-    public static long randomElement(@This EnhancedRandom thiz, long[] arr){
+    public static long randomElement(EnhancedRandom thiz, long[] arr){
         return arr[thiz.nextInt(arr.length)];
     }
 
-    public static float randomElement(@This EnhancedRandom thiz, float[] arr){
+    public static float randomElement(EnhancedRandom thiz, float[] arr){
         return arr[thiz.nextInt(arr.length)];
     }
 
-    public static double randomElement(@This EnhancedRandom thiz, double[] arr){
+    public static double randomElement(EnhancedRandom thiz, double[] arr){
         return arr[thiz.nextInt(arr.length)];
     }
 
-    public static char randomElement(@This EnhancedRandom thiz, char[] arr){
+    public static char randomElement(EnhancedRandom thiz, char[] arr){
         return arr[thiz.nextInt(arr.length)];
     }
 
-    public static char randomElement(@This EnhancedRandom thiz, String str){
+    public static char randomElement(EnhancedRandom thiz, String str){
         return str.charAt(thiz.nextInt(str.length()));
     }
 }

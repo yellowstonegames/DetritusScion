@@ -4,6 +4,7 @@ import com.github.tommyettinger.ds.ObjectFloatOrderedMap;
 import com.github.tommyettinger.textra.Font;
 import com.github.yellowstonegames.core.DescriptiveColor;
 import com.github.yellowstonegames.core.FullPalette;
+import com.github.yellowstonegames.extensions.com.github.tommyettinger.random.EnhancedRandom.EnhancedRandomExtensions;
 import com.github.yellowstonegames.files.Settings;
 import com.github.yellowstonegames.glyph.GlyphActor;
 import com.github.yellowstonegames.glyph.GlyphGrid;
@@ -41,7 +42,7 @@ public class Item implements HasStats, Replicable {
     public Item() {
         this(Font.applyColor(ITEM_CHARS.charAt(RNG.rng.nextInt(ITEM_CHARS.length())),
                 DescriptiveColor.lerpColors(
-                        RNG.rng.randomElement(FullPalette.COLOR_WHEEL_PALETTE_MID), // extension method, woo!
+                        EnhancedRandomExtensions.randomElement(RNG.rng, FullPalette.COLOR_WHEEL_PALETTE_MID),
                         DescriptiveColor.SILVER, 0.4f)),
                 null, null, null, null);
 

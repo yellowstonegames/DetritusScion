@@ -6,6 +6,7 @@ import com.github.tommyettinger.ds.ObjectList;
 import com.github.tommyettinger.random.EnhancedRandom;
 import com.github.tommyettinger.textra.Font;
 import com.github.yellowstonegames.core.FullPalette;
+import com.github.yellowstonegames.extensions.com.github.tommyettinger.random.EnhancedRandom.EnhancedRandomExtensions;
 import com.github.yellowstonegames.files.Settings;
 import com.github.yellowstonegames.glyph.GlyphActor;
 import com.github.yellowstonegames.glyph.GlyphGrid;
@@ -36,7 +37,7 @@ public class Mob implements HasStats, Replicable {
     public transient Runnable onDeath;
 
     public Mob() {
-        glyph = Font.applyColor(RNG.rng.randomElement(Text.USABLE_LETTERS),
+        glyph = Font.applyColor(EnhancedRandomExtensions.randomElement(RNG.rng, Text.USABLE_LETTERS),
                 FullPalette.COLORS_BY_HUE.random(RNG.rng));
         actor = new GlyphActor(glyph, null);
         Language lang = RNG.rng.randomElement(Language.romanizedHumanLanguages);
@@ -46,10 +47,10 @@ public class Mob implements HasStats, Replicable {
     public Mob(GlyphGrid gg, Coord position) {
         Font font = gg.getFont();
 
-        char c = RNG.rng.randomElement(Text.USABLE_LETTERS);
+        char c = EnhancedRandomExtensions.randomElement(RNG.rng, Text.USABLE_LETTERS);
         int problems = 0;
         while (!font.mapping.containsKey(c) && ++problems < 10)
-            c = RNG.rng.randomElement(Text.USABLE_LETTERS);
+            c = EnhancedRandomExtensions.randomElement(RNG.rng, Text.USABLE_LETTERS);
         if(problems == 10)
             c = (char)RNG.rng.nextInt('A', 'Z'+1);
 

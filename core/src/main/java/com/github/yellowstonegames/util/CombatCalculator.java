@@ -10,8 +10,8 @@ public class CombatCalculator {
     private final static float EVASION_FACTOR = 500;
 
     public static float calculateDamage(Mob attacker, Mob defender) {
-        float hit = Math.max(0, attacker.offense - defender.defense);
-        double precision = attacker.accuracy - defender.evasion;
+        float hit = Math.max(0, attacker.getOffense() - defender.getDefense());
+        double precision = attacker.getAccuracy() - defender.getEvasion();
         float factoredDefense = (float)(1 + precision / Math.sqrt(EVASION_FACTOR + precision * precision));
 
         return hit * factoredDefense;

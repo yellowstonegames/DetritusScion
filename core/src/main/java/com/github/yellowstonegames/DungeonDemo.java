@@ -22,6 +22,7 @@ import com.github.tommyettinger.textra.Font;
 import com.github.tommyettinger.textra.KnownFonts;
 import com.github.yellowstonegames.core.FullPalette;
 import com.github.yellowstonegames.data.Mob;
+import com.github.yellowstonegames.extensions.com.github.tommyettinger.random.EnhancedRandom.EnhancedRandomExtensions;
 import com.github.yellowstonegames.files.Config;
 import com.github.yellowstonegames.glyph.GlyphActor;
 import com.github.yellowstonegames.glyph.GlyphGrid;
@@ -259,10 +260,10 @@ public class DungeonDemo extends ApplicationAdapter {
 
     public void regenerate(){
         enemies.clear();
-        Actor[] kids = gg.children.begin();
-        for(int c = 0; c < gg.children.size; c++)
+        Actor[] kids = gg.getChildren().begin();
+        for(int c = 0; c < gg.getChildren().size; c++)
             kids[c].clearActions();
-        gg.children.end();
+        gg.getChildren().end();
         gg.clearChildren(true);
         dungeonProcessor.setPlaceGrid(dungeon = LineTools.hashesToLines(dungeonProcessor.generate(), true));
         bare = dungeonProcessor.getBarePlaceGrid();
@@ -276,7 +277,7 @@ public class DungeonDemo extends ApplicationAdapter {
         floors.remove(player);
         Coord[] selected = floors.separatedPoisson(RNG.rng, 4f, 100);
         for (int i = 0, ci = 0; i < selected.length; i++, ci++) {
-            int color = rng.randomElement(FullPalette.COLOR_WHEEL_PALETTE_FLUSH);
+            int color = EnhancedRandomExtensions.randomElement(rng, FullPalette.COLOR_WHEEL_PALETTE_FLUSH);
             Mob mob = new Mob(gg, selected[i], Text.USABLE_LETTERS.charAt(ci += RNG.rng.next(1)), toRGBA8888(darken(color, 0.1f)));
             enemies.put(selected[i], mob);
             gg.addActor(mob.actor);
