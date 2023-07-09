@@ -43,7 +43,8 @@ import static com.github.yellowstonegames.core.DescriptiveColor.*;
  */
 @SuppressWarnings("ReassignedVariable") // A gift for you, Eben.
 public class DungeonDemo extends ApplicationAdapter {
-    private Stage stage;
+    private Stage worldStage;
+    private Stage screenStage;
     private GlyphGrid gg;
     private DungeonProcessor dungeonProcessor;
     private char[][] bare, dungeon, prunedDungeon;
@@ -100,12 +101,13 @@ public class DungeonDemo extends ApplicationAdapter {
         long seed = TimeUtils.millis() >>> 21;
         Gdx.app.log("SEED", "Initial seed is " + seed);
         random = new RNG(seed);
-        stage = new Stage();
+        worldStage = new Stage();
+        screenStage = new Stage();
         KnownFonts.setAssetPrefix("fonts/");
 //        Font font = addGameIcons(KnownFonts.getIosevkaSlab(), "", "", -24, -24, 0);
         // adjustLineHeight(1.25f) may not be needed in the next release of TextraTypist...?
         Font font = KnownFonts.addGameIcons(KnownFonts.getIosevkaSlab().scaleTo(16f, 28f).adjustLineHeight(1.25f));
-        varWidthFont = KnownFonts.getGentiumUnItalic().scaleTo(2f, 1f);
+        varWidthFont = KnownFonts.getGentiumUnItalic().scaleTo(50f, 28f);
 //        Font font = new Font("Iosevka-Slab-standard.fnt", "Iosevka-Slab-standard.png", STANDARD, 0f, 0f, 0f, 0f, true)
 //            .scaleTo(15f, 24f).setTextureFilter().setName("Iosevka Slab");
 //        ShaderProgram shader = new ShaderProgram(Gdx.files.internal("shaders/vertex.glsl"),
@@ -121,8 +123,8 @@ public class DungeonDemo extends ApplicationAdapter {
         gg.backgrounds = new int[DUNGEON_WIDTH][DUNGEON_HEIGHT];
 
         messageGroup = new VerticalGroup();
-        messageGroup.bottom();
-        stage.addActor(messageGroup);
+        messageGroup.bottom().left();
+        screenStage.addActor(messageGroup);
         //use Ă to test glyph height
         String name = Language.ANCIENT_EGYPTIAN.word(TimeUtils.millis(), true);
 //        String replaced = Pattern.compile("([aeiou])").replacer("@").replace(name, 1);
@@ -231,7 +233,7 @@ public class DungeonDemo extends ApplicationAdapter {
         });
 
         regenerate();
-        stage.addActor(gg);
+        worldStage.addActor(gg);
         message("[*]WELCOME[*] to your [/]DOOM[/]!");
     }
 
@@ -249,8 +251,10 @@ public class DungeonDemo extends ApplicationAdapter {
                         1.5f, 7, ',',
                         0x992200FF, 0x99220000,
                         0f, 120f, 1f);
-                gg.removeActor(enemies.remove(next).actor);
+                Mob dead = enemies.remove(next);
+                gg.removeActor(dead.actor);
                 lighting.removeLight(next);
+                message(dead.getName() + " was obliterated!");
             }
             lighting.moveLight(old, next);
         } else {
@@ -470,9 +474,10 @@ public class DungeonDemo extends ApplicationAdapter {
         // this keeps the map stationary, but does not allow the map to be larger than the screen.
 //        camera.position.set(gg.getGridWidth() * 0.5f, gg.getGridHeight() * 0.5f, 0f);
         camera.update();
-        stage.act();
-        stage.draw();
-
+        worldStage.act();
+        worldStage.draw();
+        screenStage.act();
+        screenStage.draw();
         if (config.debugConfig.debugActive && config.debugConfig.showFPS) {
             Gdx.graphics.setTitle(Config.gameTitle + "  " + "FPS: " + Gdx.graphics.getFramesPerSecond());
         } else {
