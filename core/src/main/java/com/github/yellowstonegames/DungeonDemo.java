@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.github.tommyettinger.digital.ArrayTools;
@@ -17,9 +18,9 @@ import com.github.tommyettinger.digital.MathTools;
 import com.github.tommyettinger.digital.TrigTools;
 import com.github.tommyettinger.ds.ObjectDeque;
 import com.github.tommyettinger.random.EnhancedRandom;
-import com.github.tommyettinger.random.WhiskerRandom;
 import com.github.tommyettinger.textra.Font;
 import com.github.tommyettinger.textra.KnownFonts;
+import com.github.tommyettinger.textra.TypingLabel;
 import com.github.yellowstonegames.core.FullPalette;
 import com.github.yellowstonegames.data.Mob;
 import com.github.yellowstonegames.files.Config;
@@ -58,6 +59,11 @@ public class DungeonDemo extends ApplicationAdapter {
     private final Vector2 pos = new Vector2();
     private Runnable post;
     private LightingManager lighting;
+    private Font varWidthFont;
+    private ObjectDeque<TypingLabel> messages = new ObjectDeque<>(30);
+    private VerticalGroup messageGroup;
+
+    public RNG random;
 
     private Config config;
 
@@ -93,12 +99,13 @@ public class DungeonDemo extends ApplicationAdapter {
         Gdx.app.setLogLevel(Application.LOG_INFO);
         long seed = TimeUtils.millis() >>> 21;
         Gdx.app.log("SEED", "Initial seed is " + seed);
-        EnhancedRandom random = new WhiskerRandom(seed);
+        random = new RNG(seed);
         stage = new Stage();
         KnownFonts.setAssetPrefix("fonts/");
 //        Font font = addGameIcons(KnownFonts.getIosevkaSlab(), "", "", -24, -24, 0);
         // adjustLineHeight(1.25f) may not be needed in the next release of TextraTypist...?
         Font font = KnownFonts.addGameIcons(KnownFonts.getIosevkaSlab().scaleTo(16f, 28f).adjustLineHeight(1.25f));
+        varWidthFont = KnownFonts.getGentiumUnItalic().scaleTo(2f, 1f);
 //        Font font = new Font("Iosevka-Slab-standard.fnt", "Iosevka-Slab-standard.png", STANDARD, 0f, 0f, 0f, 0f, true)
 //            .scaleTo(15f, 24f).setTextureFilter().setName("Iosevka Slab");
 //        ShaderProgram shader = new ShaderProgram(Gdx.files.internal("shaders/vertex.glsl"),
@@ -112,6 +119,10 @@ public class DungeonDemo extends ApplicationAdapter {
         gg = new GlyphGrid(font, DUNGEON_WIDTH, DUNGEON_HEIGHT, true);
         gg.viewport.setWorldSize(config.displayConfig.mapSize.gridWidth, config.displayConfig.mapSize.gridHeight);
         gg.backgrounds = new int[DUNGEON_WIDTH][DUNGEON_HEIGHT];
+
+        messageGroup = new VerticalGroup();
+        messageGroup.bottom();
+        stage.addActor(messageGroup);
         //use Ă to test glyph height
         String name = Language.ANCIENT_EGYPTIAN.word(TimeUtils.millis(), true);
 //        String replaced = Pattern.compile("([aeiou])").replacer("@").replace(name, 1);
@@ -221,6 +232,7 @@ public class DungeonDemo extends ApplicationAdapter {
 
         regenerate();
         stage.addActor(gg);
+        message("[*]WELCOME[*] to your [/]DOOM[/]!");
     }
 
     public void move(Direction way){
@@ -287,6 +299,16 @@ public class DungeonDemo extends ApplicationAdapter {
             playerToCursor.initialize(bare);
         playerToCursor.setGoal(player);
         playerToCursor.partialScan(13, blockage);
+    }
+
+    public void message(String markupString) {
+        TypingLabel label = new TypingLabel(markupString, varWidthFont);
+        messages.addLast(label);
+        messageGroup.addActor(label);
+        while(messages.size() >= 5)
+            messageGroup.removeActor(messages.removeFirst());
+
+
     }
 
     public void recolor(){
