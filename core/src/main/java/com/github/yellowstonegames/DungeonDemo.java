@@ -106,7 +106,7 @@ public class DungeonDemo extends ApplicationAdapter {
         random = new RNG(seed);
         worldStage = new Stage();
         screenStage = new Stage();
-        screenStage.setDebugAll(true);
+//        screenStage.setDebugAll(true);
         KnownFonts.setAssetPrefix("fonts/");
 //        Font font = addGameIcons(KnownFonts.getIosevkaSlab(), "", "", -24, -24, 0);
         // adjustLineHeight(1.25f) may not be needed in the next release of TextraTypist...?
@@ -132,11 +132,11 @@ public class DungeonDemo extends ApplicationAdapter {
         // AAAAA
         root = new Table();
         root.setFillParent(true);
-        // Why does this push messageGroup to the top? How do I center it at the bottom???
-        root.add(messageGroup).fill().growY().bottom().width(config.displayConfig.messageSize.pixelWidth() * 0.1f);
+        Table nest = new Table();
+        nest.add(messageGroup);//.fill().growY().bottom().width(config.displayConfig.messageSize.pixelWidth() * 0.1f);
+        root.add(nest).bottom().expand();
 
         screenStage.addActor(root);
-        root.pack();
         //use Ă to test glyph height
         String name = Language.ANCIENT_EGYPTIAN.word(TimeUtils.millis(), true);
 //        String replaced = Pattern.compile("([aeiou])").replacer("@").replace(name, 1);
@@ -341,11 +341,12 @@ public class DungeonDemo extends ApplicationAdapter {
         else {
             label.restart(markupString);
         }
+        label.debug();
         label.setAlignment(Align.bottom);
         messages.addLast(label);
         messageGroup.addActor(label);
-        messageGroup.pack();
-        System.out.println(messageGroup.getWidth() + " and was set to " + (config.displayConfig.messageSize.pixelWidth() * 0.011f) + " with target width " + label.getWorkingLayout().getTargetWidth());
+        root.pack();
+        System.out.println(messageGroup.getWidth() + " and was set to " + (config.displayConfig.messageSize.pixelWidth() * 0.1f) + " with target width " + label.getWorkingLayout().getTargetWidth());
     }
 
     public void recolor(){
