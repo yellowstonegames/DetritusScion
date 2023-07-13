@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.github.tommyettinger.digital.ArrayTools;
@@ -123,7 +124,8 @@ public class DungeonDemo extends ApplicationAdapter {
         gg.backgrounds = new int[DUNGEON_WIDTH][DUNGEON_HEIGHT];
 
         messageGroup = new VerticalGroup();
-        messageGroup.bottom().left();
+        messageGroup.setFillParent(true);
+        messageGroup.bottom().expand().fill();
         screenStage.addActor(messageGroup);
         //use Ă to test glyph height
         String name = Language.ANCIENT_EGYPTIAN.word(TimeUtils.millis(), true);
@@ -254,7 +256,7 @@ public class DungeonDemo extends ApplicationAdapter {
                 Mob dead = enemies.remove(next);
                 gg.removeActor(dead.actor);
                 lighting.removeLight(next);
-                message(dead.getName() + " was obliterated!");
+                message(dead.getName() + " was {OCEAN=0.7;1.25;0.11;1.0;0.65}{CANNON}obliterated!{RESET}");
             }
             lighting.moveLight(old, next);
         } else {
@@ -307,9 +309,10 @@ public class DungeonDemo extends ApplicationAdapter {
 
     public void message(String markupString) {
         TypingLabel label = new TypingLabel(markupString, varWidthFont);
+        label.setAlignment(Align.bottom);
         messages.addLast(label);
         messageGroup.addActor(label);
-        while(messages.size() >= 5)
+        while(messages.size() > 5)
             messageGroup.removeActor(messages.removeFirst());
 
 
