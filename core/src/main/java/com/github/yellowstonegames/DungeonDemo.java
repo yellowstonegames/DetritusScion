@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -64,6 +65,7 @@ public class DungeonDemo extends ApplicationAdapter {
     private Font varWidthFont;
     private ObjectDeque<TypingLabel> messages = new ObjectDeque<>(30);
     private VerticalGroup messageGroup;
+    private Table root;
 
     public RNG random;
 
@@ -104,6 +106,7 @@ public class DungeonDemo extends ApplicationAdapter {
         random = new RNG(seed);
         worldStage = new Stage();
         screenStage = new Stage();
+        screenStage.setDebugAll(true);
         KnownFonts.setAssetPrefix("fonts/");
 //        Font font = addGameIcons(KnownFonts.getIosevkaSlab(), "", "", -24, -24, 0);
         // adjustLineHeight(1.25f) may not be needed in the next release of TextraTypist...?
@@ -124,9 +127,16 @@ public class DungeonDemo extends ApplicationAdapter {
         gg.backgrounds = new int[DUNGEON_WIDTH][DUNGEON_HEIGHT];
 
         messageGroup = new VerticalGroup();
-        messageGroup.setFillParent(true);
-        messageGroup.bottom().expand().fill();
-        screenStage.addActor(messageGroup);
+//        messageGroup.fill();
+
+        // AAAAA
+        root = new Table();
+        root.setFillParent(true);
+        // Why does this push messageGroup to the top? How do I center it at the bottom???
+        root.add(messageGroup).fill().growY().bottom().width(config.displayConfig.messageSize.pixelWidth() * 0.1f);
+
+        screenStage.addActor(root);
+        root.pack();
         //use Ă to test glyph height
         String name = Language.ANCIENT_EGYPTIAN.word(TimeUtils.millis(), true);
 //        String replaced = Pattern.compile("([aeiou])").replacer("@").replace(name, 1);
@@ -326,14 +336,16 @@ public class DungeonDemo extends ApplicationAdapter {
             label = new TypingLabel("", varWidthFont);
             label.setWrap(true);
             label.setText(markupString);
+            label.setMaxLines(2);
         }
-        else
+        else {
             label.restart(markupString);
+        }
         label.setAlignment(Align.bottom);
-        label.layout.setTargetWidth(config.displayConfig.messageSize.pixelWidth() * 0.015f);
         messages.addLast(label);
         messageGroup.addActor(label);
-//        System.out.println(label.getWidth() + " and was set to " + (config.displayConfig.messageSize.pixelWidth() * 0.015f) + " with actual width " + label.layout.getTargetWidth());
+        messageGroup.pack();
+        System.out.println(messageGroup.getWidth() + " and was set to " + (config.displayConfig.messageSize.pixelWidth() * 0.011f) + " with target width " + label.getWorkingLayout().getTargetWidth());
     }
 
     public void recolor(){
@@ -510,6 +522,8 @@ public class DungeonDemo extends ApplicationAdapter {
     public void resize(int width, int height) {
         super.resize(width, height);
         gg.resize(width, height);
+        screenStage.getViewport().update(width, height, true);
+
     }
 
     private boolean onGrid(int screenX, int screenY) {
