@@ -41,7 +41,7 @@ public class ScreenDisplayConfig {
     private static final int mapCellWidth = 25;
     private static final int mapCellHeight = 25;
 
-    private static final int messageGridHeight = 8;
+    private static final int messageGridHeight = 5;
 
     private static final int secondaryGridWidth = 50;
     private static final int infoGridHeight = 30;
@@ -124,7 +124,7 @@ public class ScreenDisplayConfig {
         // make sure there's enough message size to print at least one line
         messageSize.gridHeight = Math.max(3, messageSize.gridHeight);
         if (messageCount <= 0) {
-            messageCount = messageGridHeight - 2; // have to leave room for the border
+            messageCount = messageGridHeight; // have to leave room for the border
         }
 
         if (infoSize == null) {

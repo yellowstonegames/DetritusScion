@@ -308,14 +308,32 @@ public class DungeonDemo extends ApplicationAdapter {
     }
 
     public void message(String markupString) {
-        TypingLabel label = new TypingLabel(markupString, varWidthFont);
+        TypingLabel label = null;
+        int lines = 0;
+        for(TypingLabel lab : messages){
+            lines += lab.layout.lines();
+        }
+        while(lines >= config.displayConfig.messageCount){
+            messageGroup.removeActor(label = messages.removeFirst());
+            lines = 0;
+            for(TypingLabel lab : messages){
+                lines += lab.layout.lines();
+            }
+        }
+
+        if(label == null)
+        {
+            label = new TypingLabel("", varWidthFont);
+            label.setWrap(true);
+            label.setText(markupString);
+        }
+        else
+            label.restart(markupString);
         label.setAlignment(Align.bottom);
+        label.layout.setTargetWidth(config.displayConfig.messageSize.pixelWidth() * 0.015f);
         messages.addLast(label);
         messageGroup.addActor(label);
-        while(messages.size() > 5)
-            messageGroup.removeActor(messages.removeFirst());
-
-
+//        System.out.println(label.getWidth() + " and was set to " + (config.displayConfig.messageSize.pixelWidth() * 0.015f) + " with actual width " + label.layout.getTargetWidth());
     }
 
     public void recolor(){
