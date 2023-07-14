@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.utils.Align;
@@ -63,7 +64,7 @@ public class DungeonDemo extends ApplicationAdapter {
     private Runnable post;
     private LightingManager lighting;
     private Font varWidthFont;
-    private ObjectDeque<TypingLabel> messages = new ObjectDeque<>(30);
+    private ObjectDeque<Container<TypingLabel>> messages = new ObjectDeque<>(30);
     private VerticalGroup messageGroup;
     private Table root;
 
@@ -106,7 +107,7 @@ public class DungeonDemo extends ApplicationAdapter {
         random = new RNG(seed);
         worldStage = new Stage();
         screenStage = new Stage();
-//        screenStage.setDebugAll(true);
+        screenStage.setDebugAll(true);
         KnownFonts.setAssetPrefix("fonts/");
 //        Font font = addGameIcons(KnownFonts.getIosevkaSlab(), "", "", -24, -24, 0);
         // adjustLineHeight(1.25f) may not be needed in the next release of TextraTypist...?
@@ -127,13 +128,14 @@ public class DungeonDemo extends ApplicationAdapter {
         gg.backgrounds = new int[DUNGEON_WIDTH][DUNGEON_HEIGHT];
 
         messageGroup = new VerticalGroup();
+        messageGroup.left();
+//        messageGroup.setSize(config.displayConfig.messageSize.pixelWidth() * 0.1f, config.displayConfig.messageSize.pixelHeight());
 //        messageGroup.fill();
 
-        // AAAAA
         root = new Table();
         root.setFillParent(true);
         Table nest = new Table();
-        nest.add(messageGroup);//.fill().growY().bottom().width(config.displayConfig.messageSize.pixelWidth() * 0.1f);
+        nest.add(messageGroup).size(config.displayConfig.messageSize.pixelWidth() * 0.1f, config.displayConfig.messageSize.pixelHeight());//.fill().growY().bottom().width(config.displayConfig.messageSize.pixelWidth() * 0.1f);
         root.add(nest).bottom().expand();
 
         screenStage.addActor(root);
@@ -319,15 +321,20 @@ public class DungeonDemo extends ApplicationAdapter {
 
     public void message(String markupString) {
         TypingLabel label = null;
-        int lines = 0;
-        for(TypingLabel lab : messages){
-            lines += lab.layout.lines();
+        Container<TypingLabel> con = null;
+        int tall = 0;
+        for(Container<TypingLabel> c : messages){
+            tall += c.getHeight();
         }
-        while(lines >= config.displayConfig.messageCount){
-            messageGroup.removeActor(label = messages.removeFirst());
-            lines = 0;
-            for(TypingLabel lab : messages){
-                lines += lab.layout.lines();
+        while(tall >= config.displayConfig.messageSize.pixelHeight()){
+//        while(lines >= config.displayConfig.messageCount){
+            con = messages.removeFirst();
+            label = con.getActor();
+            messageGroup.removeActor(con);
+            messageGroup.pack();
+            tall = 0;
+            for(Container<TypingLabel> c : messages){
+                tall += c.getHeight();
             }
         }
 
@@ -336,15 +343,20 @@ public class DungeonDemo extends ApplicationAdapter {
             label = new TypingLabel("", varWidthFont);
             label.setWrap(true);
             label.setText(markupString);
-            label.setMaxLines(2);
+            label.setMaxLines(config.displayConfig.messageCount);
         }
         else {
             label.restart(markupString);
         }
+        if(con == null)
+        {
+            con = new Container<>(label);
+        }
+        con.prefWidth(config.displayConfig.messageSize.pixelWidth() * 0.1f);
         label.debug();
-        label.setAlignment(Align.bottom);
-        messages.addLast(label);
-        messageGroup.addActor(label);
+        label.setAlignment(Align.bottomLeft);
+        messages.addLast(con);
+        messageGroup.addActor(con);
         root.pack();
         System.out.println(messageGroup.getWidth() + " and was set to " + (config.displayConfig.messageSize.pixelWidth() * 0.1f) + " with target width " + label.getWorkingLayout().getTargetWidth());
     }
