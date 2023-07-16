@@ -129,13 +129,13 @@ public class DungeonDemo extends ApplicationAdapter {
 
         messageGroup = new VerticalGroup();
         messageGroup.left();
-//        messageGroup.setSize(config.displayConfig.messageSize.pixelWidth() * 0.1f, config.displayConfig.messageSize.pixelHeight());
+//        messageGroup.setSize(config.displayConfig.messageSize.pixelWidth() * 0.0995f, config.displayConfig.messageSize.pixelHeight());
 //        messageGroup.fill();
 
         root = new Table();
         root.setFillParent(true);
         Table nest = new Table();
-        nest.add(messageGroup).size(config.displayConfig.messageSize.pixelWidth() * 0.1f, config.displayConfig.messageSize.pixelHeight());//.fill().growY().bottom().width(config.displayConfig.messageSize.pixelWidth() * 0.1f);
+        nest.add(messageGroup).size(config.displayConfig.messageSize.pixelWidth() * 0.0995f, config.displayConfig.messageSize.pixelHeight());//.fill().growY().bottom().width(config.displayConfig.messageSize.pixelWidth() * 0.0995f);
         root.add(nest).bottom().expand();
 
         screenStage.addActor(root);
@@ -187,6 +187,19 @@ public class DungeonDemo extends ApplicationAdapter {
                         break;
                     case R:
                         regenerate();
+                        break;
+                    case V:
+                        if(config.debugConfig.debugActive) {
+                            config.debugConfig.debugActive = false;
+                            config.debugConfig.showFPS = false;
+                            Gdx.graphics.setVSync(true);
+                            Gdx.graphics.setForegroundFPS(0);
+                        } else {
+                            config.debugConfig.debugActive = true;
+                            config.debugConfig.showFPS = true;
+                            Gdx.graphics.setVSync(false);
+                            Gdx.graphics.setForegroundFPS(0);
+                        }
                         break;
                     default: return false;
                 }
@@ -248,6 +261,10 @@ public class DungeonDemo extends ApplicationAdapter {
 
         regenerate();
         worldStage.addActor(gg);
+        message("Laĕşudiphiĕşĕşĕşĕşĕşĕş Ghathŕuphighat was {OCEAN=0.7;1.25;0.11;1.0;0.65}{CANNON}obliterated!{RESET}");
+        message("Haisubhi Markhuśongaipaim was {OCEAN=0.7;1.25;0.11;1.0;0.65}{CANNON}obliterated!{RESET}");
+        message("Haisubhi Markhuśongaipaim was {OCEAN=0.7;1.25;0.11;1.0;0.65}{CANNON}obliterated!{RESET}");
+        message("Haisubhi Markhuśongaipaim was {OCEAN=0.7;1.25;0.11;1.0;0.65}{CANNON}obliterated!{RESET}");
         message("[*]WELCOME[*] to your [/]DOOM[/]!");
     }
 
@@ -293,7 +310,7 @@ public class DungeonDemo extends ApplicationAdapter {
         this.player.actor.setLocation(player);
         gg.addActor(this.player.actor);
         floors.remove(player);
-        Coord[] selected = floors.separatedPoisson(RNG.rng, 4f, 100);
+        Coord[] selected = floors.separatedPoisson(RNG.rng, 4f, 1000);
         for (int i = 0, ci = 0; i < selected.length; i++, ci++) {
             int color = RNG.rng.randomElement(FullPalette.COLOR_WHEEL_PALETTE_FLUSH);
             Mob mob = new Mob(gg, selected[i], Text.USABLE_LETTERS.charAt(ci += RNG.rng.next(1)), toRGBA8888(darken(color, 0.1f)));
@@ -320,6 +337,7 @@ public class DungeonDemo extends ApplicationAdapter {
     }
 
     public void message(String markupString) {
+        System.out.println(markupString);
         TypingLabel label = null;
         Container<TypingLabel> con = null;
         int tall = 0;
@@ -352,13 +370,13 @@ public class DungeonDemo extends ApplicationAdapter {
         {
             con = new Container<>(label);
         }
-        con.prefWidth(config.displayConfig.messageSize.pixelWidth() * 0.1f);
+        con.prefWidth(config.displayConfig.messageSize.pixelWidth() * 0.0995f);
         label.debug();
         label.setAlignment(Align.bottomLeft);
         messages.addLast(con);
         messageGroup.addActor(con);
         root.pack();
-        System.out.println(messageGroup.getWidth() + " and was set to " + (config.displayConfig.messageSize.pixelWidth() * 0.1f) + " with target width " + label.getWorkingLayout().getTargetWidth());
+        System.out.println(messageGroup.getWidth() + " and was set to " + (config.displayConfig.messageSize.pixelWidth() * 0.0995f) + " with target width " + label.getWorkingLayout().getTargetWidth());
     }
 
     public void recolor(){
