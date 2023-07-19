@@ -115,8 +115,8 @@ public class Mob implements HasStats, Replicable {
         else
             actor.setVisible(false);
         this.onDeath = () -> gg.removeActor(actor);
-        Language lang = Language.HINDI_ROMANIZED;
-//        Language lang = Language.romanizedHumanLanguages[Hasher.randomize3Bounded(glyph + 123, Language.romanizedHumanLanguages.length)];
+//        Language lang = Language.HINDI_ROMANIZED;
+        Language lang = Language.romanizedHumanLanguages[Hasher.randomize3Bounded(glyph + 123, Language.romanizedHumanLanguages.length)];
         name = lang.word(Hasher.randomize3(glyph + 456), true) + " " + lang.word(Hasher.randomize3(glyph + 789), true);
     }
 
