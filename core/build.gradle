@@ -13,12 +13,16 @@ dependencies {
 //  api "com.squidpony:SquidPress:$squidSquadVersion"
 //  api "com.squidpony:SquidText:$squidSquadVersion"
   api "com.github.yellowstonegames.SquidSquad:SquidCore:$squidSquadVersion"
-  api "com.github.yellowstonegames.SquidSquad:SquidGlyph:$squidSquadVersion"
+  api ("com.github.yellowstonegames.SquidSquad:SquidGlyph:$squidSquadVersion"){
+    exclude group: "com.github.tommyettinger", module: "textratypist"
+  }
   api "com.github.yellowstonegames.SquidSquad:SquidGrid:$squidSquadVersion"
   api "com.github.yellowstonegames.SquidSquad:SquidPath:$squidSquadVersion"
   api "com.github.yellowstonegames.SquidSquad:SquidPlace:$squidSquadVersion"
   api "com.github.yellowstonegames.SquidSquad:SquidPress:$squidSquadVersion"
   api "com.github.yellowstonegames.SquidSquad:SquidText:$squidSquadVersion"
+
+  api "com.github.tommyettinger:textratypist:$textraVersion"
 //  implementation 'systems.manifold:manifold-ext-rt:2023.1.10'
 //  implementation 'systems.manifold:manifold-props-rt:2023.1.10'
 //

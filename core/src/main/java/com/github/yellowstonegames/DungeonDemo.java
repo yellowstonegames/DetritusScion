@@ -107,7 +107,6 @@ public class DungeonDemo extends ApplicationAdapter {
         random = new RNG(seed);
         worldStage = new Stage();
         screenStage = new Stage();
-        screenStage.setDebugAll(true);
         KnownFonts.setAssetPrefix("fonts/");
 //        Font font = addGameIcons(KnownFonts.getIosevkaSlab(), "", "", -24, -24, 0);
         // adjustLineHeight(1.25f) may not be needed in the next release of TextraTypist...?
@@ -129,8 +128,6 @@ public class DungeonDemo extends ApplicationAdapter {
 
         messageGroup = new VerticalGroup();
         messageGroup.left();
-//        messageGroup.setSize(config.displayConfig.messageSize.pixelWidth() * 0.0995f, config.displayConfig.messageSize.pixelHeight());
-//        messageGroup.fill();
 
         root = new Table();
         root.setFillParent(true);
@@ -261,10 +258,10 @@ public class DungeonDemo extends ApplicationAdapter {
 
         regenerate();
         worldStage.addActor(gg);
-        message("Laĕşudiphiĕşĕşĕşĕşĕşĕş Ghathŕuphighat was {OCEAN=0.7;1.25;0.11;1.0;0.65}{CANNON}obliterated!{RESET}");
-        message("Haisubhi Markhuśongaipaim was {OCEAN=0.7;1.25;0.11;1.0;0.65}{CANNON}obliterated!{RESET}");
-        message("Haisubhi Markhuśongaipaim was {OCEAN=0.7;1.25;0.11;1.0;0.65}{CANNON}obliterated!{RESET}");
-        message("Haisubhi Markhuśongaipaim was {OCEAN=0.7;1.25;0.11;1.0;0.65}{CANNON}obliterated!{RESET}");
+//        message("Laĕşudiphiĕşĕşĕşĕşĕşĕş Ghathŕuphighat was {OCEAN=0.7;1.25;0.11;1.0;0.65}{CANNON}obliterated!{RESET}");
+//        message("Haisubhi Markhuśongaipaim was {OCEAN=0.7;1.25;0.11;1.0;0.65}{CANNON}obliterated!{RESET}");
+//        message("Haisubhi Markhuśongaipaim was {OCEAN=0.7;1.25;0.11;1.0;0.65}{CANNON}obliterated!{RESET}");
+//        message("Haisubhi Markhuśongaipaim was {OCEAN=0.7;1.25;0.11;1.0;0.65}{CANNON}obliterated!{RESET}");
         message("[*]WELCOME[*] to your [/]DOOM[/]!");
     }
 
@@ -337,7 +334,7 @@ public class DungeonDemo extends ApplicationAdapter {
     }
 
     public void message(String markupString) {
-        System.out.println(markupString);
+//        System.out.println(markupString);
         TypingLabel label = null;
         Container<TypingLabel> con = null;
         int tall = 0;
@@ -345,7 +342,6 @@ public class DungeonDemo extends ApplicationAdapter {
             tall += c.getHeight();
         }
         while(tall >= config.displayConfig.messageSize.pixelHeight()){
-//        while(lines >= config.displayConfig.messageCount){
             con = messages.removeFirst();
             label = con.getActor();
             messageGroup.removeActor(con);
@@ -360,8 +356,7 @@ public class DungeonDemo extends ApplicationAdapter {
         {
             label = new TypingLabel("", varWidthFont);
             label.setWrap(true);
-            label.setText(markupString);
-            label.setMaxLines(config.displayConfig.messageCount);
+            label.restart(markupString);
         }
         else {
             label.restart(markupString);
@@ -371,12 +366,12 @@ public class DungeonDemo extends ApplicationAdapter {
             con = new Container<>(label);
         }
         con.prefWidth(config.displayConfig.messageSize.pixelWidth() * 0.0995f);
-        label.debug();
+//        label.debug();
         label.setAlignment(Align.bottomLeft);
         messages.addLast(con);
         messageGroup.addActor(con);
         root.pack();
-        System.out.println(messageGroup.getWidth() + " and was set to " + (config.displayConfig.messageSize.pixelWidth() * 0.0995f) + " with target width " + label.getWorkingLayout().getTargetWidth());
+//        System.out.println(messageGroup.getWidth() + " and was set to " + (config.displayConfig.messageSize.pixelWidth() * 0.0995f) + " with target width " + label.getWorkingLayout().getTargetWidth());
     }
 
     public void recolor(){
