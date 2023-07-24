@@ -25,7 +25,9 @@ import com.github.tommyettinger.random.EnhancedRandom;
 import com.github.tommyettinger.textra.Font;
 import com.github.tommyettinger.textra.KnownFonts;
 import com.github.tommyettinger.textra.TypingLabel;
+import com.github.tommyettinger.textra.utils.Palette;
 import com.github.yellowstonegames.core.FullPalette;
+import com.github.yellowstonegames.core.GapShuffler;
 import com.github.yellowstonegames.data.Mob;
 import com.github.yellowstonegames.files.Config;
 import com.github.yellowstonegames.glyph.GlyphActor;
@@ -71,6 +73,7 @@ public class DungeonDemo extends ApplicationAdapter {
     private Table root;
 
     public RNG random;
+    public GapShuffler<String> killMessages;
 
     private Config config;
 
@@ -131,7 +134,11 @@ public class DungeonDemo extends ApplicationAdapter {
 //            System.out.println(shader.getLog());
 //        stage.getBatch().setShader(shader);
 //        font.shader = shader;
-
+        killMessages = new GapShuffler<>(new String[]{
+                "%s was {OCEAN=0.7;1.25;0.11;1.0;0.65}{CANNON}obliterated!{RESET}",
+                "%s just got [dark dull pear]{SLOWER}{SICK}wasted...{RESET}",
+                "%s became {RAINBOW=1;1;0.6;0.75}{WAVE}one with the cosmos{ENDWAVE}{ENDRAINBOW}, as fine dust...{RESET}",
+                "%s got [dark FIREBRICK]{SPEED=8}killed [white]{WAIT=0.4}ten {WAIT=0.4}times {WAIT=0.4}{NORMAL}before they hit the ground!{RESET}"}, random.copy());
         gg = new GlyphGrid(font, DUNGEON_WIDTH, DUNGEON_HEIGHT, true);
         gg.viewport.setWorldSize(config.displayConfig.mapSize.gridWidth, config.displayConfig.mapSize.gridHeight);
         gg.backgrounds = new int[DUNGEON_WIDTH][DUNGEON_HEIGHT];
@@ -272,7 +279,7 @@ public class DungeonDemo extends ApplicationAdapter {
 //        message("Haisubhi Markhuśongaipaim was {OCEAN=0.7;1.25;0.11;1.0;0.65}{CANNON}obliterated!{RESET}");
 //        message("Haisubhi Markhuśongaipaim was {OCEAN=0.7;1.25;0.11;1.0;0.65}{CANNON}obliterated!{RESET}");
 //        message("Haisubhi Markhuśongaipaim was {OCEAN=0.7;1.25;0.11;1.0;0.65}{CANNON}obliterated!{RESET}");
-        message("[*]WELCOME[*] to your [/]DOOM[/]!");
+        message("[*]WELCOME[*] to your [/]DOOM[/], %s!", player.getName());
     }
 
     public void move(Direction way){
@@ -292,7 +299,7 @@ public class DungeonDemo extends ApplicationAdapter {
                 Mob dead = enemies.remove(next);
                 gg.removeActor(dead.actor);
                 lighting.removeLight(next);
-                message(dead.getName() + " was {OCEAN=0.7;1.25;0.11;1.0;0.65}{CANNON}obliterated!{RESET}");
+                message(killMessages.next(), dead.getName());
             }
             lighting.moveLight(old, next);
         } else {
@@ -343,8 +350,8 @@ public class DungeonDemo extends ApplicationAdapter {
         playerToCursor.partialScan(13, blockage);
     }
 
-    public void message(String markupString) {
-//        System.out.println(markupString);
+    public void message(String formatMarkup, Object... arguments) {
+//        System.out.println(formatMarkup);
         TypingLabel label = null;
         Container<TypingLabel> con = null;
         int tall = 0;
@@ -366,22 +373,20 @@ public class DungeonDemo extends ApplicationAdapter {
         {
             label = new TypingLabel("", varWidthFont);
             label.setWrap(true);
-            label.restart(markupString);
+            label.restart(String.format(formatMarkup, arguments));
         }
         else {
-            label.restart(markupString);
+            label.restart(String.format(formatMarkup, arguments));
         }
         if(con == null)
         {
             con = new Container<>(label);
         }
         con.prefWidth(config.displayConfig.messageSize.pixelWidth() * 0.49f);
-//        label.debug();
         label.setAlignment(Align.bottomLeft);
         messages.addLast(con);
         messageGroup.add(con).row();
         root.pack();
-//        System.out.println(messageGroup.getWidth() + " and was set to " + (config.displayConfig.messageSize.pixelWidth() * 0.0995f) + " with target width " + label.getWorkingLayout().getTargetWidth());
     }
 
     public void recolor(){
