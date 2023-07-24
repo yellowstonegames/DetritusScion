@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
@@ -66,7 +67,7 @@ public class DungeonDemo extends ApplicationAdapter {
     private LightingManager lighting;
     private Font varWidthFont;
     private ObjectDeque<Container<TypingLabel>> messages = new ObjectDeque<>(30);
-    private VerticalGroup messageGroup;
+    private Table messageGroup;
     private Table root;
 
     public RNG random;
@@ -135,14 +136,14 @@ public class DungeonDemo extends ApplicationAdapter {
         gg.viewport.setWorldSize(config.displayConfig.mapSize.gridWidth, config.displayConfig.mapSize.gridHeight);
         gg.backgrounds = new int[DUNGEON_WIDTH][DUNGEON_HEIGHT];
 
-        messageGroup = new VerticalGroup();
+        messageGroup = new Table().background(new TextureRegionDrawable(font.mapping.get(font.solidBlock)).tint(new Color(0.1f, 0.1f, 0.1f, 0.6f)));
         messageGroup.left();
 
         root = new Table();
         root.setFillParent(true);
         Table nest = new Table();
-        nest.add(messageGroup).size(config.displayConfig.messageSize.pixelWidth() * 0.0995f, config.displayConfig.messageSize.pixelHeight());//.fill().growY().bottom().width(config.displayConfig.messageSize.pixelWidth() * 0.0995f);
-        root.add(nest).bottom().expand();
+        nest.add(messageGroup).size(config.displayConfig.messageSize.pixelWidth() * 0.49f, config.displayConfig.messageSize.pixelHeight());//.fill().growY().bottom().width(config.displayConfig.messageSize.pixelWidth() * 0.0995f);
+        root.add(nest).bottom().expand().padBottom(25f);
 
         screenStage.addActor(root);
         //use Ă to test glyph height
@@ -374,11 +375,11 @@ public class DungeonDemo extends ApplicationAdapter {
         {
             con = new Container<>(label);
         }
-        con.prefWidth(config.displayConfig.messageSize.pixelWidth() * 0.0995f);
+        con.prefWidth(config.displayConfig.messageSize.pixelWidth() * 0.49f);
 //        label.debug();
         label.setAlignment(Align.bottomLeft);
         messages.addLast(con);
-        messageGroup.addActor(con);
+        messageGroup.add(con).row();
         root.pack();
 //        System.out.println(messageGroup.getWidth() + " and was set to " + (config.displayConfig.messageSize.pixelWidth() * 0.0995f) + " with target width " + label.getWorkingLayout().getTargetWidth());
     }
