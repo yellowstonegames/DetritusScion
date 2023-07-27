@@ -18,6 +18,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.github.tommyettinger.digital.ArrayTools;
+import com.github.tommyettinger.digital.Hasher;
 import com.github.tommyettinger.digital.MathTools;
 import com.github.tommyettinger.digital.TrigTools;
 import com.github.tommyettinger.ds.ObjectDeque;
@@ -80,6 +81,8 @@ public class DungeonDemo extends ApplicationAdapter {
     private static final int DUNGEON_WIDTH = 100;
     private static final int DUNGEON_HEIGHT = 100;
 
+    private static final float MESSAGE_SHRINK = 0.45f;
+
     private static final int DEEP_OKLAB = describeOklab("dark dull cobalt");
     private static final int SHALLOW_OKLAB = describeOklab("dull denim");
     private static final int LAVA_OKLAB = describeOklab("dark rich ember");
@@ -136,7 +139,7 @@ public class DungeonDemo extends ApplicationAdapter {
 //        font.shader = shader;
         killMessages = new GapShuffler<>(new String[]{
                 "%s was {OCEAN=0.7;1.25;0.11;1.0;0.65}{CANNON}obliterated!{RESET}",
-                "%s just got [dark dull pear]{SLOWER}{SICK}wasted...{RESET}",
+                "%s just got [dark dull pear]{SLOWER}{SICK}{STYLE=~}wasted...{RESET}",
                 "%s became {RAINBOW=1;1;0.6;0.75}{WAVE}one with the cosmos{ENDWAVE}{ENDRAINBOW}, as fine dust...{RESET}",
                 "%s got [dark FIREBRICK]{SPEED=8}killed [white]{WAIT=0.4}ten {WAIT=0.4}times {WAIT=0.4}{NORMAL}before they hit the ground!{RESET}"}, random.copy());
         gg = new GlyphGrid(font, DUNGEON_WIDTH, DUNGEON_HEIGHT, true);
@@ -149,12 +152,12 @@ public class DungeonDemo extends ApplicationAdapter {
         root = new Table();
         root.setFillParent(true);
         Table nest = new Table();
-        nest.add(messageGroup).size(config.displayConfig.messageSize.pixelWidth() * 0.49f, config.displayConfig.messageSize.pixelHeight());//.fill().growY().bottom().width(config.displayConfig.messageSize.pixelWidth() * 0.0995f);
+        nest.add(messageGroup).size(config.displayConfig.messageSize.pixelWidth() * MESSAGE_SHRINK, config.displayConfig.messageSize.pixelHeight());//.fill().growY().bottom().width(config.displayConfig.messageSize.pixelWidth() * 0.0995f);
         root.add(nest).bottom().expand().padBottom(25f);
 
         screenStage.addActor(root);
         //use Ă to test glyph height
-        String name = Language.ANCIENT_EGYPTIAN.word(TimeUtils.millis(), true);
+        String name = "[gold]" + Language.ANCIENT_EGYPTIAN.word(TimeUtils.millis(), true) + " " + Language.ANCIENT_EGYPTIAN.word(Hasher.randomize3(TimeUtils.millis()), true) + "[white]";
 //        String replaced = Pattern.compile("([aeiou])").replacer("@").replace(name, 1);
 //        if(name.equals(replaced))
 //            replaced += "@";
@@ -373,6 +376,8 @@ public class DungeonDemo extends ApplicationAdapter {
         {
             label = new TypingLabel("", varWidthFont);
             label.setWrap(true);
+            label.setMaxLines(1);
+            label.setEllipsis("...");
             label.restart(String.format(formatMarkup, arguments));
         }
         else {
@@ -382,7 +387,7 @@ public class DungeonDemo extends ApplicationAdapter {
         {
             con = new Container<>(label);
         }
-        con.prefWidth(config.displayConfig.messageSize.pixelWidth() * 0.49f);
+        con.prefWidth(config.displayConfig.messageSize.pixelWidth() * MESSAGE_SHRINK);
         label.setAlignment(Align.bottomLeft);
         messages.addLast(con);
         messageGroup.add(con).row();
