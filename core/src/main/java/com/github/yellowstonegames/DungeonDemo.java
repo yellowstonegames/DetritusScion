@@ -6,13 +6,13 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.profiling.GLProfiler;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -26,7 +26,6 @@ import com.github.tommyettinger.random.EnhancedRandom;
 import com.github.tommyettinger.textra.Font;
 import com.github.tommyettinger.textra.KnownFonts;
 import com.github.tommyettinger.textra.TypingLabel;
-import com.github.tommyettinger.textra.utils.Palette;
 import com.github.yellowstonegames.core.FullPalette;
 import com.github.yellowstonegames.core.GapShuffler;
 import com.github.yellowstonegames.data.Mob;
@@ -78,6 +77,8 @@ public class DungeonDemo extends ApplicationAdapter {
 
     private Config config;
 
+    private GLProfiler profiler;
+
     private static final int DUNGEON_WIDTH = 100;
     private static final int DUNGEON_HEIGHT = 100;
 
@@ -110,6 +111,7 @@ public class DungeonDemo extends ApplicationAdapter {
 //        System.out.println(Text.USABLE_SYMBOLS);
 
         Gdx.app.setLogLevel(Application.LOG_INFO);
+        profiler = new GLProfiler(Gdx.graphics);
         long seed = TimeUtils.millis() >>> 21;
         Gdx.app.log("SEED", "Initial seed is " + seed);
         random = new RNG(seed);
@@ -503,6 +505,12 @@ public class DungeonDemo extends ApplicationAdapter {
 
     @Override
     public void render() {
+        if(input.isKeyJustPressed(P)){
+            profiler.enable();
+            profiler.reset();
+        } else {
+            profiler.disable();
+        }
 //        stage.getBatch().getShader().setUniformi("u_mode", 1);
         lighting.update();
         recolor();
@@ -561,6 +569,12 @@ public class DungeonDemo extends ApplicationAdapter {
             Gdx.graphics.setTitle(Config.gameTitle + "  " + "FPS: " + Gdx.graphics.getFramesPerSecond());
         } else {
             Gdx.graphics.setTitle(Config.gameTitle);
+        }
+        if(input.isKeyJustPressed(P)) {
+            GLProfiler p = profiler;
+            Gdx.app.log("profiler", "Calls: " + p.getCalls() + ", Draw Calls: " + p.getDrawCalls() +
+                    ", Shader Switches: " + p.getShaderSwitches() + ", Texture Binds: " + p.getTextureBindings() +
+                    ", Vertices: " + p.getVertexCount());
         }
     }
 
