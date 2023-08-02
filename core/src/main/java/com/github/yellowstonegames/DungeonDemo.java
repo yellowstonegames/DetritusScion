@@ -148,7 +148,7 @@ public class DungeonDemo extends ApplicationAdapter {
         gg.viewport.setWorldSize(config.displayConfig.mapSize.gridWidth, config.displayConfig.mapSize.gridHeight);
         gg.backgrounds = new int[DUNGEON_WIDTH][DUNGEON_HEIGHT];
 
-        messageGroup = new Table().background(new TextureRegionDrawable(font.mapping.get(font.solidBlock)).tint(new Color(0.1f, 0.1f, 0.1f, 0.6f)));
+        messageGroup = new Table().background(new TextureRegionDrawable(varWidthFont.mapping.get(varWidthFont.solidBlock)).tint(new Color(0.1f, 0.1f, 0.1f, 0.6f)));
         messageGroup.left();
 
         root = new Table();
