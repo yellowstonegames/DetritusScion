@@ -84,16 +84,16 @@ public class DungeonDemo extends ApplicationAdapter {
 
     private static final float MESSAGE_SHRINK = 0.45f;
 
-    private static final int DEEP_OKLAB = describeOklab("dark dull cobalt");
-    private static final int SHALLOW_OKLAB = describeOklab("dull denim");
+    private static final int DEEP_OKLAB = describeOklab("darker duller teal cobalt");
+    private static final int SHALLOW_OKLAB = describeOklab("dark dull denim");
     private static final int LAVA_OKLAB = describeOklab("dark rich ember");
     private static final int CHAR_OKLAB = describeOklab("darker dullmost black ember");
     private static final int GRASS_OKLAB = describeOklab("dullest darkest green");
     private static final int DRY_OKLAB = describeOklab("duller apricot sage");
     private static final int STONE_OKLAB = describeOklab("darkmost gray dullest bronze");
     private static final int MEMORY_RGBA = describe("darker gray black");
-    private static final int deepText = toRGBA8888(offsetLightness(DEEP_OKLAB));
-    private static final int shallowText = toRGBA8888(offsetLightness(SHALLOW_OKLAB));
+    private static final int deepText = toRGBA8888(lighten(offsetLightness(DEEP_OKLAB), 0.2f));
+    private static final int shallowText = toRGBA8888(lighten(offsetLightness(SHALLOW_OKLAB), 0.2f));
     private static final int lavaText = toRGBA8888(offsetLightness(LAVA_OKLAB));
     private static final int charText = toRGBA8888(offsetLightness(CHAR_OKLAB));
     private static final int grassText = toRGBA8888(offsetLightness(GRASS_OKLAB));
@@ -412,11 +412,11 @@ public class DungeonDemo extends ApplicationAdapter {
                     else {
                         switch (prunedDungeon[x][y]) {
                             case '~':
-                                gg.backgrounds[x][y] = (lighten(DEEP_OKLAB, 0.6f * Math.min(1.2f, Math.max(0, lighting.fovResult[x][y] + waves.getConfiguredNoise(x, y, modifiedTime)))));
+                                gg.backgrounds[x][y] = (darken(DEEP_OKLAB, 0.4f * Math.min(1.2f, Math.max(0, lighting.fovResult[x][y] + waves.getConfiguredNoise(x, y, modifiedTime)))));
                                 gg.put(x, y, prunedDungeon[x][y], deepText);
                                 break;
                             case ',':
-                                gg.backgrounds[x][y] = (lighten(SHALLOW_OKLAB, 0.6f * Math.min(1.2f, Math.max(0, lighting.fovResult[x][y] + waves.getConfiguredNoise(x, y, modifiedTime)))));
+                                gg.backgrounds[x][y] = (darken(SHALLOW_OKLAB, 0.4f * Math.min(1.2f, Math.max(0, lighting.fovResult[x][y] + waves.getConfiguredNoise(x, y, modifiedTime)))));
                                 gg.put(x, y, prunedDungeon[x][y], shallowText);
                                 break;
                             case '₤':
