@@ -88,14 +88,14 @@ public class DungeonDemo extends ApplicationAdapter {
     private static final int SHALLOW_OKLAB = describeOklab("dark dull denim");
     private static final int LAVA_OKLAB = describeOklab("dark rich ember");
     private static final int CHAR_OKLAB = describeOklab("darker dullmost black ember");
-    private static final int GRASS_OKLAB = describeOklab("dullest darkest green");
+    private static final int GRASS_OKLAB = describeOklab("darker black moss green");
     private static final int DRY_OKLAB = describeOklab("duller apricot sage");
     private static final int STONE_OKLAB = describeOklab("darkmost gray dullest bronze");
     private static final int MEMORY_RGBA = describe("darker gray black");
     private static final int deepText = toRGBA8888(lighten(offsetLightness(DEEP_OKLAB), 0.2f));
     private static final int shallowText = toRGBA8888(lighten(offsetLightness(SHALLOW_OKLAB), 0.2f));
-    private static final int lavaText = toRGBA8888(offsetLightness(LAVA_OKLAB));
-    private static final int charText = toRGBA8888(offsetLightness(CHAR_OKLAB));
+    private static final int lavaText = toRGBA8888(darken((LAVA_OKLAB), 0.3f));
+    private static final int charText = toRGBA8888(darken((CHAR_OKLAB), 0.2f));
     private static final int grassText = toRGBA8888(offsetLightness(GRASS_OKLAB));
     private static final int stoneText = toRGBA8888(describeOklab("gray dullmost butter bronze"));
 
