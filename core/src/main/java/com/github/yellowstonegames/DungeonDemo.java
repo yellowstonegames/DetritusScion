@@ -359,7 +359,7 @@ public class DungeonDemo extends ApplicationAdapter {
 //        System.out.println(formatMarkup);
         TypingLabel label = null;
         Container<TypingLabel> con = null;
-        int tall = 0;
+        float tall = 0;
         for(Container<TypingLabel> c : messages){
             tall += c.getHeight();
         }
@@ -383,6 +383,7 @@ public class DungeonDemo extends ApplicationAdapter {
             label.restart(String.format(formatMarkup, arguments));
         }
         else {
+            label.setSize(0, 0);
             label.restart(String.format(formatMarkup, arguments));
         }
         if(con == null)
