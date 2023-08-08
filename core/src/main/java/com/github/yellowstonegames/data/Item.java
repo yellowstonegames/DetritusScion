@@ -46,9 +46,9 @@ public class Item implements HasStats, Replicable {
                 null, null, null, null);
 
     }
-    public Item(long representation, GlyphGrid gg, String name, Coord position, ObjectFloatOrderedMap<String> statReplacements) {
+    public Item(long representation, Font font, String name, Coord position, ObjectFloatOrderedMap<String> statReplacements) {
         glyph = representation;
-        actor = new GlyphActor(glyph, gg == null ? null : gg.getFont());
+        actor = new GlyphActor(glyph, font);
         if(position != null)
             actor.setLocation(position);
         else
