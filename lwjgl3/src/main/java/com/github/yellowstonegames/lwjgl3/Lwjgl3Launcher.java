@@ -15,7 +15,7 @@ import com.github.yellowstonegames.files.Config;
 public class Lwjgl3Launcher {
     public static void main(String[] args) {
         // Needed for macOS support, but also Windows with non-ASCII usernames.
-        if (StartOnFirstThreadHelper.startNewJvmIfRequired()) return;
+        if (StartupHelper.startNewJvmIfRequired()) return;
         // Graal stuff
         org.lwjgl.system.Library.initialize();
         org.lwjgl.system.ThreadLocalUtil.setupEnvData();

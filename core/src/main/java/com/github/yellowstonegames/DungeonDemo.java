@@ -154,7 +154,7 @@ public class DungeonDemo extends ApplicationAdapter {
         root = new Table();
         root.setFillParent(true);
         Table nest = new Table();
-        nest.add(messageGroup).size(config.displayConfig.messageSize.pixelWidth() * MESSAGE_SHRINK, config.displayConfig.messageSize.pixelHeight());//.fill().growY().bottom().width(config.displayConfig.messageSize.pixelWidth() * 0.0995f);
+        nest.add(messageGroup).size(config.displayConfig.messageSize.pixelWidth() * MESSAGE_SHRINK, config.displayConfig.messageSize.pixelHeight());
         root.add(nest).bottom().expand().padBottom(25f);
 
         screenStage.addActor(root);
