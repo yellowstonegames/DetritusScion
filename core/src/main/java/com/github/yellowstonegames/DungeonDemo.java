@@ -129,7 +129,9 @@ public class DungeonDemo extends ApplicationAdapter {
                 .setLineMetrics(0f, -0.125f, 0f, -0.25f).setTextureFilter().setName("Iosevka Slab");
 //        Font font = addGameIcons(KnownFonts.getIosevkaSlab(), "", "", -24, -24, 0);
 //        Font font = KnownFonts.addGameIcons(KnownFonts.getIosevkaSlab().scaleTo(16f, 28f).adjustLineHeight(1.25f));
-        varWidthFont = KnownFonts.getGentiumUnItalic().scaleTo(54f, 28f);
+        varWidthFont = KnownFonts.getGentiumUnItalic().scaleTo(54f, 28f)
+                .setTextureFilter().setFancyLinePosition(0, 0f).setDescent(-16f)
+                .setLineMetrics(0f, 0f, 0f, -0.3125f).setInlineImageMetrics(0f, 8f, 8f);
 //        Font font = new Font("Iosevka-Slab-standard.fnt", "Iosevka-Slab-standard.png", STANDARD, 0f, 0f, 0f, 0f, true)
 //            .scaleTo(15f, 24f).setTextureFilter().setName("Iosevka Slab");
 //        ShaderProgram shader = new ShaderProgram(Gdx.files.internal("shaders/vertex.glsl"),
@@ -142,6 +144,7 @@ public class DungeonDemo extends ApplicationAdapter {
         killMessages = new GapShuffler<>(new String[]{
                 "%s was {OCEAN=0.7;1.25;0.11;1.0;0.65}{CANNON}obliterated!{RESET}",
                 "%s just got [dark dull pear]{SLOWER}{SICK}{STYLE=~}wasted...{RESET}",
+                "%s took a real {SLIDE=1.1;0.25;true}punch{ENDSLIDE} in the gut, and they're out.{RESET}",
                 "%s became {RAINBOW=1;1;0.6;0.75}{WAVE}one with the cosmos{ENDWAVE}{ENDRAINBOW}, as fine dust...{RESET}",
                 "%s got [dark FIREBRICK]{SPEED=8}killed [white]{WAIT=0.4}ten {WAIT=0.4}times {WAIT=0.4}{NORMAL}before they hit the ground!{RESET}"}, random.copy());
         gg = new GlyphGrid(font, DUNGEON_WIDTH, DUNGEON_HEIGHT, true);

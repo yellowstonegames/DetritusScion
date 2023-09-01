@@ -74,7 +74,7 @@ public class Text {
         if (defaultColor != null) {
             ret += "[#" + DigitTools.hex(Color.rgba8888(defaultColor)) + "]";
         } else {
-            ret += "[]";
+            ret += "[ ]";
         }
 
         return ret;
@@ -109,7 +109,7 @@ public class Text {
         if (resetColor != 256) {
             ret += "[#" + DigitTools.hex(resetColor) + "]";
         } else {
-            ret += "[]";
+            ret += "[ ]";
         }
 
         return ret;
