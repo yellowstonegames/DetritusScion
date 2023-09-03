@@ -15,12 +15,17 @@ import com.github.yellowstonegames.files.Config;
 public class Lwjgl3Launcher {
     public static void main(String[] args) {
         // Needed for macOS support, but also Windows with non-ASCII usernames.
-        if (StartupHelper.startNewJvmIfRequired()) return;
+        if (StartupHelper.startNewJvmIfRequired(true)) return;
         // Graal stuff
         org.lwjgl.system.Library.initialize();
         org.lwjgl.system.ThreadLocalUtil.setupEnvData();
 
-        // load splashscreen
+//        System.out.println("PRINTING ALL PROPERTIES");
+//        Map<Object, Object> env = System.getProperties();
+//        for(Map.Entry<Object, Object> e : env.entrySet()){
+//            System.out.println(e.getKey() + ": " + e.getValue());
+//        }
+//        System.out.println("DONE PRINTING");
 
         // now that assets are ready, load main game screen
         mainGame();

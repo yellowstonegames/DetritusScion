@@ -102,7 +102,10 @@ public class StartupHelper {
         // If targeting Java 9 or higher, you could use the following instead of the above line:
         //String javaExecPath = ProcessHandle.current().info().command().orElseThrow();
 
-        if (!(new File(javaExecPath)).exists()) {
+        // The next line first makes sure we aren't running a Graal Native Image executable (which doesn't always have java.home)
+        // and otherwise checks that the java executable can be launched.
+        if (System.getProperty("org.graalvm.nativeimage.imagecode", "").isEmpty() &&
+                !(new File(javaExecPath)).exists()) {
             System.err.println(
                     "A Java installation could not be found. If you are distributing this app with a bundled JRE, be sure to set the -XstartOnFirstThread argument manually!");
             return false;
