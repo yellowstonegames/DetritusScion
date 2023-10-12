@@ -60,10 +60,12 @@ graalvmNative {
 }
 
 jar {
+  var buildDirectory = project.layout.buildDirectory.asFile.get().absolutePath
+
 // sets the name of the .jar file this produces to the name of the game or app.
   archiveFileName.set(appName + ".jar")
 // using 'lib' instead of the default 'libs' appears to be needed by jpackageimage.
-  destinationDirectory = file("$project.buildDir/lib")
+  destinationDirectory = file("$buildDirectory/lib")
 // the duplicatesStrategy matters starting in Gradle 7.0; this setting works.
   duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
   dependsOn configurations.runtimeClasspath
@@ -97,7 +99,7 @@ if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_14)) {
     modules.set([
         'jdk.unsupported'
     ])
-    distDir.set(file(project.buildDir))
+    distDir.set(file(project.layout.buildDirectory))
     jpackage {
       imageName = appName
 // you can set this to false if you want to build an installer, or keep it as true to build just an app.
@@ -117,5 +119,6 @@ if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_14)) {
 }
 
 // Equivalent to the jar task; here for compatibility with gdx-setup.
-task dist(dependsOn: [jar]) {
+tasks.register('dist') {
+  dependsOn['jar']
 }
