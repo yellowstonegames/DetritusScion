@@ -8,6 +8,7 @@ buildscript {
 // your JAVA_HOME environment variable may also need to be a JDK with version 14 or higher.
     if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_14)) {
       classpath "org.beryx:badass-runtime-plugin:1.13.0"
+      classpath "org.graalvm.buildtools.native:org.graalvm.buildtools.native.gradle.plugin:0.9.27"
     }
   }
 }
@@ -17,6 +18,8 @@ if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_14)) {
 else {
   apply plugin: 'application'
 }
+
+apply plugin: "org.graalvm.buildtools.native"
 
 sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
 mainClassName = 'com.github.yellowstonegames.lwjgl3.Lwjgl3Launcher'
@@ -29,7 +32,6 @@ dependencies {
   implementation project(':core')
 //  implementation "com.github.tommyettinger.gdx-graalhelper:gdx-svmhelper-backend-lwjgl3:$graalHelperVersion"
   implementation "com.github.Berstanio.gdx-graalhelper:gdx-svmhelper-backend-lwjgl3:$graalHelperVersion"
-  compileOnly "org.graalvm.nativeimage:svm:$graalvmVersion"
 }
 
 def os = System.properties['os.name'].toLowerCase()
@@ -41,6 +43,19 @@ run {
   if (os.contains('mac')) {
     // Required to run LWJGL3 Java apps on MacOS
     jvmArgs += "-XstartOnFirstThread"
+  }
+}
+
+graalvmNative {
+  binaries {
+    main {
+      imageName = "DetritusScion"
+      mainClass = mainClassName
+      requiredVersion = '23.0'
+      buildArgs.add("-march=compatibility")
+      jvmArgs.addAll("-Dfile.encoding=UTF8")
+      sharedLibrary = false
+    }
   }
 }
 

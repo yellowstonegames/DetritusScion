@@ -6,6 +6,9 @@
     },
     {
       "pattern":"lsans.+"
+    },
+    {
+      "pattern": "((fonts|images|music|sfx|shaders)/.*)|(com/badlogic/gdx/utils/.*\\.(png|fnt))"
     }
   ]},
   "bundles":[]
