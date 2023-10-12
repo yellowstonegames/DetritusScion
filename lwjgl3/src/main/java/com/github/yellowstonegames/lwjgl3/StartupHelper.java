@@ -104,7 +104,7 @@ public class StartupHelper {
 
         // The next line first makes sure we aren't running a Graal Native Image executable (which doesn't always have java.home)
         // and otherwise checks that the java executable can be launched.
-        if (System.getProperty("org.graalvm.nativeimage.imagecode", "").isEmpty() &&
+        if (!System.getProperty("org.graalvm.nativeimage.imagecode", "").isEmpty() &&
                 !(new File(javaExecPath)).exists()) {
             System.err.println(
                     "A Java installation could not be found. If you are distributing this app with a bundled JRE, be sure to set the -XstartOnFirstThread argument manually!");
