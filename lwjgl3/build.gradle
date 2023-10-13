@@ -24,7 +24,7 @@ apply plugin: "org.graalvm.buildtools.native"
 sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
 mainClassName = 'com.github.yellowstonegames.lwjgl3.Lwjgl3Launcher'
 eclipse.project.name = appName + '-lwjgl3'
-sourceCompatibility = 17
+java.sourceCompatibility = 17
 
 dependencies {
   implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
@@ -45,7 +45,6 @@ run {
     jvmArgs += "-XstartOnFirstThread"
   }
 }
-
 graalvmNative {
   binaries {
     main {

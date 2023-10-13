@@ -79,6 +79,10 @@ public class StartupHelper {
             return false;
         }
 
+        // makes sure we aren't running a Graal Native Image executable (which doesn't always have java.home)
+        if(!System.getProperty("org.graalvm.nativeimage.imagecode", "").isEmpty()) {
+            return false;
+        }
         long pid = LibC.getpid();
 
         // check whether -XstartOnFirstThread is enabled
@@ -96,16 +100,14 @@ public class StartupHelper {
 
         // Restart the JVM with -XstartOnFirstThread
         ArrayList<String> jvmArgs = new ArrayList<>();
-        String separator = System.getProperty("file.separator");
+        String separator = System.getProperty("file.separator", "/");
         // The following line is used assuming you target Java 8, the minimum for LWJGL3.
-        String javaExecPath = System.getProperty("java.home") + separator + "bin" + separator + "java";
+        String javaExecPath = System.getProperty("java.home", "") + separator + "bin" + separator + "java";
         // If targeting Java 9 or higher, you could use the following instead of the above line:
         //String javaExecPath = ProcessHandle.current().info().command().orElseThrow();
 
-        // The next line first makes sure we aren't running a Graal Native Image executable (which doesn't always have java.home)
-        // and otherwise checks that the java executable can be launched.
-        if (!System.getProperty("org.graalvm.nativeimage.imagecode", "").isEmpty() &&
-                !(new File(javaExecPath)).exists()) {
+        // The next line checks that the java executable can be launched.
+        if (!(new File(javaExecPath)).exists()) {
             System.err.println(
                     "A Java installation could not be found. If you are distributing this app with a bundled JRE, be sure to set the -XstartOnFirstThread argument manually!");
             return false;
