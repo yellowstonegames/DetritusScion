@@ -26,6 +26,7 @@ import com.github.tommyettinger.random.EnhancedRandom;
 import com.github.tommyettinger.textra.Font;
 import com.github.tommyettinger.textra.KnownFonts;
 import com.github.tommyettinger.textra.TypingLabel;
+import com.github.yellowstonegames.core.DescriptiveColor;
 import com.github.yellowstonegames.core.FullPalette;
 import com.github.yellowstonegames.core.GapShuffler;
 import com.github.yellowstonegames.data.Mob;
@@ -91,7 +92,7 @@ public class DungeonDemo extends ApplicationAdapter {
     private static final int GRASS_OKLAB = describeOklab("darker black moss green");
     private static final int DRY_OKLAB = describeOklab("duller apricot sage");
     private static final int STONE_OKLAB = describeOklab("darkmost gray dullest bronze");
-    private static final int MEMORY_RGBA = describe("darker gray black");
+    private static final int MEMORY_OKLAB = describeOklab("darker gray black");
     private static final int deepText = toRGBA8888(lighten(offsetLightness(DEEP_OKLAB), 0.2f));
     private static final int shallowText = toRGBA8888(lighten(offsetLightness(SHALLOW_OKLAB), 0.2f));
     private static final int lavaText = toRGBA8888(darken((LAVA_OKLAB), 0.3f));
@@ -339,7 +340,7 @@ public class DungeonDemo extends ApplicationAdapter {
             enemies.put(selected[i], mob);
             gg.addActor(mob.actor);
             lighting.addLight(selected[i], new Radiance(rng.nextFloat(3f) + 2f,
-                    lighten(color, 0.2f), 0.5f, 0f));
+                    DescriptiveColor.edit(color, 0.75f, 0f, 0f, 0f, 0f, 1.5f, 1.5f, 1f), 0.5f, 0f));
         }
         lighting.addLight(player, new Radiance(5f, FullPalette.COSMIC_LATTE, 0.3f, 0f));
         lighting.calculateFOV(player.x, player.y, player.x - 10, player.y - 10, player.x + 11, player.y + 11);
@@ -402,7 +403,7 @@ public class DungeonDemo extends ApplicationAdapter {
 
     public void recolor(){
         float modifiedTime = (TimeUtils.millis() & 0xFFFFFL) * 0x1p-9f;
-        int rainbow = toRGBA8888(
+        int rainbow = /* toRGBA8888 */(
                 limitToGamut(100,
                         (int) (TrigTools.sinTurns(modifiedTime * 0.2f) * 40f) + 128, (int) (TrigTools.cosTurns(modifiedTime * 0.2f) * 40f) + 128, 255));
 //        FOV.reuseFOV(res, light, playerX, playerY, LineWobble.wobble(12345, modifiedTime) * 2.5f + 4f, Radius.CIRCLE);
@@ -416,23 +417,23 @@ public class DungeonDemo extends ApplicationAdapter {
                     else {
                         switch (prunedDungeon[x][y]) {
                             case '~':
-                                gg.backgrounds[x][y] = toRGBA8888(darken(DEEP_OKLAB, 0.4f * Math.min(1.2f, Math.max(0, lighting.fovResult[x][y] + waves.getConfiguredNoise(x, y, modifiedTime)))));
+                                gg.backgrounds[x][y] = /* toRGBA8888 */(darken(DEEP_OKLAB, 0.4f * Math.min(1.2f, Math.max(0, lighting.fovResult[x][y] + waves.getConfiguredNoise(x, y, modifiedTime)))));
                                 gg.put(x, y, prunedDungeon[x][y], deepText);
                                 break;
                             case ',':
-                                gg.backgrounds[x][y] = toRGBA8888(darken(SHALLOW_OKLAB, 0.4f * Math.min(1.2f, Math.max(0, lighting.fovResult[x][y] + waves.getConfiguredNoise(x, y, modifiedTime)))));
+                                gg.backgrounds[x][y] = /* toRGBA8888 */(darken(SHALLOW_OKLAB, 0.4f * Math.min(1.2f, Math.max(0, lighting.fovResult[x][y] + waves.getConfiguredNoise(x, y, modifiedTime)))));
                                 gg.put(x, y, prunedDungeon[x][y], shallowText);
                                 break;
                             case '₤':
-                                gg.backgrounds[x][y] = toRGBA8888(lighten(LAVA_OKLAB, 0.5f * Math.min(1.5f, Math.max(0, lighting.fovResult[x][y] + ridges.getConfiguredNoise(x, y, modifiedTime)))));
+                                gg.backgrounds[x][y] = /* toRGBA8888 */(lighten(LAVA_OKLAB, 0.5f * Math.min(1.5f, Math.max(0, lighting.fovResult[x][y] + ridges.getConfiguredNoise(x, y, modifiedTime)))));
                                 gg.put(x, y, prunedDungeon[x][y], lavaText);
                                 break;
                             case '¢':
-                                gg.backgrounds[x][y] = toRGBA8888(lighten(CHAR_OKLAB, 0.2f * Math.min(0.8f, Math.max(0, lighting.fovResult[x][y] + ridges.getConfiguredNoise(x, y, modifiedTime)))));
+                                gg.backgrounds[x][y] = /* toRGBA8888 */(lighten(CHAR_OKLAB, 0.2f * Math.min(0.8f, Math.max(0, lighting.fovResult[x][y] + ridges.getConfiguredNoise(x, y, modifiedTime)))));
                                 gg.put(x, y, prunedDungeon[x][y], charText);
                                 break;
                             case '"':
-                                gg.backgrounds[x][y] = toRGBA8888(lerpColors(GRASS_OKLAB, DRY_OKLAB, MathTools.square(IntPointHash.hash256(x, y, 12345) * 0x1.8p-9f)));
+                                gg.backgrounds[x][y] = /* toRGBA8888 */(lerpColors(GRASS_OKLAB, DRY_OKLAB, MathTools.square(IntPointHash.hash256(x, y, 12345) * 0x1.8p-9f)));
 // (darken(lerpColors(GRASS_OKLAB, DRY_OKLAB, waves.getConfiguredNoise(x, y) * 0.5f + 0.5f), 0.4f * Math.min(1.1f, Math.max(0, 1f - lighting.fovResult[x][y] + waves.getConfiguredNoise(x, y, modifiedTime * 0.7f)))));
                                 gg.put(x, y, prunedDungeon[x][y], grassText);
                                 break;
@@ -440,7 +441,7 @@ public class DungeonDemo extends ApplicationAdapter {
                                 gg.backgrounds[x][y] = 0;
                                 break;
                             default:
-//                                gg.backgrounds[x][y] = toRGBA8888(lighten(STONE_OKLAB, 0.6f * lighting.fovResult[x][y]));
+//                                gg.backgrounds[x][y] = /* toRGBA8888 */(lighten(STONE_OKLAB, 0.6f * lighting.fovResult[x][y]));
                                 gg.backgrounds[x][y] = 0;
                                 gg.put(x, y, prunedDungeon[x][y], stoneText);
                         }
@@ -448,26 +449,26 @@ public class DungeonDemo extends ApplicationAdapter {
                 } else if (seen.contains(x, y)) {
                     switch (prunedDungeon[x][y]) {
                         case '~':
-                            gg.backgrounds[x][y] = toRGBA8888(edit(DEEP_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
+                            gg.backgrounds[x][y] = /* toRGBA8888 */(edit(DEEP_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
                             gg.put(x, y, prunedDungeon[x][y], stoneText);
                             break;
                         case ',':
-                            gg.backgrounds[x][y] = toRGBA8888(edit(SHALLOW_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
+                            gg.backgrounds[x][y] = /* toRGBA8888 */(edit(SHALLOW_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
                             gg.put(x, y, prunedDungeon[x][y], stoneText);
                             break;
                         case '₤':
-                            gg.backgrounds[x][y] = toRGBA8888(edit(LAVA_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
+                            gg.backgrounds[x][y] = /* toRGBA8888 */(edit(LAVA_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
                             gg.put(x, y, prunedDungeon[x][y], stoneText);
                             break;
                         case '¢':
-                            gg.backgrounds[x][y] = toRGBA8888(edit(CHAR_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
+                            gg.backgrounds[x][y] = /* toRGBA8888 */(edit(CHAR_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
                             gg.put(x, y, prunedDungeon[x][y], stoneText);
                             break;
                         case ' ':
                             gg.backgrounds[x][y] = 0;
                             break;
                         default:
-                            gg.backgrounds[x][y] = MEMORY_RGBA;
+                            gg.backgrounds[x][y] = MEMORY_OKLAB;
                             gg.put(x, y, prunedDungeon[x][y], stoneText);
                     }
                 } else {
@@ -475,11 +476,20 @@ public class DungeonDemo extends ApplicationAdapter {
                 }
             }
         }
-        lighting.draw(gg.backgrounds);
+        lighting.drawOklab(gg.backgrounds);
+
         for (int i = 0; i < toCursor.size(); i++) {
             Coord curr = toCursor.get(i);
             if(inView.contains(curr))
                 gg.backgrounds[curr.x][curr.y] = rainbow;
+        }
+
+        for (int y = 0; y < DUNGEON_HEIGHT; y++) {
+            for (int x = 0; x < DUNGEON_WIDTH; x++) {
+                int bg = gg.backgrounds[x][y];
+                if(bg != 0)
+                    gg.backgrounds[x][y] = toRGBA8888(bg);
+            }
         }
     }
 
