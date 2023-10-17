@@ -416,23 +416,23 @@ public class DungeonDemo extends ApplicationAdapter {
                     else {
                         switch (prunedDungeon[x][y]) {
                             case '~':
-                                gg.backgrounds[x][y] = (darken(DEEP_OKLAB, 0.4f * Math.min(1.2f, Math.max(0, lighting.fovResult[x][y] + waves.getConfiguredNoise(x, y, modifiedTime)))));
+                                gg.backgrounds[x][y] = toRGBA8888(darken(DEEP_OKLAB, 0.4f * Math.min(1.2f, Math.max(0, lighting.fovResult[x][y] + waves.getConfiguredNoise(x, y, modifiedTime)))));
                                 gg.put(x, y, prunedDungeon[x][y], deepText);
                                 break;
                             case ',':
-                                gg.backgrounds[x][y] = (darken(SHALLOW_OKLAB, 0.4f * Math.min(1.2f, Math.max(0, lighting.fovResult[x][y] + waves.getConfiguredNoise(x, y, modifiedTime)))));
+                                gg.backgrounds[x][y] = toRGBA8888(darken(SHALLOW_OKLAB, 0.4f * Math.min(1.2f, Math.max(0, lighting.fovResult[x][y] + waves.getConfiguredNoise(x, y, modifiedTime)))));
                                 gg.put(x, y, prunedDungeon[x][y], shallowText);
                                 break;
                             case '₤':
-                                gg.backgrounds[x][y] = (lighten(LAVA_OKLAB, 0.5f * Math.min(1.5f, Math.max(0, lighting.fovResult[x][y] + ridges.getConfiguredNoise(x, y, modifiedTime)))));
+                                gg.backgrounds[x][y] = toRGBA8888(lighten(LAVA_OKLAB, 0.5f * Math.min(1.5f, Math.max(0, lighting.fovResult[x][y] + ridges.getConfiguredNoise(x, y, modifiedTime)))));
                                 gg.put(x, y, prunedDungeon[x][y], lavaText);
                                 break;
                             case '¢':
-                                gg.backgrounds[x][y] = (lighten(CHAR_OKLAB, 0.2f * Math.min(0.8f, Math.max(0, lighting.fovResult[x][y] + ridges.getConfiguredNoise(x, y, modifiedTime)))));
+                                gg.backgrounds[x][y] = toRGBA8888(lighten(CHAR_OKLAB, 0.2f * Math.min(0.8f, Math.max(0, lighting.fovResult[x][y] + ridges.getConfiguredNoise(x, y, modifiedTime)))));
                                 gg.put(x, y, prunedDungeon[x][y], charText);
                                 break;
                             case '"':
-                                gg.backgrounds[x][y] = lerpColors(GRASS_OKLAB, DRY_OKLAB, MathTools.square(IntPointHash.hash256(x, y, 12345) * 0x1.8p-9f));
+                                gg.backgrounds[x][y] = toRGBA8888(lerpColors(GRASS_OKLAB, DRY_OKLAB, MathTools.square(IntPointHash.hash256(x, y, 12345) * 0x1.8p-9f)));
 // (darken(lerpColors(GRASS_OKLAB, DRY_OKLAB, waves.getConfiguredNoise(x, y) * 0.5f + 0.5f), 0.4f * Math.min(1.1f, Math.max(0, 1f - lighting.fovResult[x][y] + waves.getConfiguredNoise(x, y, modifiedTime * 0.7f)))));
                                 gg.put(x, y, prunedDungeon[x][y], grassText);
                                 break;
@@ -449,19 +449,19 @@ public class DungeonDemo extends ApplicationAdapter {
                     switch (prunedDungeon[x][y]) {
                         case '~':
                             gg.backgrounds[x][y] = toRGBA8888(edit(DEEP_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
-                            gg.put(x, y, prunedDungeon[x][y], deepText);
+                            gg.put(x, y, prunedDungeon[x][y], stoneText);
                             break;
                         case ',':
                             gg.backgrounds[x][y] = toRGBA8888(edit(SHALLOW_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
-                            gg.put(x, y, prunedDungeon[x][y], shallowText);
+                            gg.put(x, y, prunedDungeon[x][y], stoneText);
                             break;
                         case '₤':
                             gg.backgrounds[x][y] = toRGBA8888(edit(LAVA_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
-                            gg.put(x, y, prunedDungeon[x][y], lavaText);
+                            gg.put(x, y, prunedDungeon[x][y], stoneText);
                             break;
                         case '¢':
                             gg.backgrounds[x][y] = toRGBA8888(edit(CHAR_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
-                            gg.put(x, y, prunedDungeon[x][y], charText);
+                            gg.put(x, y, prunedDungeon[x][y], stoneText);
                             break;
                         case ' ':
                             gg.backgrounds[x][y] = 0;
