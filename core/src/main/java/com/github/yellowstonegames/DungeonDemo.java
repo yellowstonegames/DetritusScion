@@ -56,7 +56,7 @@ public class DungeonDemo extends ApplicationAdapter {
     private GlyphGrid gg;
     private DungeonProcessor dungeonProcessor;
     private char[][] bare, dungeon, prunedDungeon;
-    private Region seen, inView, blockage;
+    private Region seen, inView, blockage, justSeen, justHidden;
     private final Noise waves = new Noise(123, 0.5f, Noise.FOAM_FRACTAL, 1);
     private final Noise ridges = new Noise(12345, 0.6f, Noise.FOAM_FRACTAL, 1);
     private Mob player;
@@ -68,6 +68,7 @@ public class DungeonDemo extends ApplicationAdapter {
     private final Vector2 pos = new Vector2();
     private Runnable post;
     private LightingManager lighting;
+    private long lastMove;
     private Font varWidthFont;
     private ObjectDeque<Container<TypingLabel>> messages = new ObjectDeque<>(30);
     private Table messageGroup;
@@ -178,8 +179,12 @@ public class DungeonDemo extends ApplicationAdapter {
         post = () -> {
             int playerX = Math.round(player.actor.getX()), playerY = Math.round(player.actor.getY());
             lighting.calculateFOV(playerX, playerY, playerX - 10, playerY - 10, playerX + 11, playerY + 11);
+            justSeen.remake(seen);
             seen.or(inView.refill(lighting.fovResult, 0.001f, 2f));
-            blockage.remake(seen).not().fringe8way();
+            blockage.remake(seen).not();
+            justSeen.notAnd(seen);
+            justHidden.andNot(blockage);
+            blockage.fringe8way();
             LineTools.pruneLines(dungeon, seen, prunedDungeon);
             gg.setVisibilities(inView::contains);
             if(!awaitedMoves.isEmpty())
@@ -198,6 +203,8 @@ public class DungeonDemo extends ApplicationAdapter {
         ridges.setFractalType(Noise.RIDGED_MULTI);
         seen = new Region(DUNGEON_WIDTH, DUNGEON_HEIGHT);
         blockage = new Region(DUNGEON_WIDTH, DUNGEON_HEIGHT);
+        justSeen = justSeen == null ? seen.copy() : justSeen.remake(seen);
+        justHidden = justHidden == null ? new Region(DUNGEON_WIDTH, DUNGEON_HEIGHT) : justHidden.resizeAndEmpty(DUNGEON_WIDTH, DUNGEON_HEIGHT);
         prunedDungeon = new char[DUNGEON_WIDTH][DUNGEON_HEIGHT];
         inView = new Region(DUNGEON_WIDTH, DUNGEON_HEIGHT);
         input.setInputProcessor(new InputAdapter(){
@@ -294,10 +301,11 @@ public class DungeonDemo extends ApplicationAdapter {
     public void move(Direction way){
         // this prevents movements from restarting while a slide is already in progress.
         if(player.actor.hasActions()) return;
+        lastMove = TimeUtils.millis();
         final Coord old = player.actor.getLocation();
         final Coord next = Coord.get(Math.round(player.actor.getX() + way.deltaX), Math.round(player.actor.getY() + way.deltaY));
         if(next.isWithin(DUNGEON_WIDTH, DUNGEON_HEIGHT) && bare[next.x][next.y] == '.') {
-            player.actor.addAction(MoreActions.slideTo(next.x, next.y, 0.2f, post));
+            player.actor.addAction(MoreActions.slideTo(next.x, next.y, 0.3f, post));
             if(enemies.containsKey(next)){
                 gg.burst(
                         next.x,
@@ -317,6 +325,7 @@ public class DungeonDemo extends ApplicationAdapter {
     }
 
     public void regenerate(){
+        lastMove = TimeUtils.millis();
         enemies.clear();
         Actor[] kids = gg.getChildren().begin();
         for(int c = 0; c < gg.getChildren().size; c++)
@@ -403,13 +412,16 @@ public class DungeonDemo extends ApplicationAdapter {
 
     public void recolor(){
         float modifiedTime = (TimeUtils.millis() & 0xFFFFFL) * 0x1p-9f;
+
+        final float change = Math.min(Math.max(TimeUtils.timeSinceMillis(lastMove) * (0.001f / 0.3f), 0f), 1f);
+
         int rainbow = /* toRGBA8888 */(
                 limitToGamut(100,
                         (int) (TrigTools.sinTurns(modifiedTime * 0.2f) * 40f) + 128, (int) (TrigTools.cosTurns(modifiedTime * 0.2f) * 40f) + 128, 255));
-//        FOV.reuseFOV(res, light, playerX, playerY, LineWobble.wobble(12345, modifiedTime) * 2.5f + 4f, Radius.CIRCLE);
+        int fadingX = -1, fadingY = -1;
         for (int y = 0; y < DUNGEON_HEIGHT; y++) {
             for (int x = 0; x < DUNGEON_WIDTH; x++) {
-                if (inView.contains(x, y)) {
+                if (inView.contains(x, y) || justHidden.contains(x, y)) {
                     if(toCursor.contains(Coord.get(x, y))){
                         gg.backgrounds[x][y] = rainbow;
                         gg.put(x, y, prunedDungeon[x][y], stoneText);
@@ -444,6 +456,35 @@ public class DungeonDemo extends ApplicationAdapter {
 //                                gg.backgrounds[x][y] = /* toRGBA8888 */(lighten(STONE_OKLAB, 0.6f * lighting.fovResult[x][y]));
                                 gg.backgrounds[x][y] = 0;
                                 gg.put(x, y, prunedDungeon[x][y], stoneText);
+                        }
+                        if(justSeen.contains(x, y)){
+                            if(change > 0f && change < 1f) {
+                                fadingX = x;
+                                fadingY = y;
+                            }
+                            gg.backgrounds[x][y] = fade(gg.backgrounds[x][y], 1f - change);
+                        } else if(justHidden.contains(x, y)){
+                            int tmp = 0;
+                            switch (prunedDungeon[x][y]) {
+                                case '~':
+                                    tmp = /* toRGBA8888 */(edit(DEEP_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
+                                    break;
+                                case ',':
+                                    tmp = /* toRGBA8888 */(edit(SHALLOW_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
+                                    break;
+                                case '₤':
+                                    tmp = /* toRGBA8888 */(edit(LAVA_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
+                                    break;
+                                case '¢':
+                                    tmp = /* toRGBA8888 */(edit(CHAR_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
+                                    break;
+                                case ' ':
+                                    break;
+                                default:
+                                    tmp = MEMORY_OKLAB;
+                            }
+
+                            gg.backgrounds[x][y] = lerpColors(gg.backgrounds[x][y], tmp, change);
                         }
                     }
                 } else if (seen.contains(x, y)) {
