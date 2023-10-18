@@ -88,6 +88,7 @@ public class DungeonDemo extends ApplicationAdapter {
 
     private static final float MESSAGE_SHRINK = 0.45f;
 
+    private static final int BG_OKLAB = describeOklab("dark gray black");
     private static final int DEEP_OKLAB = describeOklab("darker duller teal cobalt");
     private static final int SHALLOW_OKLAB = describeOklab("dark dull denim");
     private static final int LAVA_OKLAB = describeOklab("dark rich ember");
@@ -305,7 +306,7 @@ public class DungeonDemo extends ApplicationAdapter {
         final Coord old = player.actor.getLocation();
         final Coord next = Coord.get(Math.round(player.actor.getX() + way.deltaX), Math.round(player.actor.getY() + way.deltaY));
         if(next.isWithin(DUNGEON_WIDTH, DUNGEON_HEIGHT) && bare[next.x][next.y] == '.') {
-            player.actor.addAction(MoreActions.slideTo(next.x, next.y, 0.3f, post));
+            player.actor.addAction(MoreActions.slideTo(next.x, next.y, 0.2f, post));
             if(enemies.containsKey(next)){
                 gg.burst(
                         next.x,
@@ -360,7 +361,7 @@ public class DungeonDemo extends ApplicationAdapter {
         bare = dungeonProcessor.getBarePlaceGrid();
         EnhancedRandom rng = dungeonProcessor.rng;
         ArrayTools.insert(dungeon, prunedDungeon, 0, 0);
-        lighting = new LightingManager(FOV.generateSimpleResistances(bare), "dark gray black", Radius.CIRCLE, 2.5f);
+        lighting = new LightingManager(FOV.generateSimpleResistances(bare), BG_OKLAB, Radius.CIRCLE, 2.5f);
         previousLightLevels = ArrayTools.copy(lighting.fovResult);
         previousColorLighting = ArrayTools.copy(lighting.colorLighting);
         Region floors = new Region(bare, '.');
@@ -439,7 +440,7 @@ public class DungeonDemo extends ApplicationAdapter {
     public void recolor(){
         float modifiedTime = (TimeUtils.millis() & 0xFFFFFL) * 0x1p-9f;
 
-        final float change = Math.min(Math.max(TimeUtils.timeSinceMillis(lastMove) * (0.003f), 0f), 1f);
+        final float change = Math.min(Math.max(TimeUtils.timeSinceMillis(lastMove) * (0.004f), 0f), 1f);
 
         int rainbow = /* toRGBA8888 */(
                 limitToGamut(100,
@@ -511,14 +512,16 @@ public class DungeonDemo extends ApplicationAdapter {
                             break;
                         case '"':
 //                            gg.backgrounds[x][y] = /* toRGBA8888 */(lighten(lerpColors(GRASS_OKLAB, DRY_OKLAB, MathTools.square(IntPointHash.hash256(x, y, 12345) * 0x1.8p-9f)), 0.5f * Math.min(1.5f, Math.max(0, previousLightLevels[x][y]))));
-                            gg.backgrounds[x][y] = lerpColors(0, MEMORY_OKLAB, change);
+                            gg.backgrounds[x][y] = /* toRGBA8888 */lerpColors(lighten(lerpColors(GRASS_OKLAB, DRY_OKLAB, MathTools.square(IntPointHash.hash256(x, y, 12345) * 0x1.8p-9f)),
+                                    0.5f * Math.min(1.5f, Math.max(0, lighting.fovResult[x][y]))),
+                                    edit(GRASS_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f), change);
                             gg.put(x, y, prunedDungeon[x][y], grassText);
                             break;
                         case ' ':
                             gg.backgrounds[x][y] = 0;
                             break;
                         default:
-                            gg.backgrounds[x][y] = lerpColors(0, MEMORY_OKLAB, change);
+                            gg.backgrounds[x][y] = lerpColors(BG_OKLAB, MEMORY_OKLAB, change);
                             gg.put(x, y, prunedDungeon[x][y], stoneText);
                     }
                 } else if (seen.contains(x, y)) {
