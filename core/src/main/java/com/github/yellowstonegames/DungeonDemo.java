@@ -440,7 +440,7 @@ public class DungeonDemo extends ApplicationAdapter {
     public void recolor(){
         float modifiedTime = (TimeUtils.millis() & 0xFFFFFL) * 0x1p-9f;
 
-        final float change = Math.min(Math.max(TimeUtils.timeSinceMillis(lastMove) * (0.004f), 0f), 1f);
+        final float change = Math.min(Math.max(TimeUtils.timeSinceMillis(lastMove) * (0.003f), 0f), 1f);
 
         int rainbow = /* toRGBA8888 */(
                 limitToGamut(100,
@@ -481,7 +481,7 @@ public class DungeonDemo extends ApplicationAdapter {
                                 break;
                             default:
 //                                gg.backgrounds[x][y] = /* toRGBA8888 */(lighten(STONE_OKLAB, 0.6f * lighting.fovResult[x][y]));
-                                gg.backgrounds[x][y] = 0;
+                                gg.backgrounds[x][y] = BG_OKLAB;
                                 gg.put(x, y, prunedDungeon[x][y], stoneText);
                         }
                         if(justSeen.contains(x, y)){
