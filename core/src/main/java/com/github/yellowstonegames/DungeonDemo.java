@@ -180,35 +180,13 @@ public class DungeonDemo extends ApplicationAdapter {
         enemies = new CoordObjectOrderedMap<>(100);
         post = () -> {
             int playerX = Math.round(player.actor.getX()), playerY = Math.round(player.actor.getY());
-            ArrayTools.set(lighting.fovResult, previousLightLevels);
-            ArrayTools.set(lighting.colorLighting, previousColorLighting);
-            justHidden.refill(previousLightLevels, 0f).not();
-
-            lighting.calculateFOV(playerX, playerY, playerX - 10, playerY - 10, playerX + 11, playerY + 11);
 //            justSeen.remake(seen);
 //            seen.or(inView.refill(lighting.fovResult, 0.001f, 2f));
 //            blockage.remake(seen).not();
 //            justSeen.notAnd(seen);
 //            justHidden.andNot(blockage);
 //            blockage.fringe8way();
-            // assigns to blockage all cells that were NOT visible in the latest lightLevels calculation.
-            blockage.refill(lighting.fovResult, 0f);
-            // store current previously-seen cells as justSeen, so they can be used to ease those cells into being seen.
-            justSeen.remake(seen);
-            // blockage.not() flips its values so now it stores all cells that ARE visible in the latest lightLevels calc.
-            inView.remake(blockage.not());
-            // then, seen has all of those cells that have been visible (ever) included in with its cells.
-            seen.or(inView);
-            // this is roughly `justSeen = seen - justSeen;`, if subtraction worked on Regions.
-            justSeen.notAnd(seen);
-            // this is roughly `justHidden = justHidden - blockage;`, where justHidden had included all previously visible
-            // cells, and now will have all currently visible cells removed from it. This leaves the just-hidden cells.
-            justHidden.andNot(blockage);
-            // changes blockage so instead of all currently visible cells, it now stores the cells that would have been
-            // adjacent to those cells.
-            blockage.fringe8way();
-            LineTools.pruneLines(dungeon, seen, prunedDungeon);
-            gg.setVisibilities(inView::contains);
+
             if(!awaitedMoves.isEmpty())
                 awaitedMoves.removeFirst();
             playerToCursor.clearGoals();
@@ -341,6 +319,30 @@ public class DungeonDemo extends ApplicationAdapter {
                 message(killMessages.next(), dead.getName());
             }
             lighting.moveLight(old, next);
+
+            ArrayTools.set(lighting.fovResult, previousLightLevels);
+            ArrayTools.set(lighting.colorLighting, previousColorLighting);
+            justHidden.refill(previousLightLevels, 0f).not();
+            lighting.calculateFOV(next.x, next.y, next.x - 10, next.y - 10, next.x + 11, next.y + 11);
+            // assigns to blockage all cells that were NOT visible in the latest lightLevels calculation.
+            blockage.refill(lighting.fovResult, 0f);
+            // store current previously-seen cells as justSeen, so they can be used to ease those cells into being seen.
+            justSeen.remake(seen);
+            // blockage.not() flips its values so now it stores all cells that ARE visible in the latest lightLevels calc.
+            inView.remake(blockage.not());
+            // then, seen has all of those cells that have been visible (ever) included in with its cells.
+            seen.or(inView);
+            // this is roughly `justSeen = seen - justSeen;`, if subtraction worked on Regions.
+            justSeen.notAnd(seen);
+            // this is roughly `justHidden = justHidden - blockage;`, where justHidden had included all previously visible
+            // cells, and now will have all currently visible cells removed from it. This leaves the just-hidden cells.
+            justHidden.andNot(blockage);
+            // changes blockage so instead of all currently visible cells, it now stores the cells that would have been
+            // adjacent to those cells.
+            blockage.fringe8way();
+            LineTools.pruneLines(dungeon, seen, prunedDungeon);
+            gg.setVisibilities(inView::contains);
+
         } else {
             player.actor.addAction(MoreActions.bump(way, 0.3f));
         }
@@ -437,14 +439,14 @@ public class DungeonDemo extends ApplicationAdapter {
     public void recolor(){
         float modifiedTime = (TimeUtils.millis() & 0xFFFFFL) * 0x1p-9f;
 
-        final float change = Math.min(Math.max(TimeUtils.timeSinceMillis(lastMove) * (0.005f), 0f), 1f);
+        final float change = Math.min(Math.max(TimeUtils.timeSinceMillis(lastMove) * (0.003f), 0f), 1f);
 
         int rainbow = /* toRGBA8888 */(
                 limitToGamut(100,
                         (int) (TrigTools.sinTurns(modifiedTime * 0.2f) * 40f) + 128, (int) (TrigTools.cosTurns(modifiedTime * 0.2f) * 40f) + 128, 255));
         for (int y = 0; y < DUNGEON_HEIGHT; y++) {
             for (int x = 0; x < DUNGEON_WIDTH; x++) {
-                if (inView.contains(x, y) || justHidden.contains(x, y)) {
+                if (inView.contains(x, y)) {
                     if(toCursor.contains(Coord.get(x, y))){
                         gg.backgrounds[x][y] = rainbow;
                         gg.put(x, y, prunedDungeon[x][y], stoneText);
