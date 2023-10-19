@@ -327,14 +327,14 @@ public class DungeonDemo extends ApplicationAdapter {
             // assigns to blockage all cells that were NOT visible in the latest lightLevels calculation.
             blockage.refill(lighting.fovResult, 0f);
             // store current previously-in-view cells as justSeen, so they can be used to ease those cells into being seen.
-            justSeen.remake(inView);
+            justSeen.remake(justHidden);
             // blockage.not() flips its values so now it stores all cells that ARE visible in the latest lightLevels calc.
             inView.remake(blockage.not());
             // then, seen has all of those cells that have been visible (ever) included in with its cells.
             seen.or(inView);
             // this is roughly `justSeen = inView - justSeen;`, if subtraction worked on Regions.
             justSeen.notAnd(inView);
-            // this is roughly `justHidden = justHidden - blockage;`, where justHidden had included all previously visible
+            // this is roughly `justHidden = justHidden - inView;`, where justHidden had included all previously visible
             // cells, and now will have all currently visible cells removed from it. This leaves the just-hidden cells.
             justHidden.andNot(inView);
             // changes blockage so instead of all currently visible cells, it now stores the cells that would have been
@@ -446,41 +446,43 @@ public class DungeonDemo extends ApplicationAdapter {
                         (int) (TrigTools.sinTurns(modifiedTime * 0.2f) * 40f) + 128, (int) (TrigTools.cosTurns(modifiedTime * 0.2f) * 40f) + 128, 255));
         for (int y = 0; y < DUNGEON_HEIGHT; y++) {
             for (int x = 0; x < DUNGEON_WIDTH; x++) {
-                if(justHidden.contains(x, y) || justSeen.contains(x, y)){
-                    float ch = justSeen.contains(x, y) ? 1f - change : change;
+                boolean jh = justHidden.contains(x, y);
+                boolean js = justSeen.contains(x, y);
+                if(jh || js){
+                    float ch = js ? 1f - change : change;
+                    float[][] ll = js ? lighting.fovResult : previousLightLevels;
                     switch (prunedDungeon[x][y]) {
                         case '~':
-                            gg.backgrounds[x][y] = /* toRGBA8888 */lerpColors(darken(DEEP_OKLAB, 0.4f * Math.min(1.2f, Math.max(0, previousLightLevels[x][y] + waves.getConfiguredNoise(x, y, modifiedTime)))),
-                                    edit(DEEP_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f), ch);
+                            gg.backgrounds[x][y] = /* toRGBA8888 */lerpColors(darken(DEEP_OKLAB, 0.4f * Math.min(1.2f, Math.max(0, ll[x][y] + waves.getConfiguredNoise(x, y, modifiedTime)))),
+                                    js ? TRANSPARENT : edit(DEEP_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f), ch);
                             gg.put(x, y, prunedDungeon[x][y], deepText);
                             break;
                         case ',':
-                            gg.backgrounds[x][y] = /* toRGBA8888 */lerpColors(darken(SHALLOW_OKLAB, 0.4f * Math.min(1.2f, Math.max(0, previousLightLevels[x][y] + waves.getConfiguredNoise(x, y, modifiedTime)))),
-                                    edit(SHALLOW_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f), ch);
+                            gg.backgrounds[x][y] = /* toRGBA8888 */lerpColors(darken(SHALLOW_OKLAB, 0.4f * Math.min(1.2f, Math.max(0, ll[x][y] + waves.getConfiguredNoise(x, y, modifiedTime)))),
+                                    js ? TRANSPARENT : edit(SHALLOW_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f), ch);
                             gg.put(x, y, prunedDungeon[x][y], shallowText);
                             break;
                         case '₤':
-                            gg.backgrounds[x][y] = /* toRGBA8888 */lerpColors(lighten(LAVA_OKLAB, 0.5f * Math.min(1.5f, Math.max(0, previousLightLevels[x][y] + ridges.getConfiguredNoise(x, y, modifiedTime)))),
-                                    edit(LAVA_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f), ch);
+                            gg.backgrounds[x][y] = /* toRGBA8888 */lerpColors(lighten(LAVA_OKLAB, 0.5f * Math.min(1.5f, Math.max(0, ll[x][y] + ridges.getConfiguredNoise(x, y, modifiedTime)))),
+                                    js ? TRANSPARENT : edit(LAVA_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f), ch);
                             gg.put(x, y, prunedDungeon[x][y], lavaText);
                             break;
                         case '¢':
-                            gg.backgrounds[x][y] = /* toRGBA8888 */lerpColors(lighten(CHAR_OKLAB, 0.2f * Math.min(0.8f, Math.max(0, previousLightLevels[x][y] + ridges.getConfiguredNoise(x, y, modifiedTime)))),
-                                    edit(CHAR_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f), ch);
+                            gg.backgrounds[x][y] = /* toRGBA8888 */lerpColors(lighten(CHAR_OKLAB, 0.2f * Math.min(0.8f, Math.max(0, ll[x][y] + ridges.getConfiguredNoise(x, y, modifiedTime)))),
+                                    js ? TRANSPARENT : edit(CHAR_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f), ch);
                             gg.put(x, y, prunedDungeon[x][y], charText);
                             break;
                         case '"':
-//                            gg.backgrounds[x][y] = /* toRGBA8888 */(lighten(lerpColors(GRASS_OKLAB, DRY_OKLAB, MathTools.square(IntPointHash.hash256(x, y, 12345) * 0x1.8p-9f)), 0.5f * Math.min(1.5f, Math.max(0, previousLightLevels[x][y]))));
                             gg.backgrounds[x][y] = /* toRGBA8888 */lerpColors(lighten(lerpColors(GRASS_OKLAB, DRY_OKLAB, MathTools.square(IntPointHash.hash256(x, y, 12345) * 0x1.8p-9f)),
-                                            0.5f * Math.min(1.5f, Math.max(0, previousLightLevels[x][y]))),
-                                    edit(GRASS_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f), ch);
+                                            0.5f * Math.min(1.5f, Math.max(0, ll[x][y]))),
+                                    js ? TRANSPARENT : edit(GRASS_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f), ch);
                             gg.put(x, y, prunedDungeon[x][y], grassText);
                             break;
                         case ' ':
                             gg.backgrounds[x][y] = 0;
                             break;
                         default:
-                            gg.backgrounds[x][y] = lerpColors(BG_OKLAB, MEMORY_OKLAB, ch);
+                            gg.backgrounds[x][y] = lerpColors(BG_OKLAB, js ? TRANSPARENT : MEMORY_OKLAB, ch);
                             gg.put(x, y, prunedDungeon[x][y], stoneText);
                     }
                 } else if (inView.contains(x, y)) {
@@ -509,7 +511,6 @@ public class DungeonDemo extends ApplicationAdapter {
                             case '"':
                                 gg.backgrounds[x][y] = /* toRGBA8888 */(lighten(lerpColors(GRASS_OKLAB, DRY_OKLAB, MathTools.square(IntPointHash.hash256(x, y, 12345) * 0x1.8p-9f)),
                                         0.5f * Math.min(1.5f, Math.max(0, lighting.fovResult[x][y]))));
-// (darken(lerpColors(GRASS_OKLAB, DRY_OKLAB, waves.getConfiguredNoise(x, y) * 0.5f + 0.5f), 0.4f * Math.min(1.1f, Math.max(0, 1f - lighting.fovResult[x][y] + waves.getConfiguredNoise(x, y, modifiedTime * 0.7f)))));
                                 gg.put(x, y, prunedDungeon[x][y], grassText);
                                 break;
                             case ' ':
