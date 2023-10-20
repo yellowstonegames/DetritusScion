@@ -69,7 +69,6 @@ public class DungeonDemo extends ApplicationAdapter {
     private Runnable post;
     private LightingManager lighting;
     private float[][] previousLightLevels;
-    private int[][] previousColors;
     private long lastMove;
     private Font varWidthFont;
     private ObjectDeque<Container<TypingLabel>> messages = new ObjectDeque<>(30);
@@ -139,6 +138,20 @@ public class DungeonDemo extends ApplicationAdapter {
                 .setLineMetrics(0f, 0f, 0f, -0.3125f).setInlineImageMetrics(0f, 8f, 8f);
 //        Font font = new Font("Iosevka-Slab-standard.fnt", "Iosevka-Slab-standard.png", STANDARD, 0f, 0f, 0f, 0f, true)
 //            .scaleTo(15f, 24f).setTextureFilter().setName("Iosevka Slab");
+
+        // this section can be enabled during development, but only when the font files change.
+        // it prints the String that will be put in Text.USABLE_CHARS .
+/*
+        if(false) {
+            CharList cl = new CharList(256);
+            IntMap.Keys ks = font.mapping.keys();
+            while (ks.hasNext) {
+                cl.add((char) ks.next());
+            }
+            cl.sort();
+            System.out.println("USABLE_CHARS\n" + cl.toDenseString());
+        }
+ */
 //        ShaderProgram shader = new ShaderProgram(Gdx.files.internal("shaders/vertex.glsl"),
 //                Gdx.files.internal("shaders/colorblindness-cor.frag.glsl"));
 ////                Gdx.files.internal("shaders/colorblindness-sim.frag.glsl"));
@@ -365,16 +378,15 @@ public class DungeonDemo extends ApplicationAdapter {
         ArrayTools.insert(dungeon, prunedDungeon, 0, 0);
         lighting = new LightingManager(FOV.generateSimpleResistances(bare), BG_OKLAB, Radius.CIRCLE, 2.5f);
         previousLightLevels = ArrayTools.copy(lighting.fovResult);
-        previousColors = ArrayTools.fill(TRANSPARENT, DUNGEON_WIDTH, DUNGEON_HEIGHT);
         Region floors = new Region(bare, '.');
         Coord player = floors.singleRandom(rng);
         this.player.actor.setLocation(player);
         gg.addActor(this.player.actor);
         floors.remove(player);
         Coord[] selected = floors.separatedPoisson(RNG.rng, 4f, 1000);
-        for (int i = 0, ci = 0; i < selected.length; i++, ci++) {
+        for (int i = 0, ci = RNG.rng.nextInt(Text.USABLE_LETTERS.length()); i < selected.length; i++, ci++) {
             int color = RNG.rng.randomElement(FullPalette.COLOR_WHEEL_PALETTE_FLUSH);
-            Mob mob = new Mob(gg, selected[i], Text.USABLE_LETTERS.charAt(ci += RNG.rng.next(1)), toRGBA8888(darken(color, 0.1f)));
+            Mob mob = new Mob(gg, selected[i], Text.USABLE_LETTERS.charAt(ci = (ci + RNG.rng.next(1)) % Text.USABLE_LETTERS.length()), toRGBA8888(darken(color, 0.1f)));
             enemies.put(selected[i], mob);
             gg.addActor(mob.actor);
             lighting.addLight(selected[i], new Radiance(rng.nextFloat(3f) + 2f,
