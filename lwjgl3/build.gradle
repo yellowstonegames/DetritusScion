@@ -19,6 +19,8 @@ else {
   apply plugin: 'application'
 }
 
+import proguard.gradle.ProGuardTask
+
 apply plugin: "org.graalvm.buildtools.native"
 
 sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
@@ -62,7 +64,7 @@ jar {
   var buildDirectory = project.layout.buildDirectory.asFile.get().absolutePath
 
 // sets the name of the .jar file this produces to the name of the game or app.
-  archiveFileName.set(appName + ".jar")
+  archiveFileName.set("${appName}-${version}.jar")
 // using 'lib' instead of the default 'libs' appears to be needed by jpackageimage.
   destinationDirectory = file("$buildDirectory/lib")
 // the duplicatesStrategy matters starting in Gradle 7.0; this setting works.
@@ -83,6 +85,26 @@ jar {
     file(archiveFile).setExecutable(true, false)
   }
 }
+
+tasks.register('proguard', ProGuardTask) {
+  outputs.upToDateWhen { false }
+  configuration 'proguard-rules.pro'
+  //printmapping 'build/lib/out.map'
+  var buildDirectory = project.layout.buildDirectory.asFile.get().absolutePath
+
+  if (System.getProperty('java.version').startsWith('1.')) {
+    libraryjars "${System.getProperty('java.home')}/lib/rt.jar"
+  } else {
+    libraryjars "${System.getProperty('java.home')}/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+  }
+  injars(file("$buildDirectory/lib/${appName}-${version}.jar"))
+
+  outjars "$buildDirectory/lib/${appName}.jar"
+}
+
+proguard.dependsOn jar
+
+nativeCompile.dependsOn proguard
 
 if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_14)) {
   tasks.jpackageImage.doNotTrackState("This task reads and writes to the build folder.")

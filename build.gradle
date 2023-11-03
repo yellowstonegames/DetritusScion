@@ -9,8 +9,7 @@ buildscript {
     maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
   }
   dependencies {
-
-
+    classpath 'com.guardsquare:proguard-gradle:7.3.2'
   }
 }
 
