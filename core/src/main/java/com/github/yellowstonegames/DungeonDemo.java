@@ -193,7 +193,7 @@ public class DungeonDemo extends ApplicationAdapter {
         gg.addActor(player.actor);
         enemies = new CoordObjectOrderedMap<>(100);
         post = () -> {
-            int playerX = Math.round(player.actor.getX()), playerY = Math.round(player.actor.getY());
+//            int playerX = Math.round(player.actor.getX()), playerY = Math.round(player.actor.getY());
 //            justSeen.remake(seen);
 //            seen.or(inView.refill(lighting.fovResult, 0.001f, 2f));
 //            blockage.remake(seen).not();
