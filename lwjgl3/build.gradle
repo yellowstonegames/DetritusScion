@@ -8,8 +8,9 @@ buildscript {
 // your JAVA_HOME environment variable may also need to be a JDK with version 14 or higher.
     if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_14)) {
       classpath "org.beryx:badass-runtime-plugin:1.13.0"
-      classpath "org.graalvm.buildtools.native:org.graalvm.buildtools.native.gradle.plugin:0.9.27"
     }
+    if(enableGraalNative == "true")
+      classpath "org.graalvm.buildtools.native:org.graalvm.buildtools.native.gradle.plugin:0.9.28"
   }
 }
 if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_14)) {
@@ -21,7 +22,8 @@ else {
 
 import proguard.gradle.ProGuardTask
 
-apply plugin: "org.graalvm.buildtools.native"
+if(enableGraalNative == "true")
+  apply plugin: "org.graalvm.buildtools.native"
 
 sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
 mainClassName = 'com.github.yellowstonegames.lwjgl3.Lwjgl3Launcher'
@@ -33,9 +35,11 @@ dependencies {
   implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
   implementation project(':core')
 //  implementation "com.github.tommyettinger.gdx-graalhelper:gdx-svmhelper-backend-lwjgl3:$graalHelperVersion"
-  implementation "com.github.Berstanio.gdx-graalhelper:gdx-svmhelper-backend-lwjgl3:$graalHelperVersion"
+  if(enableGraalNative == "true")
+    implementation "com.github.Berstanio.gdx-graalhelper:gdx-svmhelper-backend-lwjgl3:$graalHelperVersion"
 }
 
+def jarName = "${appName}-${version}.jar"
 def os = System.properties['os.name'].toLowerCase()
 
 run {
@@ -47,15 +51,18 @@ run {
     jvmArgs += "-XstartOnFirstThread"
   }
 }
-graalvmNative {
-  binaries {
-    main {
-      imageName = "DetritusScion"
-      mainClass = mainClassName
-      requiredVersion = '23.0'
-      buildArgs.add("-march=compatibility")
-      jvmArgs.addAll("-Dfile.encoding=UTF8")
-      sharedLibrary = false
+
+if(enableGraalNative == "true") {
+  graalvmNative {
+    binaries {
+      main {
+        imageName = "DetritusScion"
+        mainClass = mainClassName
+        requiredVersion = '23.0'
+        buildArgs.add("-march=compatibility")
+        jvmArgs.addAll("-Dfile.encoding=UTF8")
+        sharedLibrary = false
+      }
     }
   }
 }
@@ -64,7 +71,7 @@ jar {
   var buildDirectory = project.layout.buildDirectory.asFile.get().absolutePath
 
 // sets the name of the .jar file this produces to the name of the game or app.
-  archiveFileName.set("${appName}-${version}.jar")
+  archiveFileName.set(jarName)
 // using 'lib' instead of the default 'libs' appears to be needed by jpackageimage.
   destinationDirectory = file("$buildDirectory/lib")
 // the duplicatesStrategy matters starting in Gradle 7.0; this setting works.
@@ -97,14 +104,15 @@ tasks.register('proguard', ProGuardTask) {
   } else {
     libraryjars "${System.getProperty('java.home')}/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
   }
-  injars(file("$buildDirectory/lib/${appName}-${version}.jar"))
+  injars(file("$buildDirectory/lib/${jarName}"))
 
   outjars "$buildDirectory/lib/${appName}.jar"
 }
 
 proguard.dependsOn jar
 
-nativeCompile.dependsOn proguard
+if(enableGraalNative == "true")
+  nativeCompile.dependsOn proguard
 
 if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_14)) {
   tasks.jpackageImage.doNotTrackState("This task reads and writes to the build folder.")
@@ -127,7 +135,7 @@ if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_14)) {
       skipInstaller = true
 // this may need to be set to a different path if your JAVA_HOME points to a low JDK version.
       jpackageHome = javaHome.getOrElse("")
-      mainJar = jar.archiveFileName.get()
+      mainJar = jarName
       if (os.contains('win')) {
         imageOptions = ["--icon", "../assets/images/icons/logo.ico"]
       } else if (os.contains('nix') || os.contains('nux') || os.contains('bsd')) {

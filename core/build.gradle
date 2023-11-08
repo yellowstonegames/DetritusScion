@@ -33,7 +33,11 @@ dependencies {
 //  testAnnotationProcessor 'systems.manifold:manifold-ext:2023.1.10'
 
 //  compileOnly "com.github.tommyettinger.gdx-graalhelper:gdx-svmhelper:$graalHelperVersion"
-  implementation "com.github.Berstanio.gdx-graalhelper:gdx-svmhelper:$graalHelperVersion"
+  if(enableGraalNative == "true")
+    implementation "com.github.Berstanio.gdx-graalhelper:gdx-svmhelper:$graalHelperVersion"
+  else
+    implementation "com.github.tommyettinger:gdx-graalhelper-shim:$graalHelperVersion"
+
   testImplementation "junit:junit:$junitVersion"
   testRuntimeOnly "org.junit.vintage:junit-vintage-engine:5.9.0"
 
