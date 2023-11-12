@@ -39,8 +39,6 @@ dependencies {
     implementation "com.github.tommyettinger:gdx-graalhelper-shim:$graalHelperVersion"
 
   testImplementation "junit:junit:$junitVersion"
-  testRuntimeOnly "org.junit.vintage:junit-vintage-engine:5.9.0"
-
 }
 
 //if (JavaVersion.current() != JavaVersion.VERSION_1_8 &&

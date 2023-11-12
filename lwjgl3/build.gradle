@@ -68,7 +68,7 @@ if(enableGraalNative == "true") {
 }
 
 jar {
-  var buildDirectory = project.layout.buildDirectory.asFile.get().absolutePath
+  def buildDirectory = project.layout.buildDirectory.asFile.get().absolutePath
 
 // sets the name of the .jar file this produces to the name of the game or app.
   archiveFileName.set(jarName)
