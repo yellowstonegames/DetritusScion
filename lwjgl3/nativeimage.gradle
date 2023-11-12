@@ -1,0 +1,28 @@
+project(":lwjgl3") {
+  apply plugin: "org.graalvm.buildtools.native"
+
+  dependencies {
+    implementation "io.github.berstanio:gdx-svmhelper-backend-lwjgl3:$graalHelperVersion"
+  }
+
+  graalvmNative {
+    binaries {
+      main {
+        imageName = appName
+        mainClass = project.mainClassName
+        requiredVersion = '23.0'
+        buildArgs.add("-march=compatibility")
+        jvmArgs.addAll("-Dfile.encoding=UTF8")
+        sharedLibrary = false
+      }
+    }
+  }
+
+  nativeCompile.dependsOn proguard
+}
+
+project(":core") {
+  dependencies {
+    implementation "io.github.berstanio:gdx-svmhelper:$graalHelperVersion"
+  }
+}

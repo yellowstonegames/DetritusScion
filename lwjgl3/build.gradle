@@ -9,8 +9,9 @@ buildscript {
     if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_14)) {
       classpath "org.beryx:badass-runtime-plugin:1.13.0"
     }
-    if(enableGraalNative == "true")
+    if(enableGraalNative == 'true') {
       classpath "org.graalvm.buildtools.native:org.graalvm.buildtools.native.gradle.plugin:0.9.28"
+    }
   }
 }
 if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_14)) {
@@ -22,9 +23,6 @@ else {
 
 import proguard.gradle.ProGuardTask
 
-if(enableGraalNative == "true")
-  apply plugin: "org.graalvm.buildtools.native"
-
 sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
 mainClassName = 'com.github.yellowstonegames.lwjgl3.Lwjgl3Launcher'
 eclipse.project.name = appName + '-lwjgl3'
@@ -35,8 +33,6 @@ dependencies {
   implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
   implementation project(':core')
 //  implementation "com.github.tommyettinger.gdx-graalhelper:gdx-svmhelper-backend-lwjgl3:$graalHelperVersion"
-  if(enableGraalNative == "true")
-    implementation "com.github.Berstanio.gdx-graalhelper:gdx-svmhelper-backend-lwjgl3:$graalHelperVersion"
 }
 
 def jarName = "${appName}-${version}.jar"
@@ -49,21 +45,6 @@ run {
   if (os.contains('mac')) {
     // Required to run LWJGL3 Java apps on MacOS
     jvmArgs += "-XstartOnFirstThread"
-  }
-}
-
-if(enableGraalNative == "true") {
-  graalvmNative {
-    binaries {
-      main {
-        imageName = "DetritusScion"
-        mainClass = mainClassName
-        requiredVersion = '23.0'
-        buildArgs.add("-march=compatibility")
-        jvmArgs.addAll("-Dfile.encoding=UTF8")
-        sharedLibrary = false
-      }
-    }
   }
 }
 
@@ -111,9 +92,6 @@ tasks.register('proguard', ProGuardTask) {
 
 proguard.dependsOn jar
 
-if(enableGraalNative == "true")
-  nativeCompile.dependsOn proguard
-
 if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_14)) {
   tasks.jpackageImage.doNotTrackState("This task reads and writes to the build folder.")
   runtime {
@@ -150,4 +128,8 @@ if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_14)) {
 // Equivalent to the jar task; here for compatibility with gdx-setup.
 tasks.register('dist') {
   dependsOn['jar']
+}
+
+if(enableGraalNative == 'true') {
+  apply from: file("nativeimage.gradle")
 }
