@@ -1,6 +1,6 @@
 package com.github.yellowstonegames.files;
 
-import com.anyicomplex.gdx.svm.CollectForGDXJsonSerialization;
+import com.anyicomplex.gdx.svm.ann.CollectForGDXJsonSerialization;
 
 /**
  * Debug configuration, not all need to appear in in-game settings.

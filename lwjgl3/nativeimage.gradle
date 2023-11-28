@@ -18,11 +18,14 @@ project(":lwjgl3") {
     }
   }
 
+  run {
+    doNotTrackState("Running the app should not be affected by Graal.")
+  }
   nativeCompile.dependsOn proguard
 }
 
 project(":core") {
   dependencies {
-    implementation "io.github.berstanio:gdx-svmhelper:$graalHelperVersion"
+    implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
   }
 }
