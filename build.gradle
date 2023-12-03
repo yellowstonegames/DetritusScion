@@ -21,10 +21,26 @@ allprojects {
 configure(subprojects) {
   apply plugin: 'java-library'
   sourceCompatibility = 17
+  [compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
   compileJava {
     options.incremental = true
   }
-  [compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
+  // From https://lyze.dev/2021/04/29/libGDX-Internal-Assets-List/ ; thanks, Lyze!
+  compileJava.doLast {
+    // projectfolder/assets
+    def assetsFolder = new File("${project.rootDir}/assets/")
+    // projectfolder/assets/assets.txt
+    def assetsFile = new File(assetsFolder, "assets.txt")
+    // delete that file in case we've already created it
+    assetsFile.delete()
+
+    // iterate through all files inside that folder
+    // convert it to a relative path
+    // and append it to the file assets.txt
+    fileTree(assetsFolder).collect { assetsFolder.relativePath(it) }.each {
+      assetsFile.append(it + "\n")
+    }
+  }
 }
 
 subprojects {

@@ -1,0 +1,9 @@
+{
+  "resources":{
+  "includes":[
+    {
+      "pattern": "()\\Qassets.txt\\E|\\Qfonts/Gentium-License.txt\\E|\\Qfonts/GentiumUnItalic-standard.fnt\\E|\\Qfonts/GentiumUnItalic-standard.png\\E|\\Qfonts/Iosevka-License.md\\E|\\Qfonts/Iosevka-Slab-standard.fnt\\E|\\Qfonts/Iosevka-Slab-standard.png\\E|\\Qimages/icons/logo.icns\\E|\\Qimages/icons/logo.ico\\E|\\Qimages/icons/logo.png\\E|\\Qimages/icons/logo128.png\\E|\\Qimages/icons/logo16.png\\E|\\Qimages/icons/logo256.png\\E|\\Qimages/icons/logo32.png\\E|\\Qimages/icons/logo512.png\\E|\\Qimages/icons/logo64.png\\E|\\Qmusic/.gitkeep\\E|\\QSettings/audio.json\\E|\\QSettings/debug.json\\E|\\QSettings/display.json\\E|\\QSettings/settings.json\\E|\\Qsfx/.gitkeep\\E|\\Qsfx/footstep00.ogg\\E|\\Qsfx/footstep01.ogg\\E|\\Qsfx/footstep02.ogg\\E|\\Qsfx/footstep03.ogg\\E|\\Qsfx/footstep04.ogg\\E|\\Qsfx/footstep05.ogg\\E|\\Qsfx/footstep06.ogg\\E|\\Qsfx/footstep07.ogg\\E|\\Qsfx/footstep08.ogg\\E|\\Qsfx/footstep09.ogg\\E|\\Qshaders/colorblindness-cor.frag.glsl\\E|\\Qshaders/colorblindness-sim.frag.glsl\\E|\\Qshaders/vertex.glsl\\E|libgdx.+.\\.png"
+    }
+  ]},
+  "bundles":[]
+}
