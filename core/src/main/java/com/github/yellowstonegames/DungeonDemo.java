@@ -70,6 +70,7 @@ public class DungeonDemo extends ApplicationAdapter {
     private Coord cursor = Coord.get(-1, -1);
     private final Vector2 pos = new Vector2();
     private Runnable post;
+    private VisionFramework vision = new VisionFramework();
     private LightingManager lighting;
     private float[][] previousLightLevels;
     private long lastMove;
@@ -218,13 +219,13 @@ public class DungeonDemo extends ApplicationAdapter {
         dungeonProcessor.addLake(20, '₤', '¢');
         waves.setFractalType(Noise.RIDGED_MULTI);
         ridges.setFractalType(Noise.RIDGED_MULTI);
-        seen = new Region(DUNGEON_WIDTH, DUNGEON_HEIGHT);
-        blockage = new Region(DUNGEON_WIDTH, DUNGEON_HEIGHT);
-        justSeen = justSeen == null ? seen.copy() : justSeen.remake(seen);
-        justHidden = justHidden == null ? new Region(DUNGEON_WIDTH, DUNGEON_HEIGHT) : justHidden.resizeAndEmpty(DUNGEON_WIDTH, DUNGEON_HEIGHT);
-        newlyVisible = newlyVisible == null ? seen.copy() : newlyVisible.remake(seen);
-        prunedDungeon = new char[DUNGEON_WIDTH][DUNGEON_HEIGHT];
-        inView = new Region(DUNGEON_WIDTH, DUNGEON_HEIGHT);
+//        seen = new Region(DUNGEON_WIDTH, DUNGEON_HEIGHT);
+//        blockage = new Region(DUNGEON_WIDTH, DUNGEON_HEIGHT);
+//        justSeen = justSeen == null ? seen.copy() : justSeen.remake(seen);
+//        justHidden = justHidden == null ? new Region(DUNGEON_WIDTH, DUNGEON_HEIGHT) : justHidden.resizeAndEmpty(DUNGEON_WIDTH, DUNGEON_HEIGHT);
+//        newlyVisible = newlyVisible == null ? seen.copy() : newlyVisible.remake(seen);
+//        prunedDungeon = new char[DUNGEON_WIDTH][DUNGEON_HEIGHT];
+//        inView = new Region(DUNGEON_WIDTH, DUNGEON_HEIGHT);
         input.setInputProcessor(new InputAdapter(){
             @Override
             public boolean keyDown(int keycode) {
@@ -337,30 +338,32 @@ public class DungeonDemo extends ApplicationAdapter {
                 message(killMessages.next(), dead.getName());
             }
             lighting.moveLight(old, next);
-
-            ArrayTools.set(lighting.fovResult, previousLightLevels);
-            justHidden.refill(previousLightLevels, 0f).not();
-            lighting.calculateFOV(next.x, next.y, next.x - 10, next.y - 10, next.x + 11, next.y + 11);
-            // assigns to blockage all cells that were NOT visible in the latest lightLevels calculation.
-            blockage.refill(lighting.fovResult, 0f);
-            // store current previously-in-view cells as justSeen, so they can be used to ease those cells into being seen.
-            justSeen.remake(justHidden);
-            // blockage.not() flips its values so now it stores all cells that ARE visible in the latest lightLevels calc.
-            inView.remake(blockage.not());
-            // stores cells that are currently visible but had never been seen at all (transparent) in earlier frames.
-            newlyVisible.remake(inView).andNot(seen);
-            // then, seen has all of those cells that have been visible (ever) included in with its cells.
-            seen.or(inView);
-            // this is roughly `justSeen = inView - justSeen;`, if subtraction worked on Regions.
-            justSeen.notAnd(inView);
-            // this is roughly `justHidden = justHidden - inView;`, where justHidden had included all previously visible
-            // cells, and now will have all currently visible cells removed from it. This leaves the just-hidden cells.
-            justHidden.andNot(inView);
-            // changes blockage so instead of all currently visible cells, it now stores the cells that would have been
-            // adjacent to those cells.
-            blockage.fringe8way();
-            LineTools.pruneLines(dungeon, seen, prunedDungeon);
-            gg.setVisibilities(inView::contains);
+            vision.moveViewer(old, next);
+            vision.finishChanges();
+//
+//            ArrayTools.set(lighting.fovResult, previousLightLevels);
+//            justHidden.refill(previousLightLevels, 0f).not();
+//            lighting.calculateFOV(next.x, next.y, next.x - 10, next.y - 10, next.x + 11, next.y + 11);
+//            // assigns to blockage all cells that were NOT visible in the latest lightLevels calculation.
+//            blockage.refill(lighting.fovResult, 0f);
+//            // store current previously-in-view cells as justSeen, so they can be used to ease those cells into being seen.
+//            justSeen.remake(justHidden);
+//            // blockage.not() flips its values so now it stores all cells that ARE visible in the latest lightLevels calc.
+//            inView.remake(blockage.not());
+//            // stores cells that are currently visible but had never been seen at all (transparent) in earlier frames.
+//            newlyVisible.remake(inView).andNot(seen);
+//            // then, seen has all of those cells that have been visible (ever) included in with its cells.
+//            seen.or(inView);
+//            // this is roughly `justSeen = inView - justSeen;`, if subtraction worked on Regions.
+//            justSeen.notAnd(inView);
+//            // this is roughly `justHidden = justHidden - inView;`, where justHidden had included all previously visible
+//            // cells, and now will have all currently visible cells removed from it. This leaves the just-hidden cells.
+//            justHidden.andNot(inView);
+//            // changes blockage so instead of all currently visible cells, it now stores the cells that would have been
+//            // adjacent to those cells.
+//            blockage.fringe8way();
+//            LineTools.pruneLines(dungeon, seen, prunedDungeon);
+            gg.setVisibilities(vision.inView::contains);
 
         } else {
             player.actor.addAction(MoreActions.bump(way, 0.3f));
@@ -375,14 +378,25 @@ public class DungeonDemo extends ApplicationAdapter {
             kids[c].clearActions();
         gg.getChildren().end();
         gg.clearChildren(true);
-        dungeonProcessor.setPlaceGrid(dungeon = LineTools.hashesToLines(dungeonProcessor.generate(), true));
+        dungeonProcessor.setPlaceGrid(dungeonProcessor.generate(), dungeonProcessor.getEnvironment());
         bare = dungeonProcessor.getBarePlaceGrid();
         EnhancedRandom rng = dungeonProcessor.rng;
         ArrayTools.insert(dungeon, prunedDungeon, 0, 0);
-        lighting = new LightingManager(FOV.generateSimpleResistances(bare), BG_OKLAB, Radius.CIRCLE, 2.5f);
-        previousLightLevels = ArrayTools.copy(lighting.fovResult);
         Region floors = new Region(bare, '.');
         Coord player = floors.singleRandom(rng);
+        vision.restart(bare, player, 2.5f, BG_OKLAB);
+        vision.lighting.backgroundColor = BG_OKLAB;
+        lighting = vision.lighting;
+        seen = vision.seen;
+        blockage = vision.blockage;
+        justSeen = vision.justSeen;
+        justHidden = vision.justHidden;
+        newlyVisible = vision.newlyVisible;
+        inView = vision.inView;
+        previousLightLevels = vision.previousLightLevels;
+        dungeon = vision.linePlaceMap;
+        prunedDungeon = vision.prunedPlaceMap;
+
         this.player.actor.setLocation(player);
         gg.addActor(this.player.actor);
         floors.remove(player);
@@ -457,7 +471,8 @@ public class DungeonDemo extends ApplicationAdapter {
     public void recolor(){
         float modifiedTime = (TimeUtils.millis() & 0xFFFFFL) * 0x1p-9f;
 
-        final float change = Math.min(Math.max(TimeUtils.timeSinceMillis(lastMove) * (0.003f), 0f), 1f);
+        float sinceLast = TimeUtils.timeSinceMillis(lastMove);
+        final float change = Math.min(Math.max(sinceLast * (0.003f), 0f), 1f);
 
         int rainbow = /* toRGBA8888 */(
                 limitToGamut(100,
@@ -501,8 +516,8 @@ public class DungeonDemo extends ApplicationAdapter {
                             gg.backgrounds[x][y] = 0;
                             break;
                         default:
-                            gg.backgrounds[x][y] = lerpColors(BG_OKLAB, nv ? TRANSPARENT : MEMORY_OKLAB, ch);
-                            gg.put(x, y, prunedDungeon[x][y], stoneText);
+                            gg.backgrounds[x][y] = vision.backgroundColors[x][y];
+                            gg.put(x, y, prunedDungeon[x][y], setAlpha(stoneText, alpha(vision.getForegroundColor(x, y, sinceLast))));
                     }
                 } else if (inView.contains(x, y)) {
                     if(toCursor.contains(Coord.get(x, y))){
@@ -537,8 +552,8 @@ public class DungeonDemo extends ApplicationAdapter {
                                 break;
                             default:
 //                                gg.backgrounds[x][y] = /* toRGBA8888 */(lighten(STONE_OKLAB, 0.6f * lighting.fovResult[x][y]));
-                                gg.backgrounds[x][y] = BG_OKLAB;
-                                gg.put(x, y, prunedDungeon[x][y], stoneText);
+                                gg.backgrounds[x][y] = vision.backgroundColors[x][y];
+                                gg.put(x, y, prunedDungeon[x][y], setAlpha(stoneText, alpha(vision.getForegroundColor(x, y, sinceLast))));
                         }
                     }
                 } else if (seen.contains(x, y)) {
@@ -567,8 +582,8 @@ public class DungeonDemo extends ApplicationAdapter {
                             gg.backgrounds[x][y] = 0;
                             break;
                         default:
-                            gg.backgrounds[x][y] = MEMORY_OKLAB;
-                            gg.put(x, y, prunedDungeon[x][y], stoneText);
+                            gg.backgrounds[x][y] = vision.backgroundColors[x][y];
+                            gg.put(x, y, prunedDungeon[x][y], setAlpha(stoneText, alpha(vision.getForegroundColor(x, y, sinceLast))));
                     }
                 } else {
                     gg.backgrounds[x][y] = 0;
@@ -625,7 +640,7 @@ public class DungeonDemo extends ApplicationAdapter {
             profiler.disable();
         }
 //        stage.getBatch().getShader().setUniformi("u_mode", 1);
-        lighting.update();
+        vision.update(TimeUtils.timeSinceMillis(lastMove));
         recolor();
         handleHeldKeys();
         for (int i = 0; i < enemies.size(); i++) {
