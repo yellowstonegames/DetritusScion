@@ -1,7 +1,11 @@
 fonts/Gentium-License.txt
+fonts/Gentium-Un-Italic-sdf.dat
+fonts/Gentium-Un-Italic-sdf.png
 fonts/GentiumUnItalic-standard.fnt
 fonts/GentiumUnItalic-standard.png
 fonts/Iosevka-License.md
+fonts/Iosevka-Slab-sdf.dat
+fonts/Iosevka-Slab-sdf.png
 fonts/Iosevka-Slab-standard.fnt
 fonts/Iosevka-Slab-standard.png
 images/icons/logo.icns

@@ -6,6 +6,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.profiling.GLProfiler;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -43,6 +45,7 @@ import com.github.yellowstonegames.util.Text;
 
 import static com.badlogic.gdx.Gdx.input;
 import static com.badlogic.gdx.Input.Keys.*;
+import static com.github.tommyettinger.textra.Font.DistanceFieldType.SDF;
 import static com.github.tommyettinger.textra.Font.DistanceFieldType.STANDARD;
 import static com.github.yellowstonegames.core.DescriptiveColor.*;
 
@@ -126,14 +129,14 @@ public class DungeonDemo extends ApplicationAdapter {
         // OK, this is a total mess.
         // Here, we sort-of duplicate KnownFonts.getIosevkaSlab(), but change the size, offsetY, and descent.
         // Having descent = 0 is normally incorrect, but seems to work well with GlyphGrid for some reason.
-        Font font = new Font(prefix + "Iosevka-Slab-standard.fnt",
-                prefix + "Iosevka-Slab-standard.png", STANDARD, 0f, 0f, 0f, 0f, true) // offsetY changed
-                .scaleTo(16, 28).fitCell(16, 28, false)
-                .setDescent(0f) // changed a lot
+        Font font = new Font(prefix + "Iosevka-Slab-sdf.dat",
+            new TextureRegion(new Texture(prefix + "Iosevka-Slab-sdf.png")), 0f, 0f, 0f, 0f, true, true) // offsetY changed
+                .scaleTo(16, 28).fitCell(28, 28, true)
+//                .setDescent(0f) // changed a lot
                 .setLineMetrics(0f, -0.125f, 0f, -0.25f).setTextureFilter().setName("Iosevka Slab");
 //        Font font = addGameIcons(KnownFonts.getIosevkaSlab(), "", "", -24, -24, 0);
 //        Font font = KnownFonts.addGameIcons(KnownFonts.getIosevkaSlab().scaleTo(16f, 28f).adjustLineHeight(1.25f));
-        varWidthFont = KnownFonts.getGentiumUnItalic().scaleTo(54f, 28f)
+        varWidthFont = KnownFonts.getGentiumUnItalic(SDF).scaleTo(54f, 28f)
                 .setTextureFilter().setFancyLinePosition(0, 0f).setDescent(-16f)
                 .setLineMetrics(0f, 0f, 0f, -0.3125f).setInlineImageMetrics(0f, 8f, 8f);
 //        Font font = new Font("Iosevka-Slab-standard.fnt", "Iosevka-Slab-standard.png", STANDARD, 0f, 0f, 0f, 0f, true)
@@ -238,7 +241,7 @@ public class DungeonDemo extends ApplicationAdapter {
                             config.debugConfig.debugActive = false;
                             config.debugConfig.showFPS = false;
                             Gdx.graphics.setVSync(true);
-                            Gdx.graphics.setForegroundFPS(0);
+                            Gdx.graphics.setForegroundFPS(300);
                         } else {
                             config.debugConfig.debugActive = true;
                             config.debugConfig.showFPS = true;
