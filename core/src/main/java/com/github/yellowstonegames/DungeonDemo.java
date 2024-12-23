@@ -493,7 +493,7 @@ public class DungeonDemo extends ApplicationAdapter {
 //                vision.backgroundColors[curr.x][curr.y] = rainbow;
 //        }
 
-//        float[][] lightLevels = vision.lighting.fovResult;
+        float[][] lightLevels = vision.lighting.fovResult;
 
         for (int x = 0; x < DUNGEON_WIDTH; x++) {
             for (int y = 0; y < DUNGEON_HEIGHT; y++) {
@@ -515,7 +515,7 @@ public class DungeonDemo extends ApplicationAdapter {
         Mob monster;
         for (int i = 0; i < DUNGEON_WIDTH; i++) {
             for (int j = 0; j < DUNGEON_HEIGHT; j++) {
-                if (vision.inView.contains(i, j) || vision.justHidden.contains(i, j)) {
+                if (lightLevels[i][j] > 0.01) {
                     if ((monster = enemies.get(Coord.get(i, j))) != null) {
                         monster.actor.getColor().set(toRGBA8888(vision.getForegroundColor(i, j, change)));
                     }
@@ -640,7 +640,7 @@ public class DungeonDemo extends ApplicationAdapter {
 //            }
 //        }
 //        vision.update(change);
-        lighting.draw(gg.backgrounds);
+//        lighting.draw(gg.backgrounds);
         for (int i = 0; i < toCursor.size(); i++) {
             Coord curr = toCursor.get(i);
             if(inView.contains(curr))
@@ -696,7 +696,7 @@ public class DungeonDemo extends ApplicationAdapter {
             Actor a = enemies.getAt(i).actor;
             a.setRotation((System.currentTimeMillis() & 0xFFFFFL) * 0.25f);
             Coord pos = enemies.keyAt(i);
-            a.getColor().set(DescriptiveColor.toRGBA8888(vision.getForegroundColor(pos, change)));
+//            a.getColor().set(DescriptiveColor.toRGBA8888(vision.getForegroundColor(pos, change)));
             if(inView.contains(pos))
                 gg.map.remove(pos);
         }
