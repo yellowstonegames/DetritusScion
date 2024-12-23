@@ -379,13 +379,13 @@ public class DungeonDemo extends ApplicationAdapter {
             kids[c].clearActions();
         gg.getChildren().end();
         gg.clearChildren(true);
-        dungeonProcessor.setPlaceGrid(dungeonProcessor.generate(), dungeonProcessor.getEnvironment());
+        dungeonProcessor.setPlaceGrid(dungeon = dungeonProcessor.generate(), dungeonProcessor.getEnvironment());
         bare = dungeonProcessor.getBarePlaceGrid();
         EnhancedRandom rng = dungeonProcessor.rng;
-        ArrayTools.insert(dungeon, prunedDungeon, 0, 0);
+//        ArrayTools.insert(dungeon, prunedDungeon, 0, 0);
         Region floors = new Region(bare, '.');
         Coord player = floors.singleRandom(rng);
-        vision.restart(bare, player, 2.5f, BG_OKLAB);
+        vision.restart(dungeon, player, 2.5f, BG_OKLAB);
         vision.lighting.backgroundColor = BG_OKLAB;
         lighting = vision.lighting;
         seen = vision.seen;
@@ -470,13 +470,38 @@ public class DungeonDemo extends ApplicationAdapter {
         root.pack();
     }
 
+    public int bgMix(char c, int x, int y, float modifiedTime, int lightColor) {
+        int base = 0;
+         switch (c) {
+             case '~':
+                 base = darken(DEEP_OKLAB, 0.4f * Math.min(1.2f, Math.max(0, waves.getConfiguredNoise(x, y, modifiedTime))));
+                 break;
+             case ',':
+                 base = darken(SHALLOW_OKLAB, 0.4f * Math.min(1.2f, Math.max(0, waves.getConfiguredNoise(x, y, modifiedTime))));
+                 break;
+             case '₤':
+                 base = lighten(LAVA_OKLAB, 0.5f * Math.min(1.5f, Math.max(0, ridges.getConfiguredNoise(x, y, modifiedTime))));
+                 break;
+             case '¢':
+                 base = lighten(CHAR_OKLAB, 0.2f * Math.min(0.8f, Math.max(0, ridges.getConfiguredNoise(x, y, modifiedTime))));
+                 break;
+             case '"':
+                 base = lighten(lerpColors(GRASS_OKLAB, DRY_OKLAB, MathTools.square(IntPointHash.hash256(x, y, 12345) * 0x1.8p-9f)), 0.75f);
+                 break;
+             case ' ':
+                 return 0;
+             default:
+                 return toRGBA8888(vision.backgroundColors[x][y]);
+         }
+         return toRGBA8888(oklab(lightness(base), channelA(base) + channelA(lightColor) - 0.5f, channelB(base) + channelB(lightColor) - 0.5f, alpha(lightColor)));
+    }
+
     public void recolor(){
         float time = (TimeUtils.millis() & 0xFFFFFL) * 0x1p-9f;
 //        float modifiedTime = (TimeUtils.millis() & 0xFFFFFL) * 0x1p-9f;
 
         float sinceLast = TimeUtils.timeSinceMillis(lastMove);
-        final float change = Math.min(Math.max(sinceLast, 0f), 1000f);
-        final float tinyChange = Math.max(0.003f * change, 1f);
+        final float change = Math.min(Math.max(sinceLast * 3f, 0f), 1000f);
 
         vision.update(change);
 //        final float sun = 1f - ((time * 0.1f) - (int)(time * 0.1f)),
@@ -500,13 +525,11 @@ public class DungeonDemo extends ApplicationAdapter {
                 char glyph = vision.prunedPlaceMap[x][y];
                 if (vision.seen.contains(x, y)) {
                     // cells that were seen more than one frame ago, and aren't visible now, appear as a gray memory.
-                    gg.backgrounds[x][y] = toRGBA8888(vision.backgroundColors[x][y]);
+                    gg.backgrounds[x][y] = bgMix(glyph, x, y, time, vision.backgroundColors[x][y]);
                     if(vision.inView.contains(x, y))
                         gg.put(x, y, glyph, toRGBA8888(vision.getForegroundColor(x, y, change)));
                     else
                         gg.put(x, y, glyph, MEMORY_RGBA);
-                    // visual debugging; show all cells that were just taken out of view
-//                    if(vision.justHidden.contains(x, y)) batch.draw(charMapping.getOrDefault('s', solid), x, y, 1f, 1f);
                 } else {
                     gg.backgrounds[x][y] = 0;
                 }
@@ -688,15 +711,12 @@ public class DungeonDemo extends ApplicationAdapter {
         } else {
             profiler.disable();
         }
-        float change = (float) Math.min(Math.max(TimeUtils.timeSinceMillis(lastMove) , 0.0), 1000.0);
-//        vision.update(change);
         recolor();
         handleHeldKeys();
         for (int i = 0; i < enemies.size(); i++) {
             Actor a = enemies.getAt(i).actor;
             a.setRotation((System.currentTimeMillis() & 0xFFFFFL) * 0.25f);
             Coord pos = enemies.keyAt(i);
-//            a.getColor().set(DescriptiveColor.toRGBA8888(vision.getForegroundColor(pos, change)));
             if(inView.contains(pos))
                 gg.map.remove(pos);
         }
