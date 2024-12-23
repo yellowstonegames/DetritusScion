@@ -147,7 +147,7 @@ public class Lwjgl3Launcher {
 
         appConfig.useVsync(config.displayConfig.vsync);
         if (!(config.debugConfig.debugActive && config.debugConfig.showFPS)) {
-            appConfig.setForegroundFPS(Lwjgl3ApplicationConfiguration.getDisplayMode().refreshRate);
+            appConfig.setForegroundFPS(Lwjgl3ApplicationConfiguration.getDisplayMode().refreshRate+1);
         }
 
         new Lwjgl3Application(dungeonDemo, appConfig) {

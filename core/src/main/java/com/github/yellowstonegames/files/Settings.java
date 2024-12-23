@@ -20,7 +20,7 @@ public class Settings {
 
     // public GameMode mode = GameMode.CRAWL; // TODO - figure out way to set up game mode choice after refactoring
 
-    public String seed = "bananas";
+    public String seed = "herd them kitties";
 
     public int worldWidth = 160;
     public int worldHeight = 160;
