@@ -100,6 +100,7 @@ public class DungeonDemo extends ApplicationAdapter {
     private static final int DRY_OKLAB = describeOklab("duller apricot sage");
     private static final int STONE_OKLAB = describeOklab("darkmost gray dullest bronze");
     private static final int MEMORY_OKLAB = describeOklab("darker gray black");
+    private static final int MEMORY_RGBA = describe("black silver");
     private static final int deepText = toRGBA8888(lighten(offsetLightness(DEEP_OKLAB), 0.2f));
     private static final int shallowText = toRGBA8888(lighten(offsetLightness(SHALLOW_OKLAB), 0.2f));
     private static final int lavaText = toRGBA8888(darken((LAVA_OKLAB), 0.3f));
@@ -470,143 +471,189 @@ public class DungeonDemo extends ApplicationAdapter {
     }
 
     public void recolor(){
-        float modifiedTime = (TimeUtils.millis() & 0xFFFFFL) * 0x1p-9f;
+        float time = (TimeUtils.millis() & 0xFFFFFL) * 0x1p-9f;
+//        float modifiedTime = (TimeUtils.millis() & 0xFFFFFL) * 0x1p-9f;
 
         float sinceLast = TimeUtils.timeSinceMillis(lastMove);
         final float change = Math.min(Math.max(sinceLast, 0f), 1000f);
         final float tinyChange = Math.max(0.003f * change, 1f);
-        int rainbow = /*toRGBA8888*/(
-                limitToGamut(100,
-                        (int) (TrigTools.sinTurns(modifiedTime * 0.2f) * 40f) + 128, (int) (TrigTools.cosTurns(modifiedTime * 0.2f) * 40f) + 128, 255));
-        for (int y = 0; y < DUNGEON_HEIGHT; y++) {
-            for (int x = 0; x < DUNGEON_WIDTH; x++) {
-                boolean jh = justHidden.contains(x, y);
-                boolean js = justSeen.contains(x, y);
-                boolean nv = newlyVisible.contains(x, y);
-                if(jh || js){
-                    float ch = js ? 1f - tinyChange : tinyChange;
-                    float[][] ll = js ? lighting.fovResult : previousLightLevels;
-                    switch (prunedDungeon[x][y]) {
-                        case '~':
-                            gg.backgrounds[x][y] = /* toRGBA8888 */lerpColors(darken(DEEP_OKLAB, 0.4f * Math.min(1.2f, Math.max(0, ll[x][y] + waves.getConfiguredNoise(x, y, modifiedTime)))),
-                                    nv ? TRANSPARENT : edit(DEEP_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f), ch);
-                            gg.put(x, y, prunedDungeon[x][y], deepText);
-                            break;
-                        case ',':
-                            gg.backgrounds[x][y] = /* toRGBA8888 */lerpColors(darken(SHALLOW_OKLAB, 0.4f * Math.min(1.2f, Math.max(0, ll[x][y] + waves.getConfiguredNoise(x, y, modifiedTime)))),
-                                    nv ? TRANSPARENT : edit(SHALLOW_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f), ch);
-                            gg.put(x, y, prunedDungeon[x][y], shallowText);
-                            break;
-                        case '₤':
-                            gg.backgrounds[x][y] = /* toRGBA8888 */lerpColors(lighten(LAVA_OKLAB, 0.5f * Math.min(1.5f, Math.max(0, ll[x][y] + ridges.getConfiguredNoise(x, y, modifiedTime)))),
-                                    nv ? TRANSPARENT : edit(LAVA_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f), ch);
-                            gg.put(x, y, prunedDungeon[x][y], lavaText);
-                            break;
-                        case '¢':
-                            gg.backgrounds[x][y] = /* toRGBA8888 */lerpColors(lighten(CHAR_OKLAB, 0.2f * Math.min(0.8f, Math.max(0, ll[x][y] + ridges.getConfiguredNoise(x, y, modifiedTime)))),
-                                    nv ? TRANSPARENT : edit(CHAR_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f), ch);
-                            gg.put(x, y, prunedDungeon[x][y], charText);
-                            break;
-                        case '"':
-                            gg.backgrounds[x][y] = /* toRGBA8888 */lerpColors(lighten(lerpColors(GRASS_OKLAB, DRY_OKLAB, MathTools.square(IntPointHash.hash256(x, y, 12345) * 0x1.8p-9f)),
-                                            0.5f * Math.min(1.5f, Math.max(0, ll[x][y]))),
-                                    nv ? TRANSPARENT : edit(GRASS_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f), ch);
-                            gg.put(x, y, prunedDungeon[x][y], grassText);
-                            break;
-                        case ' ':
-                            gg.backgrounds[x][y] = 0;
-                            break;
-                        default:
-                            gg.backgrounds[x][y] = vision.backgroundColors[x][y];
-                            gg.put(x, y, prunedDungeon[x][y], setAlpha(stoneText, alpha(vision.getForegroundColor(x, y, sinceLast))));
-                    }
-                } else if (inView.contains(x, y)) {
-                    if(toCursor.contains(Coord.get(x, y))){
-                        gg.backgrounds[x][y] = rainbow;
-                        gg.put(x, y, prunedDungeon[x][y], stoneText);
-                    }
-                    else {
-                        switch (prunedDungeon[x][y]) {
-                            case '~':
-                                gg.backgrounds[x][y] = /* toRGBA8888 */(darken(DEEP_OKLAB, 0.4f * Math.min(1.2f, Math.max(0, lighting.fovResult[x][y] + waves.getConfiguredNoise(x, y, modifiedTime)))));
-                                gg.put(x, y, prunedDungeon[x][y], deepText);
-                                break;
-                            case ',':
-                                gg.backgrounds[x][y] = /* toRGBA8888 */(darken(SHALLOW_OKLAB, 0.4f * Math.min(1.2f, Math.max(0, lighting.fovResult[x][y] + waves.getConfiguredNoise(x, y, modifiedTime)))));
-                                gg.put(x, y, prunedDungeon[x][y], shallowText);
-                                break;
-                            case '₤':
-                                gg.backgrounds[x][y] = /* toRGBA8888 */(lighten(LAVA_OKLAB, 0.5f * Math.min(1.5f, Math.max(0, lighting.fovResult[x][y] + ridges.getConfiguredNoise(x, y, modifiedTime)))));
-                                gg.put(x, y, prunedDungeon[x][y], lavaText);
-                                break;
-                            case '¢':
-                                gg.backgrounds[x][y] = /* toRGBA8888 */(lighten(CHAR_OKLAB, 0.2f * Math.min(0.8f, Math.max(0, lighting.fovResult[x][y] + ridges.getConfiguredNoise(x, y, modifiedTime)))));
-                                gg.put(x, y, prunedDungeon[x][y], charText);
-                                break;
-                            case '"':
-                                gg.backgrounds[x][y] = /* toRGBA8888 */(lighten(lerpColors(GRASS_OKLAB, DRY_OKLAB, MathTools.square(IntPointHash.hash256(x, y, 12345) * 0x1.8p-9f)),
-                                        0.5f * Math.min(1.5f, Math.max(0, lighting.fovResult[x][y]))));
-                                gg.put(x, y, prunedDungeon[x][y], grassText);
-                                break;
-                            case ' ':
-                                gg.backgrounds[x][y] = 0;
-                                break;
-                            default:
-//                                gg.backgrounds[x][y] = /* toRGBA8888 */(lighten(STONE_OKLAB, 0.6f * lighting.fovResult[x][y]));
-                                gg.backgrounds[x][y] = vision.backgroundColors[x][y];
-                                gg.put(x, y, prunedDungeon[x][y], setAlpha(stoneText, alpha(vision.getForegroundColor(x, y, sinceLast))));
-                        }
-                    }
-                } else if (seen.contains(x, y)) {
-                    switch (prunedDungeon[x][y]) {
-                        case '~':
-                            gg.backgrounds[x][y] = /* toRGBA8888 */(edit(DEEP_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
-                            gg.put(x, y, prunedDungeon[x][y], deepText);
-                            break;
-                        case ',':
-                            gg.backgrounds[x][y] = /* toRGBA8888 */(edit(SHALLOW_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
-                            gg.put(x, y, prunedDungeon[x][y], shallowText);
-                            break;
-                        case '₤':
-                            gg.backgrounds[x][y] = /* toRGBA8888 */(edit(LAVA_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
-                            gg.put(x, y, prunedDungeon[x][y], lavaText);
-                            break;
-                        case '¢':
-                            gg.backgrounds[x][y] = /* toRGBA8888 */(edit(CHAR_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
-                            gg.put(x, y, prunedDungeon[x][y], charText);
-                            break;
-                        case '"':
-                            gg.backgrounds[x][y] = /* toRGBA8888 */(edit(GRASS_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
-                            gg.put(x, y, prunedDungeon[x][y], grassText);
-                            break;
-                        case ' ':
-                            gg.backgrounds[x][y] = 0;
-                            break;
-                        default:
-                            gg.backgrounds[x][y] = vision.backgroundColors[x][y];
-                            gg.put(x, y, prunedDungeon[x][y], setAlpha(stoneText, alpha(vision.getForegroundColor(x, y, sinceLast))));
-                    }
+
+        vision.update(change);
+//        final float sun = 1f - ((time * 0.1f) - (int)(time * 0.1f)),
+//                blueYellow = TrigTools.sinTurns(sun),
+//                greenRed = TrigTools.cosTurns(sun);
+//        vision.rememberedOklabColor = DescriptiveColor.oklab(0.45f + blueYellow * 0.15f, blueYellow * 0.02f + 0.5f, greenRed * 0.03f + 0.51f, 1f);
+
+        int rainbow = toRGBA8888(DescriptiveColor.maximizeSaturation(160,
+            (int) (TrigTools.sinTurns(time * 0.5f) * 30f) + 128, (int) (TrigTools.cosTurns(time * 0.5f) * 30f) + 128, 255));
+
+//        for (int i = 0; i < toCursor.size(); i++) {
+//            Coord curr = toCursor.get(i);
+//            if (vision.inView.contains(curr))
+//                vision.backgroundColors[curr.x][curr.y] = rainbow;
+//        }
+
+//        float[][] lightLevels = vision.lighting.fovResult;
+
+        for (int x = 0; x < DUNGEON_WIDTH; x++) {
+            for (int y = 0; y < DUNGEON_HEIGHT; y++) {
+                char glyph = vision.prunedPlaceMap[x][y];
+                if (vision.seen.contains(x, y)) {
+                    // cells that were seen more than one frame ago, and aren't visible now, appear as a gray memory.
+                    gg.backgrounds[x][y] = toRGBA8888(vision.backgroundColors[x][y]);
+                    if(vision.inView.contains(x, y))
+                        gg.put(x, y, glyph, toRGBA8888(vision.getForegroundColor(x, y, change)));
+                    else
+                        gg.put(x, y, glyph, MEMORY_RGBA);
+                    // visual debugging; show all cells that were just taken out of view
+//                    if(vision.justHidden.contains(x, y)) batch.draw(charMapping.getOrDefault('s', solid), x, y, 1f, 1f);
                 } else {
                     gg.backgrounds[x][y] = 0;
                 }
             }
         }
-        vision.update(change);
-        lighting.drawOklab(gg.backgrounds);
+        Mob monster;
+        for (int i = 0; i < DUNGEON_WIDTH; i++) {
+            for (int j = 0; j < DUNGEON_HEIGHT; j++) {
+                if (vision.inView.contains(i, j) || vision.justHidden.contains(i, j)) {
+                    if ((monster = enemies.get(Coord.get(i, j))) != null) {
+                        monster.actor.getColor().set(toRGBA8888(vision.getForegroundColor(i, j, change)));
+                    }
+                }
+            }
+        }
 
+//        int rainbow = /*toRGBA8888*/(
+//                limitToGamut(100,
+//                        (int) (TrigTools.sinTurns(modifiedTime * 0.2f) * 40f) + 128, (int) (TrigTools.cosTurns(modifiedTime * 0.2f) * 40f) + 128, 255));
+//        for (int y = 0; y < DUNGEON_HEIGHT; y++) {
+//            for (int x = 0; x < DUNGEON_WIDTH; x++) {
+//                boolean jh = justHidden.contains(x, y);
+//                boolean js = justSeen.contains(x, y);
+//                boolean nv = newlyVisible.contains(x, y);
+//                if(jh || js){
+//                    float ch = js ? 1f - tinyChange : tinyChange;
+//                    float[][] ll = js ? lighting.fovResult : previousLightLevels;
+//                    switch (prunedDungeon[x][y]) {
+//                        case '~':
+//                            gg.backgrounds[x][y] = /* toRGBA8888 */lerpColors(darken(DEEP_OKLAB, 0.4f * Math.min(1.2f, Math.max(0, ll[x][y] + waves.getConfiguredNoise(x, y, modifiedTime)))),
+//                                    nv ? TRANSPARENT : edit(DEEP_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f), ch);
+//                            gg.put(x, y, prunedDungeon[x][y], deepText);
+//                            break;
+//                        case ',':
+//                            gg.backgrounds[x][y] = /* toRGBA8888 */lerpColors(darken(SHALLOW_OKLAB, 0.4f * Math.min(1.2f, Math.max(0, ll[x][y] + waves.getConfiguredNoise(x, y, modifiedTime)))),
+//                                    nv ? TRANSPARENT : edit(SHALLOW_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f), ch);
+//                            gg.put(x, y, prunedDungeon[x][y], shallowText);
+//                            break;
+//                        case '₤':
+//                            gg.backgrounds[x][y] = /* toRGBA8888 */lerpColors(lighten(LAVA_OKLAB, 0.5f * Math.min(1.5f, Math.max(0, ll[x][y] + ridges.getConfiguredNoise(x, y, modifiedTime)))),
+//                                    nv ? TRANSPARENT : edit(LAVA_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f), ch);
+//                            gg.put(x, y, prunedDungeon[x][y], lavaText);
+//                            break;
+//                        case '¢':
+//                            gg.backgrounds[x][y] = /* toRGBA8888 */lerpColors(lighten(CHAR_OKLAB, 0.2f * Math.min(0.8f, Math.max(0, ll[x][y] + ridges.getConfiguredNoise(x, y, modifiedTime)))),
+//                                    nv ? TRANSPARENT : edit(CHAR_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f), ch);
+//                            gg.put(x, y, prunedDungeon[x][y], charText);
+//                            break;
+//                        case '"':
+//                            gg.backgrounds[x][y] = /* toRGBA8888 */lerpColors(lighten(lerpColors(GRASS_OKLAB, DRY_OKLAB, MathTools.square(IntPointHash.hash256(x, y, 12345) * 0x1.8p-9f)),
+//                                            0.5f * Math.min(1.5f, Math.max(0, ll[x][y]))),
+//                                    nv ? TRANSPARENT : edit(GRASS_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f), ch);
+//                            gg.put(x, y, prunedDungeon[x][y], grassText);
+//                            break;
+//                        case ' ':
+//                            gg.backgrounds[x][y] = 0;
+//                            break;
+//                        default:
+//                            gg.backgrounds[x][y] = vision.backgroundColors[x][y];
+//                            gg.put(x, y, prunedDungeon[x][y], setAlpha(stoneText, alpha(vision.getForegroundColor(x, y, sinceLast))));
+//                    }
+//                } else if (inView.contains(x, y)) {
+//                    if(toCursor.contains(Coord.get(x, y))){
+//                        gg.backgrounds[x][y] = rainbow;
+//                        gg.put(x, y, prunedDungeon[x][y], stoneText);
+//                    }
+//                    else {
+//                        switch (prunedDungeon[x][y]) {
+//                            case '~':
+//                                gg.backgrounds[x][y] = /* toRGBA8888 */(darken(DEEP_OKLAB, 0.4f * Math.min(1.2f, Math.max(0, lighting.fovResult[x][y] + waves.getConfiguredNoise(x, y, modifiedTime)))));
+//                                gg.put(x, y, prunedDungeon[x][y], deepText);
+//                                break;
+//                            case ',':
+//                                gg.backgrounds[x][y] = /* toRGBA8888 */(darken(SHALLOW_OKLAB, 0.4f * Math.min(1.2f, Math.max(0, lighting.fovResult[x][y] + waves.getConfiguredNoise(x, y, modifiedTime)))));
+//                                gg.put(x, y, prunedDungeon[x][y], shallowText);
+//                                break;
+//                            case '₤':
+//                                gg.backgrounds[x][y] = /* toRGBA8888 */(lighten(LAVA_OKLAB, 0.5f * Math.min(1.5f, Math.max(0, lighting.fovResult[x][y] + ridges.getConfiguredNoise(x, y, modifiedTime)))));
+//                                gg.put(x, y, prunedDungeon[x][y], lavaText);
+//                                break;
+//                            case '¢':
+//                                gg.backgrounds[x][y] = /* toRGBA8888 */(lighten(CHAR_OKLAB, 0.2f * Math.min(0.8f, Math.max(0, lighting.fovResult[x][y] + ridges.getConfiguredNoise(x, y, modifiedTime)))));
+//                                gg.put(x, y, prunedDungeon[x][y], charText);
+//                                break;
+//                            case '"':
+//                                gg.backgrounds[x][y] = /* toRGBA8888 */(lighten(lerpColors(GRASS_OKLAB, DRY_OKLAB, MathTools.square(IntPointHash.hash256(x, y, 12345) * 0x1.8p-9f)),
+//                                        0.5f * Math.min(1.5f, Math.max(0, lighting.fovResult[x][y]))));
+//                                gg.put(x, y, prunedDungeon[x][y], grassText);
+//                                break;
+//                            case ' ':
+//                                gg.backgrounds[x][y] = 0;
+//                                break;
+//                            default:
+////                                gg.backgrounds[x][y] = /* toRGBA8888 */(lighten(STONE_OKLAB, 0.6f * lighting.fovResult[x][y]));
+//                                gg.backgrounds[x][y] = vision.backgroundColors[x][y];
+//                                gg.put(x, y, prunedDungeon[x][y], setAlpha(stoneText, alpha(vision.getForegroundColor(x, y, sinceLast))));
+//                        }
+//                    }
+//                } else if (seen.contains(x, y)) {
+//                    switch (prunedDungeon[x][y]) {
+//                        case '~':
+//                            gg.backgrounds[x][y] = /* toRGBA8888 */(edit(DEEP_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
+//                            gg.put(x, y, prunedDungeon[x][y], deepText);
+//                            break;
+//                        case ',':
+//                            gg.backgrounds[x][y] = /* toRGBA8888 */(edit(SHALLOW_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
+//                            gg.put(x, y, prunedDungeon[x][y], shallowText);
+//                            break;
+//                        case '₤':
+//                            gg.backgrounds[x][y] = /* toRGBA8888 */(edit(LAVA_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
+//                            gg.put(x, y, prunedDungeon[x][y], lavaText);
+//                            break;
+//                        case '¢':
+//                            gg.backgrounds[x][y] = /* toRGBA8888 */(edit(CHAR_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
+//                            gg.put(x, y, prunedDungeon[x][y], charText);
+//                            break;
+//                        case '"':
+//                            gg.backgrounds[x][y] = /* toRGBA8888 */(edit(GRASS_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
+//                            gg.put(x, y, prunedDungeon[x][y], grassText);
+//                            break;
+//                        case ' ':
+//                            gg.backgrounds[x][y] = 0;
+//                            break;
+//                        default:
+//                            gg.backgrounds[x][y] = vision.backgroundColors[x][y];
+//                            gg.put(x, y, prunedDungeon[x][y], setAlpha(stoneText, alpha(vision.getForegroundColor(x, y, sinceLast))));
+//                    }
+//                } else {
+//                    gg.backgrounds[x][y] = 0;
+//                }
+//            }
+//        }
+//        vision.update(change);
+        lighting.draw(gg.backgrounds);
         for (int i = 0; i < toCursor.size(); i++) {
             Coord curr = toCursor.get(i);
             if(inView.contains(curr))
                 gg.backgrounds[curr.x][curr.y] = rainbow;
         }
-
-        for (int y = 0; y < DUNGEON_HEIGHT; y++) {
-            for (int x = 0; x < DUNGEON_WIDTH; x++) {
-                int bg = gg.backgrounds[x][y];
-                if(bg != 0)
-                    gg.backgrounds[x][y] = toRGBA8888(bg);
-            }
-        }
+//
+//        for (int y = 0; y < DUNGEON_HEIGHT; y++) {
+//            for (int x = 0; x < DUNGEON_WIDTH; x++) {
+//                int bg = gg.backgrounds[x][y];
+//                if(bg != 0)
+//                    gg.backgrounds[x][y] = toRGBA8888(bg);
+//            }
+//        }
     }
 
     /**
