@@ -19,7 +19,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.github.tommyettinger.digital.ArrayTools;
 import com.github.tommyettinger.digital.Hasher;
 import com.github.tommyettinger.digital.MathTools;
 import com.github.tommyettinger.digital.TrigTools;
@@ -46,7 +45,6 @@ import com.github.yellowstonegames.util.Text;
 import static com.badlogic.gdx.Gdx.input;
 import static com.badlogic.gdx.Input.Keys.*;
 import static com.github.tommyettinger.textra.Font.DistanceFieldType.SDF;
-import static com.github.tommyettinger.textra.Font.DistanceFieldType.STANDARD;
 import static com.github.yellowstonegames.core.DescriptiveColor.*;
 
 /**
@@ -99,8 +97,8 @@ public class DungeonDemo extends ApplicationAdapter {
     private static final int GRASS_OKLAB = describeOklab("darker black moss green");
     private static final int DRY_OKLAB = describeOklab("duller apricot sage");
     private static final int STONE_OKLAB = describeOklab("darkmost gray dullest bronze");
-    private static final int MEMORY_OKLAB = describeOklab("darker gray black");
-    private static final int MEMORY_RGBA = describe("black silver");
+    private static final int MEMORY_BG = describe("darker gray black");
+    private static final int MEMORY_FG = describe("black silver");
     private static final int deepText = toRGBA8888(lighten(offsetLightness(DEEP_OKLAB), 0.2f));
     private static final int shallowText = toRGBA8888(lighten(offsetLightness(SHALLOW_OKLAB), 0.2f));
     private static final int lavaText = toRGBA8888(darken((LAVA_OKLAB), 0.3f));
@@ -471,29 +469,33 @@ public class DungeonDemo extends ApplicationAdapter {
     }
 
     public int bgMix(char c, int x, int y, float modifiedTime, int lightColor) {
+        if (!(vision.inView.contains(x, y) || vision.justHidden.contains(x, y))) return MEMORY_BG;
         int base = 0;
-         switch (c) {
-             case '~':
-                 base = darken(DEEP_OKLAB, 0.4f * Math.min(1.2f, Math.max(0, waves.getConfiguredNoise(x, y, modifiedTime))));
-                 break;
-             case ',':
-                 base = darken(SHALLOW_OKLAB, 0.4f * Math.min(1.2f, Math.max(0, waves.getConfiguredNoise(x, y, modifiedTime))));
-                 break;
-             case '₤':
-                 base = lighten(LAVA_OKLAB, 0.5f * Math.min(1.5f, Math.max(0, ridges.getConfiguredNoise(x, y, modifiedTime))));
-                 break;
-             case '¢':
-                 base = lighten(CHAR_OKLAB, 0.2f * Math.min(0.8f, Math.max(0, ridges.getConfiguredNoise(x, y, modifiedTime))));
-                 break;
-             case '"':
-                 base = lighten(lerpColors(GRASS_OKLAB, DRY_OKLAB, MathTools.square(IntPointHash.hash256(x, y, 12345) * 0x1.8p-9f)), 0.75f);
-                 break;
-             case ' ':
-                 return 0;
-             default:
-                 return toRGBA8888(vision.backgroundColors[x][y]);
-         }
-         return toRGBA8888(oklab(lightness(base), channelA(base) + channelA(lightColor) - 0.5f, channelB(base) + channelB(lightColor) - 0.5f, alpha(lightColor)));
+        switch (c) {
+            case '~':
+                base = darken(DEEP_OKLAB, -0.1f + 0.25f * Math.min(0.7f, Math.max(0.2f, waves.getConfiguredNoise(x, y, modifiedTime))));
+                break;
+            case ',':
+                base = darken(SHALLOW_OKLAB, 0.25f * Math.min(0.7f, Math.max(0.2f, waves.getConfiguredNoise(x, y, modifiedTime))));
+                break;
+            case '₤':
+                base = lighten(LAVA_OKLAB, 0.5f * Math.min(1.5f, Math.max(0, ridges.getConfiguredNoise(x, y, modifiedTime))));
+                break;
+            case '¢':
+                base = lighten(CHAR_OKLAB, 0.3f * Math.min(0.5f, Math.max(0.1f, ridges.getConfiguredNoise(x, y, modifiedTime))));
+                break;
+            case ':':
+                base = lerpColors(CHAR_OKLAB, SILVER, 0.6f);
+                break;
+            case '"':
+                base = lerpColors(GRASS_OKLAB, DRY_OKLAB, MathTools.square(IntPointHash.hash256(x, y, 12345) * 0x1.8p-9f));
+                break;
+            case ' ':
+                return 0;
+            default:
+                return toRGBA8888(vision.backgroundColors[x][y]);
+        }
+        return toRGBA8888(oklab(lightness(base), channelA(base) + channelA(lightColor) - 0.5f, channelB(base) + channelB(lightColor) - 0.5f, alpha(lightColor)));
     }
 
     public void recolor(){
@@ -529,7 +531,7 @@ public class DungeonDemo extends ApplicationAdapter {
                     if(vision.inView.contains(x, y))
                         gg.put(x, y, glyph, toRGBA8888(vision.getForegroundColor(x, y, change)));
                     else
-                        gg.put(x, y, glyph, MEMORY_RGBA);
+                        gg.put(x, y, glyph, MEMORY_FG);
                 } else {
                     gg.backgrounds[x][y] = 0;
                 }
