@@ -410,10 +410,11 @@ public class DungeonDemo extends ApplicationAdapter {
                     DescriptiveColor.edit(color, 0.75f, 0f, 0f, 0f, 0f, 1.5f, 1.5f, 1f), 0.5f, 0f));
         }
         lighting.addLight(player, new Radiance(5f, FullPalette.COSMIC_LATTE, 0.3f, 0f));
-        lighting.calculateFOV(player.x, player.y, player.x - 10, player.y - 10, player.x + 11, player.y + 11);
-        seen.remake(inView.refill(lighting.fovResult, 0.001f, 2f));
-        blockage.remake(seen).not().fringe8way();
-        LineTools.pruneLines(dungeon, seen, prunedDungeon);
+//        lighting.calculateFOV(player.x, player.y, player.x - 10, player.y - 10, player.x + 11, player.y + 11);
+//        seen.remake(inView.refill(lighting.fovResult, 0.001f, 2f));
+//        blockage.remake(seen).not().fringe8way();
+//        LineTools.pruneLines(dungeon, seen, prunedDungeon);
+        vision.finishChanges();
         gg.setVisibilities(inView::contains);
 //        gg.backgrounds = new int[config.displayConfig.mapSize.gridWidth][config.displayConfig.mapSize.gridHeight];
 //        ArrayTools.fill(gg.backgrounds, 0);
@@ -639,13 +640,15 @@ public class DungeonDemo extends ApplicationAdapter {
         } else {
             profiler.disable();
         }
-//        stage.getBatch().getShader().setUniformi("u_mode", 1);
-        vision.update(TimeUtils.timeSinceMillis(lastMove));
+        float change = (float) Math.min(Math.max(TimeUtils.timeSinceMillis(lastMove) , 0.0), 1000.0);
+        vision.update(change);
         recolor();
         handleHeldKeys();
         for (int i = 0; i < enemies.size(); i++) {
-            enemies.getAt(i).actor.setRotation((System.currentTimeMillis() & 0xFFFFFL) * 0.25f);
+            Actor a = enemies.getAt(i).actor;
+            a.setRotation((System.currentTimeMillis() & 0xFFFFFL) * 0.25f);
             Coord pos = enemies.keyAt(i);
+            a.getColor().set(DescriptiveColor.toRGBA8888(vision.getForegroundColor(pos, change)));
             if(inView.contains(pos))
                 gg.map.remove(pos);
         }
