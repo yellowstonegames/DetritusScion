@@ -470,9 +470,9 @@ public class DungeonDemo extends ApplicationAdapter {
         root.pack();
     }
 
-    public int bgMix(char c, int x, int y, float modifiedTime, int lightColor) {
+    public int bgMix(char c, int x, int y, float modifiedTime, float change, int lightColor) {
         if (!(vision.inView.contains(x, y) || vision.justHidden.contains(x, y))) return MEMORY_BG;
-        int base = 0;
+        int base;
         switch (c) {
             case '~':
                 base = darken(DEEP_OKLAB, -0.1f + 0.25f * Math.min(0.7f, Math.max(0.2f, waves.getConfiguredNoise(x, y, modifiedTime))));
@@ -493,10 +493,59 @@ public class DungeonDemo extends ApplicationAdapter {
                 base = lerpColors(GRASS_OKLAB, DRY_OKLAB, MathTools.square(IntPointHash.hash256(x, y, 12345) * 0x1.8p-9f));
                 break;
             case ' ':
-                return 0;
+                base = TRANSPARENT;
+                break;
             default:
-                return toRGBA8888(vision.backgroundColors[x][y]);
+                base = lightColor;
+                break;
         }
+        if(vision.justHidden.contains(x, y))
+            return lerpColors(toRGBA8888(base), MEMORY_BG, change * 1E-3f);
+        if(vision.newlyVisible.contains(x, y)) {
+            int rgbaBase = toRGBA8888(base);
+            return lerpColors(rgbaBase & -256, rgbaBase, change * 1E-3f);
+        }
+        if(vision.justSeen.contains(x, y))
+            return lerpColors(MEMORY_BG, toRGBA8888(base), change * 1E-3f);
+        return toRGBA8888(oklab(lightness(base), channelA(base) + channelA(lightColor) - 0.5f, channelB(base) + channelB(lightColor) - 0.5f, alpha(lightColor)));
+    }
+
+
+    public int fgMix(char c, int x, int y, int lightColor) {
+        if (!(vision.inView.contains(x, y) || vision.justHidden.contains(x, y))) return MEMORY_FG;
+        int base;
+        boolean early = false;
+        switch (c) {
+            case '~':
+                base = offsetLightness(DEEP_OKLAB);
+                break;
+            case ',':
+                base = offsetLightness(SHALLOW_OKLAB);
+                break;
+            case '₤':
+                base = offsetLightness(LAVA_OKLAB);
+                break;
+            case '¢':
+                base = offsetLightness(CHAR_OKLAB);
+                break;
+            case ':':
+                base = offsetLightness(SILVER);
+                break;
+            case '"':
+                base = offsetLightness(GRASS_OKLAB);
+                break;
+            case ' ':
+                base = TRANSPARENT;
+                early = true;
+                break;
+            default:
+                base = WHITE;
+                early = true;
+                break;
+        }
+        if(vision.justHidden.contains(x, y))
+            return lerpColors(MEMORY_FG, toRGBA8888(base), alpha(lightColor));
+        if(early) return toRGBA8888(base);
         return toRGBA8888(oklab(lightness(base), channelA(base) + channelA(lightColor) - 0.5f, channelB(base) + channelB(lightColor) - 0.5f, alpha(lightColor)));
     }
 
@@ -516,13 +565,10 @@ public class DungeonDemo extends ApplicationAdapter {
         for (int x = 0; x < DUNGEON_WIDTH; x++) {
             for (int y = 0; y < DUNGEON_HEIGHT; y++) {
                 char glyph = vision.prunedPlaceMap[x][y];
-                if (vision.seen.contains(x, y)) {
+                if (vision.seen.contains(x, y) || vision.justHidden.contains(x, y)) {
                     // cells that were seen more than one frame ago, and aren't visible now, appear as a gray memory.
-                    gg.backgrounds[x][y] = bgMix(glyph, x, y, time, vision.backgroundColors[x][y]);
-                    if(vision.inView.contains(x, y))
-                        gg.put(x, y, glyph, toRGBA8888(vision.getForegroundColor(x, y, change)));
-                    else
-                        gg.put(x, y, glyph, MEMORY_FG);
+                    gg.backgrounds[x][y] = bgMix(glyph, x, y, time, change, vision.backgroundColors[x][y]);
+                    gg.put(x, y, glyph, fgMix(glyph, x, y, vision.getForegroundColor(x, y, change)));
                 } else {
                     gg.backgrounds[x][y] = 0;
                 }
