@@ -473,9 +473,9 @@ public class DungeonDemo extends ApplicationAdapter {
         float modifiedTime = (TimeUtils.millis() & 0xFFFFFL) * 0x1p-9f;
 
         float sinceLast = TimeUtils.timeSinceMillis(lastMove);
-        final float change = Math.min(Math.max(sinceLast * (0.003f), 0f), 1f);
-
-        int rainbow = /* toRGBA8888 */(
+        final float change = Math.min(Math.max(sinceLast, 0f), 1000f);
+        final float tinyChange = Math.max(0.003f * change, 1f);
+        int rainbow = /*toRGBA8888*/(
                 limitToGamut(100,
                         (int) (TrigTools.sinTurns(modifiedTime * 0.2f) * 40f) + 128, (int) (TrigTools.cosTurns(modifiedTime * 0.2f) * 40f) + 128, 255));
         for (int y = 0; y < DUNGEON_HEIGHT; y++) {
@@ -484,7 +484,7 @@ public class DungeonDemo extends ApplicationAdapter {
                 boolean js = justSeen.contains(x, y);
                 boolean nv = newlyVisible.contains(x, y);
                 if(jh || js){
-                    float ch = js ? 1f - change : change;
+                    float ch = js ? 1f - tinyChange : tinyChange;
                     float[][] ll = js ? lighting.fovResult : previousLightLevels;
                     switch (prunedDungeon[x][y]) {
                         case '~':
@@ -591,6 +591,7 @@ public class DungeonDemo extends ApplicationAdapter {
                 }
             }
         }
+        vision.update(change);
         lighting.drawOklab(gg.backgrounds);
 
         for (int i = 0; i < toCursor.size(); i++) {
@@ -641,7 +642,7 @@ public class DungeonDemo extends ApplicationAdapter {
             profiler.disable();
         }
         float change = (float) Math.min(Math.max(TimeUtils.timeSinceMillis(lastMove) , 0.0), 1000.0);
-        vision.update(change);
+//        vision.update(change);
         recolor();
         handleHeldKeys();
         for (int i = 0; i < enemies.size(); i++) {
